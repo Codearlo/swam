@@ -1,0 +1,36 @@
+/* public/shared/styles/utilities.css */
+
+/* Aplicar el fondo morado oscuro a todo el cuerpo */
+body {
+    background-color: var(--color-purple-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-light);
+}
+
+/* Clase para aplicar el efecto Glassmorphism a cualquier elemento (Card, Modal, etc.) */
+.u-glass-effect {
+    background: var(--glass-background);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--glass-border);
+    border-radius: var(--spacing-md);
+    padding: var(--spacing-lg);
+}
+
+/* Clases de Flexbox básicas */
+.u-flex {
+    display: flex;
+}
+
+.u-flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.u-full-width {
+    width: 100%;
+}

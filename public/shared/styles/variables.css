@@ -1,0 +1,27 @@
+/* public/shared/styles/variables.css */
+
+:root {
+    /* Paleta de Colores Morados */
+    --color-purple-primary: #8a2be2; /* Azul Violeta: El morado principal de la marca */
+    --color-purple-dark: #6a1ba9;   /* Morado Oscuro para acentos o :hover */
+    --color-purple-light: #b48ddf;  /* Morado Claro para fondos suaves */
+    --color-purple-bg: #1e1526;     /* Fondo Oscuro base */
+
+    /* Colores Funcionales */
+    --color-text-light: #f3f4f6;
+    --color-text-dark: #374151;
+    --color-success: #10b981;
+    --color-error: #ef4444;
+
+    /* Propiedades de Glassmorphism (Efecto Cristal) */
+    --glass-blur: 10px;               /* Nivel de desenfoque del cristal */
+    --glass-background: rgba(255, 255, 255, 0.08); /* Fondo semitransparente para el cristal */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil del cristal */
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    
+    /* Espaciado y Fuentes */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --font-family-base: sans-serif;
+}
