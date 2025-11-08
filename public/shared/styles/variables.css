@@ -5,7 +5,7 @@
     --color-purple-primary: #8a2be2; /* Azul Violeta: El morado principal de la marca */
     --color-purple-dark: #6a1ba9;   /* Morado Oscuro para acentos o :hover */
     --color-purple-light: #b48ddf;  /* Morado Claro para fondos suaves */
-    --color-purple-bg: #1e1526;     /* Fondo Oscuro base */
+    --color-purple-bg: #000000;     /* Fondo Oscuro base: NEGRO PURO solicitado */
 
     /* Colores Funcionales */
     --color-text-light: #f3f4f6;
@@ -17,7 +17,7 @@
     --glass-blur: 10px;               /* Nivel de desenfoque del cristal */
     --glass-background: rgba(255, 255, 255, 0.08); /* Fondo semitransparente para el cristal */
     --glass-border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil del cristal */
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra más oscura para el negro puro */
     
     /* Espaciado y Fuentes */
     --spacing-sm: 8px;

@@ -1,0 +1,158 @@
+/* public/store/header/store-header.css */
+
+.store-header-container {
+    /* Contenedor del header que permite el efecto sticky */
+    position: sticky; 
+    top: var(--spacing-lg); /* DESPLAZAMIENTO: Se baja el header 24px del techo */
+    z-index: 100; /* Asegura que esté por encima del contenido principal */
+    width: 100%;
+    background-color: transparent; /* El fondo está ahora en el body */
+    padding: 0 var(--spacing-md); /* Reducimos el padding horizontal, el padding superior es el 'top' */
+    margin-bottom: var(--spacing-lg); /* Espacio después de que el header está fijo */
+}
+
+.store-header {
+    /* El u-glass-effect se aplica en el HTML */
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md); /* Espacio entre las dos filas del header */
+    margin: 0 auto;
+    max-width: 1200px; /* Ancho máximo para el header centrado */
+    /* Añadimos un poco de margen para que la tarjeta de cristal no toque los bordes */
+}
+
+/* Primera Fila (Logo, Buscador, Iconos) */
+.store-header__top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+}
+
+/* Logo */
+.store-header__logo-link {
+    flex-shrink: 0; /* Evita que el logo se encoja */
+}
+
+.store-header__logo {
+    height: 40px; /* Altura fija para el logo */
+    width: auto;
+}
+
+/* Buscador */
+.store-header__search-container {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    max-width: 500px;
+    background-color: var(--color-text-light);
+    border-radius: var(--spacing-sm);
+    overflow: hidden;
+}
+
+.store-header__search-input {
+    border: none;
+    outline: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    flex-grow: 1;
+    color: var(--color-text-dark);
+}
+
+.store-header__search-input::placeholder {
+    color: var(--color-text-dark);
+    opacity: 0.6;
+}
+
+.store-header__search-button {
+    background-color: var(--color-purple-primary);
+    color: var(--color-text-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 0 var(--spacing-sm) var(--spacing-sm) 0;
+    transition: background-color 0.2s ease;
+}
+
+.store-header__search-button:hover {
+    background-color: var(--color-purple-dark);
+}
+
+/* Iconos de Usuario y Carrito */
+.store-header__icons {
+    flex-shrink: 0;
+    gap: var(--spacing-md);
+}
+
+.store-header__icon-link {
+    color: var(--color-purple-light);
+    transition: color 0.2s ease, transform 0.1s ease;
+    padding: var(--spacing-sm);
+    border-radius: 50%;
+}
+
+.store-header__icon-link:hover {
+    color: var(--color-purple-primary);
+    transform: scale(1.05);
+}
+
+/* Segunda Fila (Navegación de Categorías) */
+.store-header__bottom-row {
+    /* Una línea separadora visual */
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.store-header__nav {
+    display: flex;
+    justify-content: center; /* CENTRADO DE NAVEGACIÓN SOLICITADO */
+    gap: var(--spacing-lg);
+    font-weight: 600;
+}
+
+.store-header__nav-link {
+    color: var(--color-purple-light);
+    padding: var(--spacing-sm) 0;
+    position: relative;
+}
+
+.store-header__nav-link:hover {
+    color: var(--color-purple-primary);
+}
+
+/* Indicador de "activo" opcional */
+.store-header__nav-link.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-purple-primary);
+    border-radius: 2px;
+}
+
+/* Media Query para pantallas más pequeñas (opcional, basado en el archivo de categorías) */
+@media (max-width: 768px) {
+    .store-header__top-row {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .store-header__search-container {
+        order: 3; /* Mueve la búsqueda abajo en el móvil */
+        width: 100%;
+        max-width: none;
+        margin-top: var(--spacing-md);
+    }
+
+    .store-header__icons {
+        order: 2;
+        margin-left: auto; /* Empuja los iconos a la derecha */
+    }
+
+    .store-header__logo-link {
+        order: 1;
+    }
+    
+    .store-header__nav {
+        justify-content: space-around;
+        gap: var(--spacing-sm);
+    }
+}
