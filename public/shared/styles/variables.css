@@ -1,23 +1,23 @@
 /* public/shared/styles/variables.css */
 
 :root {
-    /* Paleta de Colores Morados */
-    --color-purple-primary: #8a2be2; /* Azul Violeta: El morado principal de la marca */
-    --color-purple-dark: #6a1ba9;   /* Morado Oscuro para acentos o :hover */
-    --color-purple-light: #b48ddf;  /* Morado Claro para fondos suaves */
-    --color-purple-bg: #000000;     /* Fondo Oscuro base: NEGRO PURO solicitado */
+    /* Paleta de Colores Monocromático (Anteriormente Morados) */
+    --color-purple-primary: #f3f4f6; /* Blanco: Nuevo color de acento principal */
+    --color-purple-dark: #d1d5db;   /* Gris Claro: Color de acento para :hover */
+    --color-purple-light: #f3f4f6;  /* Blanco: Color de texto/enlace */
+    --color-purple-bg: #000000;     /* Fondo Oscuro base: NEGRO PURO */
 
     /* Colores Funcionales */
     --color-text-light: #f3f4f6;
-    --color-text-dark: #374151;
+    --color-text-dark: #374151; /* Gris oscuro para texto sobre fondos claros */
     --color-success: #10b981;
     --color-error: #ef4444;
 
-    /* Propiedades de Glassmorphism (Efecto Cristal) */
+    /* Propiedades de Glassmorphism (Efecto Cristal - Basado en Negro) */
     --glass-blur: 10px;               /* Nivel de desenfoque del cristal */
     --glass-background: rgba(0, 0, 0, 0.4); /* Fondo negro semitransparente (más oscuro) */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.1); /* Borde más sutil para el fondo oscuro */
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra más oscura para el negro puro */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1); /* Borde más sutil */
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); 
     
     /* Espaciado y Fuentes */
     --spacing-sm: 8px;

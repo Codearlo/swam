@@ -8,7 +8,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     margin-bottom: var(--spacing-md);
-    color: var(--color-purple-light);
+    color: var(--color-purple-light); /* Ahora es blanco */
 }
 
 h1 { font-size: 2.5rem; }
@@ -21,10 +21,10 @@ p {
 }
 
 a {
-    color: var(--color-purple-light);
+    color: var(--color-purple-light); /* Blanco */
     transition: color 0.2s ease;
 }
 
 a:hover {
-    color: var(--color-purple-primary);
+    color: var(--color-purple-dark); /* Gris claro para el hover */
 }

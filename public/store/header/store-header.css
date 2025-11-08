@@ -3,7 +3,7 @@
 .store-header-container {
     /* Contenedor del header que permite el efecto sticky */
     position: sticky; 
-    top: var(--spacing-lg); /* DESPLAZAMIENTO: Se baja el header 24px del techo */
+    top: 60px; /* MODIFICADO: Aumentamos el desplazamiento a 60px para un mayor centrado/flotación */
     z-index: 100; /* Asegura que esté por encima del contenido principal */
     width: 100%;
     background-color: transparent; /* El fondo está ahora en el body */
@@ -33,11 +33,19 @@
 /* Logo */
 .store-header__logo-link {
     flex-shrink: 0; /* Evita que el logo se encoja */
+    gap: var(--spacing-sm); /* Espacio entre el logo y el texto */
+    font-size: 1.5rem; /* Tamaño de fuente para el nombre de la marca */
+    font-weight: 700;
 }
 
 .store-header__logo {
     height: 40px; /* Altura fija para el logo */
     width: auto;
+}
+
+.store-header__brand-name {
+    color: var(--color-purple-light); /* Blanco */
+    letter-spacing: 1px;
 }
 
 /* Buscador */
@@ -63,15 +71,16 @@
 }
 
 .store-header__search-button {
-    background-color: var(--color-purple-primary);
-    color: var(--color-text-light);
+    background-color: var(--color-purple-primary); /* Blanco */
+    color: var(--color-text-dark); /* Texto oscuro para contraste */
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: 0 var(--spacing-sm) var(--spacing-sm) 0;
     transition: background-color 0.2s ease;
 }
 
 .store-header__search-button:hover {
-    background-color: var(--color-purple-dark);
+    background-color: var(--color-purple-dark); /* Gris claro */
+    color: var(--color-text-dark); /* Asegurar que el texto sigue siendo oscuro */
 }
 
 /* Iconos de Usuario y Carrito */
@@ -81,14 +90,14 @@
 }
 
 .store-header__icon-link {
-    color: var(--color-purple-light);
+    color: var(--color-purple-light); /* Blanco */
     transition: color 0.2s ease, transform 0.1s ease;
     padding: var(--spacing-sm);
     border-radius: 50%;
 }
 
 .store-header__icon-link:hover {
-    color: var(--color-purple-primary);
+    color: var(--color-purple-dark); /* Gris claro para el hover */
     transform: scale(1.05);
 }
 
@@ -107,13 +116,13 @@
 }
 
 .store-header__nav-link {
-    color: var(--color-purple-light);
+    color: var(--color-purple-light); /* Blanco */
     padding: var(--spacing-sm) 0;
     position: relative;
 }
 
 .store-header__nav-link:hover {
-    color: var(--color-purple-primary);
+    color: var(--color-purple-dark); /* Gris claro para el hover */
 }
 
 /* Indicador de "activo" opcional */
@@ -124,7 +133,7 @@
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: var(--color-purple-primary);
+    background-color: var(--color-purple-primary); /* Blanco */
     border-radius: 2px;
 }
 
