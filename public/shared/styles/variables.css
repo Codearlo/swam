@@ -15,8 +15,8 @@
 
     /* Propiedades de Glassmorphism (Efecto Cristal) */
     --glass-blur: 10px;               /* Nivel de desenfoque del cristal */
-    --glass-background: rgba(255, 255, 255, 0.08); /* Fondo semitransparente para el cristal */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil del cristal */
+    --glass-background: rgba(0, 0, 0, 0.4); /* Fondo negro semitransparente (más oscuro) */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1); /* Borde más sutil para el fondo oscuro */
     --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra más oscura para el negro puro */
     
     /* Espaciado y Fuentes */
