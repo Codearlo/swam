@@ -1,31 +1,20 @@
 /* public/shared/styles/utilities.css */
 
-/* Aplicar el fondo morado oscuro (ahora NEGRO PURO) a todo el cuerpo */
+/* Aplicar el fondo morado oscuro a todo el cuerpo */
 body {
     background-color: var(--color-purple-bg);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     color: var(--color-text-light);
-    position: relative; /* Necesario para posicionar el pseudo-elemento de luz */
-    z-index: 1; /* Asegura que el contenido esté por encima de la luz de fondo */
 }
 
-/* Luces Moradas en el Fondo (simulación de luces/brillo) */
-body::before {
-    content: '';
-    position: fixed; /* Fija la luz para que no se mueva al hacer scroll */
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px; /* Tamaño del brillo */
-    height: 600px;
-    background: radial-gradient(circle, var(--color-purple-primary) 0%, transparent 70%);
-    opacity: 0.15; /* Opacidad sutil */
-    z-index: -1; /* Mover detrás del contenido */
-    pointer-events: none; /* Ignorar eventos del ratón */
+/* El main es transparente para mostrar el fondo negro del body */
+main {
+    background-color: transparent;
+    width: 100%;
+    flex-grow: 1;
 }
-
 
 /* Clase para aplicar el efecto Glassmorphism a cualquier elemento (Card, Modal, etc.) */
 .u-glass-effect {
