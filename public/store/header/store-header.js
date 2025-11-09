@@ -29,16 +29,81 @@ document.addEventListener('DOMContentLoaded', () => {
             // Lógica adicional después de cargar el componente:
             if (url.includes('store-header.html')) {
                 setupProfileMenu();
+                // NUEVO: Ejecutar la lógica para actualizar el icono después de cargar el HTML
+                updateProfileIcon(); 
             }
         } catch (error) {
             console.error(`Error loading component from ${url}:`, error);
             targetElement.innerHTML = '<h1>Error al cargar el Header.</h1>';
         }
     }
+    
+    // NUEVA FUNCIÓN: Genera el avatar con la inicial del nombre.
+    function generateInitialAvatar(fullName) {
+        if (!fullName) return '';
+        
+        // Obtener la primera letra del primer nombre
+        const initial = fullName.trim().charAt(0).toUpperCase();
+        
+        // Estilo CSS para el avatar (similar a un círculo blanco sobre fondo oscuro)
+        return `
+            <span class="profile-initial-avatar">
+                ${initial}
+            </span>
+            <style>
+                .profile-initial-avatar {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background-color: var(--color-purple-primary); /* Blanco */
+                    color: var(--color-text-dark); /* Texto oscuro */
+                    font-weight: 700;
+                    font-size: 1rem;
+                }
+                .store-header__icon-link {
+                    /* Asegurar que el padding sea uniforme para el círculo */
+                    padding: 0;
+                    width: 30px; 
+                    height: 30px; 
+                    /* Remover el border-radius del link para que lo use el span interno */
+                    border-radius: 0; 
+                }
+            </style>
+        `;
+    }
+
+    // NUEVA FUNCIÓN: Actualiza el icono de perfil si el usuario está autenticado.
+    function updateProfileIcon() {
+        const iconContainer = document.getElementById('profile-icon-content');
+        const iconButton = document.getElementById('profile-icon-button');
+        const isUserAuthenticated = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
+        
+        if (!iconContainer || !isUserAuthenticated) return;
+        
+        const fullName = typeof getUserFullName === 'function' ? getUserFullName() : null;
+        
+        if (fullName) {
+            // Insertar el avatar de la inicial
+            iconContainer.innerHTML = generateInitialAvatar(fullName);
+            // Ajustar el padding y estilo del botón contenedor para que se vea bien
+            iconButton.style.padding = '0';
+            iconButton.style.borderRadius = '50%';
+        } else {
+            // Si está autenticado pero no hay nombre (caso de error), dejar el SVG por defecto.
+            iconContainer.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            `;
+        }
+    }
+
 
     // Lógica del Menú Desplegable (se mantiene la lógica de inyección de enlaces)
     function setupProfileMenu() {
-        const iconButton = document.querySelector('#profile-menu-container .store-header__icon-link');
+        // ID actualizado del botón: profile-icon-button
+        const iconButton = document.getElementById('profile-icon-button'); 
         const dropdown = document.getElementById('profile-dropdown');
         const isUserAuthenticated = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
         const userRole = typeof getUserRole === 'function' ? getUserRole() : null;

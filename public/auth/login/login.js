@@ -24,14 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     success: true,
                     token: 'mock_admin_token_123',
                     role: 'admin',
-                    full_name: 'Admin User'
+                    full_name: 'Admin User' // NOMBRE SIMULADO
                 };
             } else if (email === 'client@swam.com' && password === '123456') {
                 mockResponse = {
                     success: true,
                     token: 'mock_client_token_456',
                     role: 'client', 
-                    full_name: 'Client User'
+                    full_name: 'Client User' // NOMBRE SIMULADO
                 };
             } else {
                 mockResponse = {
@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (mockResponse.success) {
-                // Las funciones setAuthData y redirectAfterLogin provienen de auth-utils.js
-                setAuthData(mockResponse.token, mockResponse.role);
+                // LLAMADA ACTUALIZADA con mockResponse.full_name
+                setAuthData(mockResponse.token, mockResponse.role, mockResponse.full_name);
                 redirectAfterLogin(mockResponse.role);
             } else {
                 errorMessage.textContent = mockResponse.message;

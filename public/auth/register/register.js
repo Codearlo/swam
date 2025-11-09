@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 success: true,
                 token: 'mock_client_token_' + Date.now(),
                 role: 'client',
-                full_name: fullName
+                full_name: fullName // USAR EL NOMBRE INGRESADO EN EL FORMULARIO
             };
             
             if (mockResponse.success) {
-                // Las funciones setAuthData y redirectAfterLogin provienen de auth-utils.js
-                setAuthData(mockResponse.token, mockResponse.role);
+                // LLAMADA ACTUALIZADA con mockResponse.full_name
+                setAuthData(mockResponse.token, mockResponse.role, mockResponse.full_name);
                 redirectAfterLogin(mockResponse.role);
             } else {
                 errorMessage.textContent = 'Error al registrar el usuario. Inténtalo con otro email.';

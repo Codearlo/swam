@@ -1,14 +1,16 @@
 /* public/shared/scripts/auth-utils.js */
 
 /**
- * Almacena el token y el rol del usuario en el Local Storage.
+ * Almacena el token, el rol y el nombre completo del usuario en el Local Storage.
  * @param {string} token - El token de autenticación (JWT).
  * @param {string} role - El rol del usuario ('admin' o 'client').
+ * @param {string} fullName - El nombre completo del usuario.
  */
-function setAuthData(token, role) {
+function setAuthData(token, role, fullName) {
     localStorage.setItem('swam_auth_token', token);
     // La base de datos usa 'employee', pero el frontend usará 'client' por defecto si no es 'admin'.
     localStorage.setItem('swam_user_role', role === 'admin' ? 'admin' : 'client'); 
+    localStorage.setItem('swam_user_full_name', fullName); // NUEVO: Guardar nombre completo
 }
 
 /**
@@ -28,11 +30,20 @@ function getUserRole() {
 }
 
 /**
+ * Obtiene el nombre completo del usuario.
+ * @returns {string | null} El nombre completo del usuario o null si no existe.
+ */
+function getUserFullName() {
+    return localStorage.getItem('swam_user_full_name');
+}
+
+/**
  * Cierra la sesión, elimina los datos de autenticación y redirige a la página principal.
  */
 function logout() {
     localStorage.removeItem('swam_auth_token');
     localStorage.removeItem('swam_user_role');
+    localStorage.removeItem('swam_user_full_name'); // NUEVO: Eliminar nombre completo
     // Redirección con recarga completa
     window.location.href = '/'; 
 }
