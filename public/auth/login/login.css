@@ -13,7 +13,7 @@
 
 .button {
     padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--spacing-sm); /* MODIFICADO: Bordes menos redondeados */
+    border-radius: var(--spacing-sm); /* MODIFICADO: Bordes menos redondeados (8px) */
     font-weight: 600;
     transition: background-color 0.2s ease, transform 0.1s ease;
     text-transform: uppercase;
@@ -62,6 +62,7 @@
     min-height: 100vh; /* Ajustado para ocupar toda la vista vertical */
     padding: var(--spacing-lg);
     display: flex;
+    flex-direction: column; /* Cambiado a columna para apilar el enlace y la tarjeta */
     align-items: center;
     justify-content: center;
     
@@ -71,6 +72,24 @@
     background-repeat: no-repeat;
     background-color: rgba(0, 0, 0, 0.7); 
     background-blend-mode: darken;
+}
+
+/* NUEVO: Estilo del enlace de retorno */
+.auth-return-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-purple-light);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.auth-return-link:hover {
+    color: var(--color-text-light); /* Blanco puro al pasar el ratón */
+    transform: translateX(-5px); /* Pequeño desplazamiento a la izquierda */
 }
 
 /* Tarjeta principal (Aplicando Glassmorphism) */
