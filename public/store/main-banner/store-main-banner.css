@@ -1,0 +1,131 @@
+/* public/store/main-banner/store-main-banner.css */
+
+/* --- GENERAL BUTTON STYLING (Componente Reutilizable) --- */
+.button {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: 50px; /* Redondeado para el estilo moderno */
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.button--primary {
+    background-color: var(--color-purple-primary); /* Blanco */
+    color: var(--color-text-dark); /* Texto oscuro sobre el blanco */
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4); /* Sombra suave para destacar (Blanco) */
+}
+
+.button--primary:hover {
+    background-color: var(--color-purple-dark); /* Gris Claro */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6); /* Sombra más fuerte (Blanco) */
+}
+
+/* --- MAIN BANNER STYLING --- */
+
+.main-banner-section {
+    width: 100%;
+    min-height: 80vh; /* Para centrarlo verticalmente en la pantalla si el contenido es corto */
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.main-banner {
+    width: 90%;
+    max-width: 800px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 60px; /* Padding interno más grande */
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    /* Eliminado el box-shadow del glow para el efecto "manchado" */
+}
+
+/* Pseudo-Elementos Flotantes (Círculos, como en la referencia) */
+.main-banner__floating-shape {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, var(--color-purple-primary) 0%, transparent 60%);
+    border-radius: 50%;
+    filter: blur(80px); /* Desenfoque extremo para el efecto de luz */
+    opacity: 0.2;
+    z-index: -1;
+}
+
+.main-banner__floating-shape.shape-1 {
+    top: -50px;
+    right: -50px;
+    transform: rotate(15deg);
+}
+
+.main-banner__floating-shape.shape-2 {
+    bottom: -100px;
+    left: -100px;
+    width: 350px;
+    height: 350px;
+    opacity: 0.15;
+    transform: rotate(-30deg);
+}
+
+
+/* Título y Contenido */
+.main-banner__content {
+    margin-top: var(--spacing-lg);
+    z-index: 10;
+}
+
+.main-banner h1 {
+    font-size: 3.5rem; /* Título grande */
+    line-height: 1.1;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-light);
+}
+
+.main-banner__subtext {
+    color: var(--color-purple-light); /* Texto secundario más suave */
+    max-width: 450px;
+}
+
+/* Indicadores de Estado (Simulando los puntos en la parte superior) */
+.main-banner__top {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-banner__icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.main-banner__indicators {
+    gap: var(--spacing-sm);
+}
+
+.main-banner__indicator {
+    display: block;
+    width: 30px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.main-banner__indicator.is-active {
+    background-color: var(--color-success); /* Blanco/Accent para la activación */
+    /* Eliminado el box-shadow del glow */
+}
+
+/* CTA */
+.main-banner__cta {
+    margin-top: var(--spacing-lg);
+    width: 100%;
+    justify-content: flex-start; /* Alineado a la izquierda */
+}

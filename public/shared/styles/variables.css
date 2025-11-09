@@ -1,23 +1,23 @@
 /* public/shared/styles/variables.css */
 
 :root {
-    /* Paleta de Colores Monocromático (Anteriormente Morados) */
-    --color-purple-primary: #f3f4f6; /* Blanco: Nuevo color de acento principal */
-    --color-purple-dark: #d1d5db;   /* Gris Claro: Color de acento para :hover */
-    --color-purple-light: #f3f4f6;  /* Blanco: Color de texto/enlace */
-    --color-purple-bg: #000000;     /* Fondo Oscuro base: NEGRO PURO */
+    /* Paleta de Colores Monocromático (Blanco y Negro) */
+    --color-purple-primary: #f3f4f6; /* Blanco (Acento principal) */
+    --color-purple-dark: #d1d5db;   /* Gris Claro (Para :hover o fondos de tarjeta) */
+    --color-purple-light: #a1a1a1;  /* Gris Medio (Para enlaces/texto suave) */
+    --color-purple-bg: #000000;     /* Fondo base NEGRO PURO */
 
     /* Colores Funcionales */
-    --color-text-light: #f3f4f6;
+    --color-text-light: #f3f4f6; /* Blanco/Gris claro */
     --color-text-dark: #374151; /* Gris oscuro para texto sobre fondos claros */
-    --color-success: #10b981;
-    --color-error: #ef4444;
+    --color-success: #f3f4f6; /* Éxito se vuelve blanco/claro */
+    --color-error: #ef4444; /* Mantener rojo para error por convención */
 
-    /* Propiedades de Glassmorphism (Efecto Cristal - Basado en Negro) */
-    --glass-blur: 10px;               /* Nivel de desenfoque del cristal */
-    --glass-background: rgba(0, 0, 0, 0.4); /* Fondo negro semitransparente (más oscuro) */
-    --glass-border: 1px solid rgba(255, 255, 255, 0.1); /* Borde más sutil */
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); 
+    /* Propiedades de Glassmorphism (Efecto Cristal - Dashboard Style) */
+    --glass-blur: 15px;               /* Nivel de desenfoque del cristal */
+    --glass-background: rgba(0, 0, 0, 0.3); /* Fondo negro altamente translúcido */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible pero sutil */
+    --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); /* Sombra pura negra */
     
     /* Espaciado y Fuentes */
     --spacing-sm: 8px;
