@@ -33,15 +33,15 @@
                         <label for="email-register">Email</label>
                         <input type="email" id="email-register" name="email" required>
                     </div>
-                    <div class="form-group">
+                    
+                    <div class="form-group form-group--password">
                         <label for="password-register">Contraseña</label>
                         <input type="password" id="password-register" name="password" required>
+                        <div class="password-strength-bar">
+                            <span id="password-strength-indicator" class="password-strength-indicator"></span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="password-confirm">Confirmar Contraseña</label>
-                        <input type="password" id="password-confirm" name="password_confirm" required>
-                    </div>
-
+                    
                     <button type="submit" class="button button--primary u-full-width">
                         Registrarse
                     </button>

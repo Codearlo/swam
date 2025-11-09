@@ -1,10 +1,46 @@
 /* public/auth/register/register.js */
 
+/**
+ * Mide la fortaleza de la contraseña y actualiza la barra.
+ * @param {string} password - La contraseña ingresada.
+ * @param {HTMLElement} indicator - Elemento span para la barra de color.
+ */
+function updatePasswordStrength(password, indicator) {
+    let strength = 0;
+    if (password.length > 5) strength++;
+    if (password.length > 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    indicator.classList.remove('strength-weak', 'strength-medium', 'strength-strong');
+
+    if (password.length === 0) {
+        indicator.style.width = '0%';
+    } else if (strength < 3) {
+        indicator.style.width = '33%';
+        indicator.classList.add('strength-weak');
+    } else if (strength < 5) {
+        indicator.style.width = '66%';
+        indicator.classList.add('strength-medium');
+    } else {
+        indicator.style.width = '100%';
+        indicator.classList.add('strength-strong');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     const errorMessage = document.getElementById('register-error-message');
+    const passwordInput = document.getElementById('password-register');
+    const strengthIndicator = document.getElementById('password-strength-indicator');
 
-    if (!registerForm) return;
+    if (!registerForm || !passwordInput || !strengthIndicator) return;
+
+    // Listener para actualizar la barra en tiempo real
+    passwordInput.addEventListener('input', () => {
+        updatePasswordStrength(passwordInput.value, strengthIndicator);
+    });
 
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -13,16 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fullName = document.getElementById('full-name').value;
         const email = document.getElementById('email-register').value;
-        const password = document.getElementById('password-register').value;
-        const passwordConfirm = document.getElementById('password-confirm').value;
+        const password = passwordInput.value;
+        // La validación de confirmación de contraseña se ha eliminado.
 
-        if (password !== passwordConfirm) {
-            errorMessage.textContent = 'Las contraseñas no coinciden.';
+        // Simulación: Comprobar que la contraseña tenga una fortaleza mínima (ej. > 5 caracteres)
+        if (password.length < 6) {
+            errorMessage.textContent = 'La contraseña debe tener al menos 6 caracteres.';
             errorMessage.classList.remove('u-hidden');
             return;
         }
 
-        // --- MOCK DE LLAMADA A LA API (REEMPLAZAR POR LLAMADA REAL) ---
+        // --- MOCK DE LLAMADA A LA API ---
         try {
             // Simulación de respuesta de la API. Asumimos que la API siempre asigna 'client'
             const mockResponse = {

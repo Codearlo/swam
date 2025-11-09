@@ -1,3 +1,40 @@
 /* public/auth/register/register.css */
-/* Importamos el estilo base del login para mantener la consistencia */
+
+/* Simplemente enlaza a login.css para compartir todos los estilos base */
 @import url('../login/login.css');
+
+/* --- Estilos Específicos de Register --- */
+
+.form-group--password {
+    position: relative;
+}
+
+/* Barra de fortaleza de contraseña */
+.password-strength-bar {
+    height: 4px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 4px; /* Espacio sutil */
+    overflow: hidden;
+}
+
+.password-strength-indicator {
+    display: block;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* Clases de estado (Para ser aplicadas con JS) */
+.strength-weak {
+    background-color: var(--color-error); /* Rojo */
+}
+
+.strength-medium {
+    background-color: orange;
+}
+
+.strength-strong {
+    background-color: var(--color-success); /* Blanco/Acento (Usaremos blanco, ya que success es blanco) */
+}

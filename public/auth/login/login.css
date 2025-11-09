@@ -1,13 +1,76 @@
 /* public/auth/login/login.css */
 
+/* --- GENERAL BUTTON STYLING (COPIADO DE MAIN-BANNER PERO MODIFICADO CON ANIMACIÓN) --- */
+
+@keyframes slideShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 150%; /* Se mueve más allá del borde derecho para desaparecer */
+    }
+}
+
+.button {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--spacing-sm); /* MODIFICADO: Bordes menos redondeados */
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    position: relative; /* Necesario para el brillo */
+    overflow: hidden; /* Oculta el brillo fuera del botón */
+    z-index: 1;
+}
+
+.button--primary {
+    background-color: var(--color-purple-primary); /* Blanco */
+    color: var(--color-text-dark); /* Texto oscuro sobre el blanco */
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4); /* Sombra suave para destacar (Blanco) */
+}
+
+.button--primary:hover {
+    background-color: var(--color-purple-dark); /* Gris Claro */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6); /* Sombra más fuerte (Blanco) */
+}
+
+/* Pseudo-elemento para el brillo */
+.button--primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Empieza completamente a la izquierda */
+    width: 25%; /* Ancho del brillo */
+    height: 100%;
+    background: rgba(255, 255, 255, 0.4); /* Brillo más fuerte */
+    transform: skewX(-20deg); /* Inclinación diagonal del brillo */
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+/* Animación de brillo al hacer hover */
+.button--primary:hover::after {
+    animation: slideShine 1s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+/* --- ESTILOS DE AUTENTICACIÓN --- */
+
 /* Estilos de la sección principal */
 .auth-section {
     width: 100%;
-    min-height: calc(100vh - 80px); /* Ajustado para el header pegado */
+    min-height: 100vh; /* Ajustado para ocupar toda la vista vertical */
     padding: var(--spacing-lg);
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    background-image: url('../../assets/images/banner_auth.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0.7); 
+    background-blend-mode: darken;
 }
 
 /* Tarjeta principal (Aplicando Glassmorphism) */
@@ -69,6 +132,14 @@
 .auth-form input:focus {
     outline: none;
     border-color: var(--color-purple-primary);
+}
+
+/* Contenedor de enlaces adicionales */
+.auth-form__links {
+    display: flex;
+    justify-content: flex-end; /* Mueve el enlace de "Olvidaste tu contraseña" a la derecha */
+    font-size: 0.85rem;
+    margin-top: calc(var(--spacing-md) * -0.5); /* Lo sube cerca del campo de contraseña */
 }
 
 /* Enlace inferior */
