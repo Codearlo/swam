@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAM - Registrarse</title>
+    <link rel="icon" type="image/png" href="../../assets/favicon.ico">
+
+    <script src="../../shared/scripts/cache-buster.js"></script>
+    
+    <link rel="stylesheet" href="../../shared/styles/reset.css">
+    <link rel="stylesheet" href="../../shared/styles/variables.css">
+    <link rel="stylesheet" href="../../shared/styles/typography.css">
+    <link rel="stylesheet" href="../../shared/styles/utilities.css">
+    
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+    <main id="app-container">
+        <section class="auth-section u-flex-center">
+            <div class="auth-card u-glass-effect">
+                <div class="auth-card__header u-flex-center">
+                    <img src="../../assets/logo.png" alt="SWAM Logo" class="auth-card__logo">
+                    <h2>Crear Cuenta</h2>
+                </div>
+
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="full-name">Nombre Completo</label>
+                        <input type="text" id="full-name" name="full_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email-register">Email</label>
+                        <input type="email" id="email-register" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password-register">Contraseña</label>
+                        <input type="password" id="password-register" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password-confirm">Confirmar Contraseña</label>
+                        <input type="password" id="password-confirm" name="password_confirm" required>
+                    </div>
+
+                    <button type="submit" class="button button--primary u-full-width">
+                        Registrarse
+                    </button>
+                    
+                    <p class="auth-card__link">
+                        ¿Ya tienes cuenta? <a href="../login/login.html">Inicia Sesión</a>
+                    </p>
+
+                    <p id="register-error-message" class="error-message u-hidden"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="../../shared/scripts/helpers.js"></script>
+    <script src="../../shared/scripts/api.js"></script>
+    <script src="../../shared/scripts/auth-utils.js"></script>
+    <script src="register.js" defer></script>
+</body>
+</html>

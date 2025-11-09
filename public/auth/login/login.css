@@ -1,0 +1,92 @@
+/* public/auth/login/login.css */
+
+/* Estilos de la sección principal */
+.auth-section {
+    width: 100%;
+    min-height: calc(100vh - 80px); /* Ajustado para el header pegado */
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tarjeta principal (Aplicando Glassmorphism) */
+.auth-card {
+    width: 90%;
+    max-width: 400px;
+    /* u-glass-effect ya aplica fondo y blur */
+    padding: var(--spacing-lg) calc(var(--spacing-lg) * 1.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.auth-card__header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+}
+
+.auth-card__logo {
+    width: 40px;
+    height: 40px;
+}
+
+.auth-card h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Formulario */
+.auth-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.auth-form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.auth-form input {
+    background-color: rgba(255, 255, 255, 0.05); /* Fondo oscuro en el input */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-light);
+    transition: border-color 0.2s ease;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--color-purple-primary);
+}
+
+/* Enlace inferior */
+.auth-card__link {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-purple-light);
+    margin-top: var(--spacing-sm);
+}
+
+.error-message {
+    color: var(--color-error);
+    text-align: center;
+    margin-top: var(--spacing-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.u-hidden {
+    display: none;
+}

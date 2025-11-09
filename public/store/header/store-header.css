@@ -210,4 +210,280 @@
         justify-content: space-around;
         gap: var(--spacing-sm);
     }
+}/* public/store/header/store-header.css */
+
+@keyframes slideShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 150%; /* Se mueve más allá del borde derecho para desaparecer */
+    }
+}
+
+.store-header-container {
+    /* Header pegado arriba, sin flotación extra */
+    position: sticky; 
+    top: 0; 
+    z-index: 100;
+    width: 100%;
+    /* El fondo del contenedor es el color base para una barra sólida */
+    background-color: var(--color-purple-bg); 
+    padding: 0;
+    margin-bottom: 0; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Sombra ligera para separarlo */
+}
+
+.store-header {
+    /* Usamos background-color en lugar de u-glass-effect para la barra principal */
+    background: none; 
+    box-shadow: none;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0; 
+    
+    padding: var(--spacing-sm) var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin: 0 auto;
+    max-width: 1400px; /* Ancho máximo para el look de dashboard */
+}
+
+/* Primera Fila (Logo, Buscador, Iconos) */
+.store-header__top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm) 0;
+}
+
+/* Logo */
+.store-header__logo-link {
+    flex-shrink: 0;
+    gap: var(--spacing-sm);
+    font-size: 1.5rem;
+    font-weight: 700;
+    align-items: center;
+}
+
+.store-header__logo {
+    height: 24px; /* Logo más pequeño para la barra superior */
+    width: auto;
+}
+
+.store-header__brand-name {
+    color: var(--color-text-light); /* Blanco puro para el nombre de la marca */
+    letter-spacing: 1px;
+}
+
+/* Buscador (Estilo sutil de dashboard) */
+.store-header__search-container {
+    flex-grow: 1;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.05); /* Fondo de búsqueda oscuro */
+    border-radius: var(--spacing-sm);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.store-header__search-input {
+    border: none;
+    outline: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    flex-grow: 1;
+    color: var(--color-text-light); /* Texto de búsqueda claro */
+    background: none;
+}
+
+.store-header__search-input::placeholder {
+    color: var(--color-purple-light);
+    opacity: 0.8;
+}
+
+.store-header__search-button {
+    background-color: transparent;
+    color: var(--color-purple-primary); /* Blanco */
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 0;
+    transition: color 0.2s ease;
+}
+
+.store-header__search-button:hover {
+    color: var(--color-purple-dark); /* Gris Claro */
+    background: none;
+}
+
+/* Iconos de Usuario y Carrito */
+.store-header__icons {
+    flex-shrink: 0;
+    gap: var(--spacing-md);
+}
+
+.store-header__icon-link {
+    color: var(--color-text-light); /* Iconos blancos */
+    transition: color 0.2s ease, transform 0.1s ease;
+    padding: var(--spacing-sm);
+    border-radius: 50%;
+}
+
+.store-header__icon-link:hover {
+    color: var(--color-purple-primary); /* Blanco/Accent para el hover */
+    transform: scale(1.05);
+}
+
+/* --- ESTILOS PARA EL MENÚ DE PERFIL --- */
+.store-header__profile-menu-container {
+    position: relative; /* Para posicionar el dropdown */
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%; /* Justo debajo del botón */
+    right: 0;
+    margin-top: var(--spacing-sm);
+    min-width: 200px;
+    z-index: 101; /* Asegurar que esté por encima de todo */
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm);
+    transform-origin: top right;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    
+    /* El u-glass-effect se aplica en el HTML */
+}
+
+.profile-dropdown.u-hidden {
+    opacity: 0;
+    pointer-events: none; /* Deshabilita interacciones cuando está oculto */
+    transform: scale(0.95);
+}
+
+.profile-dropdown:not(.u-hidden) {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--spacing-sm);
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+    color: var(--color-text-light);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil al pasar el ratón */
+    color: var(--color-purple-primary);
+}
+
+.dropdown-item svg {
+    flex-shrink: 0;
+}
+
+/* Estilo para el botón de logout */
+.dropdown-item.is-logout {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    color: var(--color-error); /* Color rojo para destacar la acción de cierre */
+}
+
+.dropdown-item.is-logout:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: var(--color-error);
+}
+/* Segunda Fila (Navegación de Categorías - Tabs estilo Dashboard) */
+.store-header__bottom-row {
+    padding-top: 0;
+    border-top: none; 
+}
+
+.store-header__nav {
+    display: flex;
+    justify-content: center; /* Centrado de la navegación */
+    gap: var(--spacing-lg);
+    font-weight: 600;
+}
+
+.store-header__nav-link {
+    color: var(--color-purple-light);
+    padding: var(--spacing-sm) var(--spacing-sm);
+    position: relative;
+    border-radius: var(--spacing-sm);
+    transition: all 0.2s ease;
+    overflow: hidden; 
+    z-index: 1; 
+    width: 120px; /* MODIFICADO: Ancho fijo para todas las secciones */
+    text-align: center; /* MODIFICADO: Centrar el texto dentro del ancho fijo */
+}
+
+/* Pseudo-elemento para el brillo */
+.store-header__nav-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Empieza completamente a la izquierda */
+    width: 25%; /* Ancho del brillo */
+    height: 100%;
+    /* Efecto de brillo diagonal */
+    background: rgba(255, 255, 255, 0.2);
+    transform: skewX(-20deg); /* Inclinación diagonal del brillo */
+    z-index: 2;
+    transition: all 0.3s ease; /* Transición para que no aparezca de golpe */
+}
+
+
+.store-header__nav-link:hover {
+    color: var(--color-text-light); /* Se vuelve blanco puro */
+    background-color: transparent; /* Eliminamos el fondo grisáceo */
+}
+
+/* Animación de brillo al hacer hover */
+.store-header__nav-link:hover::after {
+    animation: slideShine 1s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+/* Indicador de "activo" estilo Dashboard */
+.store-header__nav-link.is-active {
+    color: var(--color-text-light);
+    background-color: var(--color-purple-primary); /* Blanco sólido */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Sombra blanca/gris */
+}
+
+.store-header__nav-link.is-active::after {
+    display: none; /* Quitamos la línea inferior */
+}
+
+/* Media Query para pantallas más pequeñas (opcional, basado en el archivo de categorías) */
+@media (max-width: 768px) {
+    .store-header__top-row {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .store-header__search-container {
+        order: 3; /* Mueve la búsqueda abajo en el móvil */
+        width: 100%;
+        max-width: none;
+        margin-top: var(--spacing-md);
+    }
+
+    .store-header__icons {
+        order: 2;
+        margin-left: auto; /* Empuja los iconos a la derecha */
+    }
+
+    .store-header__logo-link {
+        order: 1;
+    }
+    
+    .store-header__nav {
+        justify-content: space-around;
+        gap: var(--spacing-sm);
+    }
 }

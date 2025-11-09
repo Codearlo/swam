@@ -1,0 +1,3 @@
+/* public/auth/register/register.css */
+/* Importamos el estilo base del login para mantener la consistencia */
+@import url('../login/login.css');

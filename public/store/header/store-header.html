@@ -1,6 +1,6 @@
 <nav class="store-header u-glass-effect">
     <div class="store-header__top-row u-flex u-full-width">
-        <a href="/" class="store-header__logo-link u-flex-center">
+        <a href="index.html" class="store-header__logo-link u-flex-center">
             <img src="public/assets/logo.png" alt="SWAM Logo" class="store-header__logo">
             <span class="store-header__brand-name">SWAM</span>
         </a>
@@ -13,10 +13,15 @@
         </div>
 
         <div class="store-header__icons u-flex">
-            <a href="/profile" class="store-header__icon-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </a>
-            <a href="/cart" class="store-header__icon-link">
+            <div id="profile-menu-container" class="store-header__profile-menu-container">
+                <button class="store-header__icon-link" aria-label="Perfil o Inicio de Sesión">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+                <div id="profile-dropdown" class="profile-dropdown u-glass-effect u-hidden">
+                    </div>
+            </div>
+            
+            <a href="/cart" class="store-header__icon-link" aria-label="Carrito de compras">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             </a>
         </div>
