@@ -75,7 +75,7 @@ async function registerUser(userData) {
     }
 }
 
-// NUEVA FUNCIÓN: Simula la verificación de sesión en la página de confirmación
+// FUNCIÓN PARA VERIFICAR SESIÓN TRAS CLIC EN EL CORREO
 async function verifySession() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
@@ -91,29 +91,29 @@ async function verifySession() {
             };
         }
 
-        // Supabase maneja la verificación del token en el fragmento de URL
+        // 1. Obtener la sesión (Supabase lo maneja automáticamente con el hash de la URL)
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
         if (sessionError || !session) {
             return {
                 success: false,
-                error: 'Sesión no encontrada o token inválido.'
+                error: 'Sesión no encontrada o token inválido. (Error: ' + (sessionError?.message || 'Token Missing') + ')'
             };
         }
-
-        // Obtener datos del perfil de usuario (ej. nombre completo, rol)
+        
+        // 2. Obtener datos del perfil de usuario de la tabla 'users'
+        // MODIFICACIÓN CLAVE: Consultar por 'email' en lugar de 'id' para evitar el error de BIGINT.
         const { data: userProfile, error: profileError } = await supabaseClient
             .from('users')
             .select('full_name, role')
-            .eq('id', session.user.id)
+            .eq('email', session.user.email) // <--- USAMOS EMAIL
             .single();
             
         if (profileError || !userProfile) {
-             // Si el perfil no existe, pero la sesión sí, es un caso raro, pero lo manejamos
-             return handleSupabaseError(profileError || new Error('Perfil no encontrado'), 'verifySession');
+             return handleSupabaseError(profileError || new Error('Perfil de usuario no encontrado después de la verificación.'), 'verifySession');
         }
 
-        // Almacenar datos de autenticación del usuario
+        // 3. Almacenar datos de autenticación del usuario
         setAuthData(session.access_token, userProfile.role, userProfile.full_name);
 
         return {
@@ -122,6 +122,7 @@ async function verifySession() {
         };
 
     } catch (error) {
+        // Devuelve el error de la base de datos si ocurre, para depuración
         return handleSupabaseError(error, 'verifySession');
     }
 }
@@ -426,5 +427,5 @@ window.api = {
     getDashboardData,
     getRecentSales,
     getInventoryAlerts,
-    verifySession // AÑADIDA NUEVA FUNCIÓN
+    verifySession
 };
