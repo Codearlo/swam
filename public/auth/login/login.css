@@ -1,5 +1,11 @@
 /* public/auth/login/login.css */
 
+/* NUEVA ANIMACIÓN DE CARGA */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* --- GENERAL BUTTON STYLING (COPIADO DE MAIN-BANNER PERO MODIFICADO CON ANIMACIÓN) --- */
 
 @keyframes slideShine {

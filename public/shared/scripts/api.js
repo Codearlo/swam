@@ -229,9 +229,11 @@ async function handleOAuthRedirect() {
                 }]);
 
             if (insertError) {
-                console.warn('Error al insertar en tabla profiles (OAuth):', insertError);
+                // Si la inserción falla (ej. RLS), lanza el error
+                throw insertError;
             }
         } else if (fetchError) {
+            // Si falla la consulta
             return handleSupabaseError(fetchError, 'handleOAuthRedirect - Fetch Profile');
         } else {
             userRole = userProfile.role; // Usar el rol existente
@@ -246,6 +248,7 @@ async function handleOAuthRedirect() {
 
     } catch (error) {
         // El error 'invalid input syntax for type bigint' ya NO debería ocurrir
+        // El error 'violates row-level security policy' (RLS) SÍ será capturado aquí
         return handleSupabaseError(error, 'handleOAuthRedirect');
     }
 }
