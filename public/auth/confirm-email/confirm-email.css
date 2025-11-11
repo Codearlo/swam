@@ -1,0 +1,16 @@
+/* public/auth/confirm-email/confirm-email.css */
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    animation: spin 1s linear infinite;
+    color: var(--color-purple-primary);
+}
+
+.success-icon {
+    animation: none;
+    color: var(--color-success);
+}

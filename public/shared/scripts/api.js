@@ -1,19 +1,16 @@
 /* public/shared/scripts/api.js */
 
-// Asume que 'supabaseClient', 'isSupabaseConfigured', 'handleSupabaseError', 'getMockDashboardData', etc., están definidos.
-
 async function registerUser(userData) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         
         if (!configured) {
-            console.log('Modo MOCK - Registro simulado');
-            // MODIFICACIÓN CLAVE: Simular registro exitoso SIN verificación para redirigir directamente al inicio.
+            console.log('Modo MOCK - Registro simulado. Simula necesidad de verificación.');
+            // En modo MOCK, simulamos éxito en el envío del correo
             return {
                 success: true,
-                token: 'mock_token_' + Date.now(),
-                role: 'client',
-                full_name: userData.full_name
+                needsEmailVerification: true, // Simular que se necesita verificación
+                message: 'Verificación simulada enviada. Redirigiendo al login...'
             };
         }
 
@@ -24,7 +21,7 @@ async function registerUser(userData) {
                 data: {
                     full_name: userData.full_name
                 },
-                emailRedirectTo: window.location.origin
+                emailRedirectTo: `${window.location.origin}/public/auth/confirm-email/confirm-email.html` // NUEVA URL DE REDIRECCIÓN
             }
         });
 
@@ -37,6 +34,7 @@ async function registerUser(userData) {
         }
 
         if (authData.session) {
+            // Esto solo ocurre si la confirmación de email está DESACTIVADA en Supabase
             const { error: insertError } = await supabaseClient
                 .from('users')
                 .insert([{
@@ -60,11 +58,11 @@ async function registerUser(userData) {
                 user_id: authData.user.id
             };
         } else {
-            // Este es el flujo que indica "necesita verificación de email" (Modo producción)
+            // Esto ocurre si la confirmación de email está ACTIVADA en Supabase (flujo deseado)
             return {
                 success: true,
                 needsEmailVerification: true,
-                message: 'Verifica tu email para completar el registro'
+                message: 'Se ha enviado un enlace de verificación a tu email.'
             };
         }
 
@@ -74,6 +72,57 @@ async function registerUser(userData) {
             success: false,
             error: error.message || 'Error al registrar usuario'
         };
+    }
+}
+
+// NUEVA FUNCIÓN: Simula la verificación de sesión en la página de confirmación
+async function verifySession() {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+
+        if (!configured) {
+            console.log('Modo MOCK - Sesión verificada y establecida.');
+            // MOCK: Simular éxito de sesión y devolver datos de un usuario logueado
+            const mockName = 'Usuario Confirmado';
+            setAuthData('mock_verified_token', 'client', mockName);
+            return {
+                success: true,
+                full_name: mockName
+            };
+        }
+
+        // Supabase maneja la verificación del token en el fragmento de URL
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError || !session) {
+            return {
+                success: false,
+                error: 'Sesión no encontrada o token inválido.'
+            };
+        }
+
+        // Obtener datos del perfil de usuario (ej. nombre completo, rol)
+        const { data: userProfile, error: profileError } = await supabaseClient
+            .from('users')
+            .select('full_name, role')
+            .eq('id', session.user.id)
+            .single();
+            
+        if (profileError || !userProfile) {
+             // Si el perfil no existe, pero la sesión sí, es un caso raro, pero lo manejamos
+             return handleSupabaseError(profileError || new Error('Perfil no encontrado'), 'verifySession');
+        }
+
+        // Almacenar datos de autenticación del usuario
+        setAuthData(session.access_token, userProfile.role, userProfile.full_name);
+
+        return {
+            success: true,
+            full_name: userProfile.full_name
+        };
+
+    } catch (error) {
+        return handleSupabaseError(error, 'verifySession');
     }
 }
 
@@ -376,5 +425,6 @@ window.api = {
     resetPassword,
     getDashboardData,
     getRecentSales,
-    getInventoryAlerts
+    getInventoryAlerts,
+    verifySession // AÑADIDA NUEVA FUNCIÓN
 };

@@ -26,6 +26,7 @@ function updatePasswordStrength(password, indicator) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
+    const authCard = document.querySelector('.auth-card');
     const errorMessage = document.getElementById('register-error-message');
     const passwordInput = document.getElementById('password-register');
     const strengthIndicator = document.getElementById('password-strength-indicator');
@@ -35,6 +36,28 @@ document.addEventListener('DOMContentLoaded', () => {
     passwordInput.addEventListener('input', () => {
         updatePasswordStrength(passwordInput.value, strengthIndicator);
     });
+
+    const displayConfirmationMessage = () => {
+        authCard.innerHTML = `
+            <div class="auth-card__header u-flex-center" style="gap: 20px; text-align: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--color-purple-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-purple-primary); /* Simula el efecto Glass */">
+                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                    <path d="M22 7l-10 7-10-7"></path>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                </svg>
+                <h2 style="font-size: 2rem;">¡Registro Exitoso!</h2>
+            </div>
+            <p style="text-align: center; color: var(--color-purple-light); font-size: 1.1rem; margin-bottom: 30px;">
+                Hemos enviado un **enlace de confirmación** a tu correo electrónico. 
+                <br><br>
+                Ve a tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
+            </p>
+            <a href="../login/login.html" class="button button--primary u-full-width">
+                Ir a Iniciar Sesión
+            </a>
+        `;
+        authCard.style.padding = '60px 40px';
+    };
 
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -70,20 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.success) {
-                if (response.needsEmailVerification) {
-                    // Este bloque SÓLO se ejecutará si Supabase está configurado y requiere email
-                    errorMessage.textContent = response.message || 'Verifica tu email para completar el registro.';
-                    errorMessage.style.color = 'var(--color-success)';
-                    errorMessage.classList.remove('u-hidden');
-                    
-                    window.location.href = '/public/auth/login/login.html';
-                } else {
-                    // ESTA ES LA RUTA DE ÉXITO INMEDIATO (Modo MOCK o Producción sin verificación)
-                    setAuthData(response.token, response.role, response.full_name);
-                    redirectAfterLogin(response.role); // Redirige al /index.html
-                }
+                // Si la API devuelve éxito (sin importar si es MOCK o producción con verificación)
+                // Ocultamos el formulario y mostramos el mensaje de confirmación
+                displayConfirmationMessage();
             } else {
-                errorMessage.textContent = response.error || 'Error al registrar el usuario.';
+                // Flujo de Error (Ej. usuario ya existe, error de Supabase)
+                errorMessage.textContent = response.error || 'Error al registrar el usuario. Inténtalo de nuevo.';
                 errorMessage.classList.remove('u-hidden');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Registrarse';
