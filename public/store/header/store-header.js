@@ -179,4 +179,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (headerContainer) {
         loadComponent('public/store/header/store-header.html', headerContainer);
     }
-});
+});   

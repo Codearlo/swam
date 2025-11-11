@@ -1,0 +1,163 @@
+/* public/shared/components/sidebar/sidebar.css */
+
+.admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+}
+
+/* HEADER DEL SIDEBAR */
+.sidebar-header {
+    margin-bottom: calc(var(--spacing-lg) * 2);
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.sidebar-logo__img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.sidebar-logo__text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-light);
+    letter-spacing: 0.5px;
+}
+
+/* NAVEGACIÓN */
+.sidebar-nav {
+    flex: 1;
+}
+
+.sidebar-section {
+    margin-bottom: calc(var(--spacing-lg) * 1.5);
+}
+
+.sidebar-section__title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-purple-light);
+    margin-bottom: var(--spacing-md);
+    padding-left: var(--spacing-sm);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--spacing-sm);
+    color: var(--color-purple-light);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sidebar-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--color-purple-primary);
+    border-radius: 0 3px 3px 0;
+    transition: height 0.2s ease;
+}
+
+.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-light);
+}
+
+.sidebar-link:hover::before {
+    height: 70%;
+}
+
+.sidebar-link.is-active {
+    background-color: rgba(243, 244, 246, 0.1);
+    color: var(--color-text-light);
+}
+
+.sidebar-link.is-active::before {
+    height: 70%;
+}
+
+.sidebar-link svg {
+    flex-shrink: 0;
+}
+
+/* FOOTER DEL SIDEBAR */
+.sidebar-footer {
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--spacing-sm);
+}
+
+.sidebar-user__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-purple-primary) 0%, var(--color-purple-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-dark);
+    flex-shrink: 0;
+}
+
+.sidebar-user__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-user__name {
+    font-weight: 600;
+    color: var(--color-text-light);
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user__role {
+    font-size: 0.75rem;
+    color: var(--color-purple-light);
+}
+
+/* SCROLLBAR PERSONALIZADO */
+.admin-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+}

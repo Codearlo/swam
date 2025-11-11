@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAM - Dashboard Administrativo</title>
+    <link rel="icon" type="image/png" href="../../public/assets/favicon.ico">
+
+    <!-- Supabase JS Client - DEBE IR ANTES de cache-buster -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../public/shared/scripts/cache-buster.js"></script>
+    
+    <link rel="stylesheet" href="../../public/shared/styles/reset.css">
+    <link rel="stylesheet" href="../../public/shared/styles/variables.css">
+    <link rel="stylesheet" href="../../public/shared/styles/typography.css">
+    <link rel="stylesheet" href="../../public/shared/styles/utilities.css">
+    
+    <link rel="stylesheet" href="../../public/shared/components/sidebar/sidebar.css">
+    <link rel="stylesheet" href="../../public/shared/components/sidebar/sidebar-responsive.css">
+    
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="dashboard-responsive.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside id="sidebar-container" class="admin-sidebar"></aside>
+        
+        <main class="admin-main">
+            <header class="admin-header u-glass-effect">
+                <div class="admin-header__left">
+                    <button id="sidebar-toggle" class="admin-header__menu-btn" aria-label="Toggle Menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <h1 class="admin-header__title">Dashboard</h1>
+                </div>
+                
+                <div class="admin-header__right">
+                    <button class="admin-header__notification-btn" aria-label="Notificaciones">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <div class="admin-header__user">
+                        <span id="user-name-display">Admin User</span>
+                        <button id="logout-btn" class="admin-header__logout-btn" aria-label="Cerrar sesión">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-container">
+                <section class="dashboard-section">
+                    <h2 class="dashboard-section__title">Resumen General</h2>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card u-glass-effect">
+                            <div class="metric-card__icon metric-card__icon--success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            </div>
+                            <div class="metric-card__content">
+                                <p class="metric-card__label">Ventas del Día</p>
+                                <h3 class="metric-card__value" id="daily-sales">S/. 0.00</h3>
+                                <span class="metric-card__change metric-card__change--positive">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    +12% vs ayer
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card u-glass-effect">
+                            <div class="metric-card__icon metric-card__icon--info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            </div>
+                            <div class="metric-card__content">
+                                <p class="metric-card__label">Órdenes Activas</p>
+                                <h3 class="metric-card__value" id="active-orders">0</h3>
+                                <span class="metric-card__change metric-card__change--neutral">
+                                    3 en tránsito
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card u-glass-effect">
+                            <div class="metric-card__icon metric-card__icon--warning">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                            <div class="metric-card__content">
+                                <p class="metric-card__label">Clientes Activos</p>
+                                <h3 class="metric-card__value" id="active-customers">0</h3>
+                                <span class="metric-card__change metric-card__change--positive">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    +5 este mes
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card u-glass-effect">
+                            <div class="metric-card__icon metric-card__icon--error">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <div class="metric-card__content">
+                                <p class="metric-card__label">Productos en Stock</p>
+                                <h3 class="metric-card__value" id="products-stock">0</h3>
+                                <span class="metric-card__change metric-card__change--negative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+                                    8 con stock bajo
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-section">
+                    <div class="dashboard-row">
+                        <div class="dashboard-col dashboard-col--8">
+                            <div class="chart-card u-glass-effect">
+                                <div class="chart-card__header">
+                                    <h3 class="chart-card__title">Ventas del Mes</h3>
+                                    <div class="chart-card__actions">
+                                        <button class="chart-btn chart-btn--active">Semana</button>
+                                        <button class="chart-btn">Mes</button>
+                                        <button class="chart-btn">Año</button>
+                                    </div>
+                                </div>
+                                <div class="chart-card__body">
+                                    <canvas id="sales-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-col dashboard-col--4">
+                            <div class="chart-card u-glass-effect">
+                                <div class="chart-card__header">
+                                    <h3 class="chart-card__title">Productos Más Vendidos</h3>
+                                </div>
+                                <div class="chart-card__body">
+                                    <div class="top-products-list" id="top-products-list">
+                                        <div class="top-product-item">
+                                            <div class="top-product-item__info">
+                                                <span class="top-product-item__rank">#1</span>
+                                                <div>
+                                                    <p class="top-product-item__name">Teclado Mecánico RGB</p>
+                                                    <span class="top-product-item__sales">45 ventas</span>
+                                                </div>
+                                            </div>
+                                            <span class="top-product-item__amount">S/. 3,240</span>
+                                        </div>
+
+                                        <div class="top-product-item">
+                                            <div class="top-product-item__info">
+                                                <span class="top-product-item__rank">#2</span>
+                                                <div>
+                                                    <p class="top-product-item__name">Mouse Gamer Inalámbrico</p>
+                                                    <span class="top-product-item__sales">38 ventas</span>
+                                                </div>
+                                            </div>
+                                            <span class="top-product-item__amount">S/. 2,850</span>
+                                        </div>
+
+                                        <div class="top-product-item">
+                                            <div class="top-product-item__info">
+                                                <span class="top-product-item__rank">#3</span>
+                                                <div>
+                                                    <p class="top-product-item__name">Monitor 27" 144Hz</p>
+                                                    <span class="top-product-item__sales">32 ventas</span>
+                                                </div>
+                                            </div>
+                                            <span class="top-product-item__amount">S/. 9,600</span>
+                                        </div>
+
+                                        <div class="top-product-item">
+                                            <div class="top-product-item__info">
+                                                <span class="top-product-item__rank">#4</span>
+                                                <div>
+                                                    <p class="top-product-item__name">Auriculares Gamer</p>
+                                                    <span class="top-product-item__sales">28 ventas</span>
+                                                </div>
+                                            </div>
+                                            <span class="top-product-item__amount">S/. 1,960</span>
+                                        </div>
+
+                                        <div class="top-product-item">
+                                            <div class="top-product-item__info">
+                                                <span class="top-product-item__rank">#5</span>
+                                                <div>
+                                                    <p class="top-product-item__name">Silla Gamer Ergonómica</p>
+                                                    <span class="top-product-item__sales">22 ventas</span>
+                                                </div>
+                                            </div>
+                                            <span class="top-product-item__amount">S/. 6,600</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-section">
+                    <div class="dashboard-row">
+                        <div class="dashboard-col dashboard-col--6">
+                            <div class="list-card u-glass-effect">
+                                <div class="list-card__header">
+                                    <h3 class="list-card__title">Ventas Recientes</h3>
+                                    <a href="/admin/sales/list/sales-list.html" class="list-card__link">Ver todas</a>
+                                </div>
+                                <div class="list-card__body">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Cliente</th>
+                                                <th>Monto</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-sales-table">
+                                            <tr>
+                                                <td><span class="table-code">VNT-001</span></td>
+                                                <td>Juan Pérez</td>
+                                                <td>S/. 450.00</td>
+                                                <td><span class="status-badge status-badge--success">Completado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="table-code">VNT-002</span></td>
+                                                <td>María García</td>
+                                                <td>S/. 1,200.00</td>
+                                                <td><span class="status-badge status-badge--success">Completado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="table-code">VNT-003</span></td>
+                                                <td>Carlos López</td>
+                                                <td>S/. 780.00</td>
+                                                <td><span class="status-badge status-badge--warning">Pendiente</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-col dashboard-col--6">
+                            <div class="list-card u-glass-effect">
+                                <div class="list-card__header">
+                                    <h3 class="list-card__title">Alertas de Inventario</h3>
+                                    <a href="/admin/products/alerts/inventory-alerts.html" class="list-card__link">Ver todas</a>
+                                </div>
+                                <div class="list-card__body">
+                                    <div class="alerts-list" id="inventory-alerts-list">
+                                        <div class="alert-item alert-item--warning">
+                                            <div class="alert-item__icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            </div>
+                                            <div class="alert-item__content">
+                                                <p class="alert-item__title">Stock bajo: Teclado Mecánico</p>
+                                                <span class="alert-item__subtitle">Quedan 5 unidades</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="alert-item alert-item--error">
+                                            <div class="alert-item__icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                            </div>
+                                            <div class="alert-item__content">
+                                                <p class="alert-item__title">Agotado: Mouse Pad RGB</p>
+                                                <span class="alert-item__subtitle">0 unidades disponibles</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="alert-item alert-item--warning">
+                                            <div class="alert-item__icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                            </div>
+                                            <div class="alert-item__content">
+                                                <p class="alert-item__title">Stock bajo: Webcam HD</p>
+                                                <span class="alert-item__subtitle">Quedan 3 unidades</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts en orden correcto -->
+    <script src="../../public/shared/scripts/supabase-client.js"></script>
+    <script src="../../public/shared/scripts/helpers.js"></script>
+    <script src="../../public/shared/scripts/api.js"></script>
+    <script src="../../public/shared/scripts/auth-utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js" defer></script>
+</body>
+</html>

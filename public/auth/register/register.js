@@ -1,10 +1,5 @@
 /* public/auth/register/register.js */
 
-/**
- * Mide la fortaleza de la contraseña y actualiza la barra.
- * @param {string} password - La contraseña ingresada.
- * @param {HTMLElement} indicator - Elemento span para la barra de color.
- */
 function updatePasswordStrength(password, indicator) {
     let strength = 0;
     if (password.length > 5) strength++;
@@ -37,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!registerForm || !passwordInput || !strengthIndicator) return;
 
-    // Listener para actualizar la barra en tiempo real
     passwordInput.addEventListener('input', () => {
         updatePasswordStrength(passwordInput.value, strengthIndicator);
     });
@@ -47,41 +41,60 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage.classList.add('u-hidden');
         errorMessage.textContent = '';
 
-        const fullName = document.getElementById('full-name').value;
-        const email = document.getElementById('email-register').value;
+        const fullName = document.getElementById('full-name').value.trim();
+        const email = document.getElementById('email-register').value.trim();
         const password = passwordInput.value;
-        // La validación de confirmación de contraseña se ha eliminado.
 
-        // Simulación: Comprobar que la contraseña tenga una fortaleza mínima (ej. > 5 caracteres)
+        if (!fullName || fullName.length < 3) {
+            errorMessage.textContent = 'El nombre completo debe tener al menos 3 caracteres.';
+            errorMessage.classList.remove('u-hidden');
+            return;
+        }
+
         if (password.length < 6) {
             errorMessage.textContent = 'La contraseña debe tener al menos 6 caracteres.';
             errorMessage.classList.remove('u-hidden');
             return;
         }
 
-        // --- MOCK DE LLAMADA A LA API ---
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Registrando...';
+
         try {
-            // Simulación de respuesta de la API. Asumimos que la API siempre asigna 'client'
-            const mockResponse = {
-                success: true,
-                token: 'mock_client_token_' + Date.now(),
-                role: 'client',
-                full_name: fullName // USAR EL NOMBRE INGRESADO EN EL FORMULARIO
-            };
+            let response;
             
-            if (mockResponse.success) {
-                // LLAMADA ACTUALIZADA con mockResponse.full_name
-                setAuthData(mockResponse.token, mockResponse.role, mockResponse.full_name);
-                redirectAfterLogin(mockResponse.role);
+            if (typeof api !== 'undefined' && api.registerUser) {
+                response = await api.registerUser({
+                    full_name: fullName,
+                    email: email,
+                    password: password
+                });
             } else {
-                errorMessage.textContent = 'Error al registrar el usuario. Inténtalo con otro email.';
+                response = {
+                    success: true,
+                    token: 'mock_token_' + Date.now(),
+                    role: 'client',
+                    full_name: fullName
+                };
+            }
+
+            if (response.success) {
+                setAuthData(response.token, response.role, response.full_name);
+                redirectAfterLogin(response.role);
+            } else {
+                errorMessage.textContent = response.error || 'Error al registrar el usuario.';
                 errorMessage.classList.remove('u-hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrarse';
             }
 
         } catch (error) {
             console.error('Error al registrarse:', error);
-            errorMessage.textContent = 'Error de conexión con el servidor. Intenta más tarde.';
+            errorMessage.textContent = 'Error de conexión. Intenta más tarde.';
             errorMessage.classList.remove('u-hidden');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Registrarse';
         }
     });
 });
