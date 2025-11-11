@@ -1,11 +1,14 @@
 /* public/shared/scripts/api.js */
 
+// Asume que 'supabaseClient', 'isSupabaseConfigured', 'handleSupabaseError', 'getMockDashboardData', etc., están definidos.
+
 async function registerUser(userData) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         
         if (!configured) {
             console.log('Modo MOCK - Registro simulado');
+            // MODIFICACIÓN CLAVE: Simular registro exitoso SIN verificación para redirigir directamente al inicio.
             return {
                 success: true,
                 token: 'mock_token_' + Date.now(),
@@ -57,6 +60,7 @@ async function registerUser(userData) {
                 user_id: authData.user.id
             };
         } else {
+            // Este es el flujo que indica "necesita verificación de email" (Modo producción)
             return {
                 success: true,
                 needsEmailVerification: true,

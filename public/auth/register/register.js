@@ -71,16 +71,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.success) {
                 if (response.needsEmailVerification) {
+                    // Este bloque SÓLO se ejecutará si Supabase está configurado y requiere email
                     errorMessage.textContent = response.message || 'Verifica tu email para completar el registro.';
                     errorMessage.style.color = 'var(--color-success)';
                     errorMessage.classList.remove('u-hidden');
                     
-                    setTimeout(() => {
-                        window.location.href = '/public/auth/login/login.html';
-                    }, 3000);
+                    window.location.href = '/public/auth/login/login.html';
                 } else {
+                    // ESTA ES LA RUTA DE ÉXITO INMEDIATO (Modo MOCK o Producción sin verificación)
                     setAuthData(response.token, response.role, response.full_name);
-                    redirectAfterLogin(response.role);
+                    redirectAfterLogin(response.role); // Redirige al /index.html
                 }
             } else {
                 errorMessage.textContent = response.error || 'Error al registrar el usuario.';
