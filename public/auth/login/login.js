@@ -51,6 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMessage.classList.add('u-hidden');
             errorMessage.textContent = '';
             
+            // CORRECCIÓN DEFENSIVA: Verifica que 'api' exista antes de usarlo.
+            if (typeof api === 'undefined' || typeof api.signInWithGoogle !== 'function') {
+                errorMessage.textContent = 'Error interno: Las funciones de autenticación no están cargadas.';
+                errorMessage.classList.remove('u-hidden');
+                return;
+            }
+
             googleLoginBtn.disabled = true;
             googleLoginBtn.textContent = 'Redirigiendo a Google...';
 

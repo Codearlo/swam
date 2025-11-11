@@ -68,6 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'Registrando...';
 
         try {
+            // CORRECCIÓN DEFENSIVA: Verifica la API
+            if (typeof api === 'undefined' || typeof api.registerUser !== 'function') {
+                throw new Error('Las funciones de autenticación no están cargadas.');
+            }
+            
             const response = await api.registerUser({
                 full_name: fullName,
                 email: email,
@@ -94,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error al registrarse:', error);
-            errorMessage.textContent = 'Error de conexión. Intenta más tarde.';
+            errorMessage.textContent = error.message.includes('cargadas') ? error.message : 'Error de conexión. Intenta más tarde.';
             errorMessage.classList.remove('u-hidden');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Registrarse';
@@ -108,6 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMessage.classList.add('u-hidden');
             errorMessage.textContent = '';
             
+            // CORRECCIÓN DEFENSIVA: Verifica que 'api' exista antes de usarlo.
+            if (typeof api === 'undefined' || typeof api.signInWithGoogle !== 'function') {
+                errorMessage.textContent = 'Error interno: Las funciones de autenticación no están cargadas.';
+                errorMessage.classList.remove('u-hidden');
+                return;
+            }
+
             googleRegisterBtn.disabled = true;
             googleRegisterBtn.textContent = 'Redirigiendo a Google...';
 
