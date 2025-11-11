@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         errorMessage.classList.add('u-hidden');
         errorMessage.textContent = '';
+        errorMessage.style.color = 'var(--color-error)';
 
         const fullName = document.getElementById('full-name').value.trim();
         const email = document.getElementById('email-register').value.trim();
@@ -62,26 +63,25 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'Registrando...';
 
         try {
-            let response;
-            
-            if (typeof api !== 'undefined' && api.registerUser) {
-                response = await api.registerUser({
-                    full_name: fullName,
-                    email: email,
-                    password: password
-                });
-            } else {
-                response = {
-                    success: true,
-                    token: 'mock_token_' + Date.now(),
-                    role: 'client',
-                    full_name: fullName
-                };
-            }
+            const response = await api.registerUser({
+                full_name: fullName,
+                email: email,
+                password: password
+            });
 
             if (response.success) {
-                setAuthData(response.token, response.role, response.full_name);
-                redirectAfterLogin(response.role);
+                if (response.needsEmailVerification) {
+                    errorMessage.textContent = response.message || 'Verifica tu email para completar el registro.';
+                    errorMessage.style.color = 'var(--color-success)';
+                    errorMessage.classList.remove('u-hidden');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/public/auth/login/login.html';
+                    }, 3000);
+                } else {
+                    setAuthData(response.token, response.role, response.full_name);
+                    redirectAfterLogin(response.role);
+                }
             } else {
                 errorMessage.textContent = response.error || 'Error al registrar el usuario.';
                 errorMessage.classList.remove('u-hidden');

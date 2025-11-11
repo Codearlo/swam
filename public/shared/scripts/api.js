@@ -20,41 +20,56 @@ async function registerUser(userData) {
             options: {
                 data: {
                     full_name: userData.full_name
-                }
+                },
+                emailRedirectTo: window.location.origin
             }
         });
 
         if (authError) {
-            return handleSupabaseError(authError, 'registerUser - Auth');
+            throw authError;
         }
 
-        const { data: user, error: insertError } = await supabaseClient
-            .from('users')
-            .insert([{
-                full_name: userData.full_name,
-                email: userData.email,
-                password_hash: 'handled_by_auth',
+        if (!authData.user) {
+            throw new Error('No se pudo crear el usuario');
+        }
+
+        if (authData.session) {
+            const { error: insertError } = await supabaseClient
+                .from('users')
+                .insert([{
+                    id: authData.user.id,
+                    full_name: userData.full_name,
+                    email: userData.email,
+                    role: 'client',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                }]);
+
+            if (insertError) {
+                console.warn('Error al insertar en tabla users:', insertError);
+            }
+
+            return {
+                success: true,
+                token: authData.session.access_token,
                 role: 'client',
-                is_active: true
-            }])
-            .select()
-            .single();
-
-        if (insertError) {
-            await supabaseClient.auth.admin.deleteUser(authData.user.id);
-            return handleSupabaseError(insertError, 'registerUser - Insert');
+                full_name: userData.full_name,
+                user_id: authData.user.id
+            };
+        } else {
+            return {
+                success: true,
+                needsEmailVerification: true,
+                message: 'Verifica tu email para completar el registro'
+            };
         }
-
-        return {
-            success: true,
-            token: authData.session?.access_token || 'mock_token',
-            role: user.role || 'client',
-            full_name: user.full_name,
-            user_id: user.id
-        };
 
     } catch (error) {
-        return handleSupabaseError(error, 'registerUser');
+        console.error('Error en registerUser:', error);
+        return {
+            success: false,
+            error: error.message || 'Error al registrar usuario'
+        };
     }
 }
 
