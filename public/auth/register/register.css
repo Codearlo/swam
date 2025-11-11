@@ -52,6 +52,52 @@
     animation: slideShine 1s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
+/* NUEVO: Botón Secundario (Google) */
+.button--secondary {
+    background-color: rgba(255, 255, 255, 0.05); /* Fondo oscuro transparente */
+    color: var(--color-text-light);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+}
+
+.button--secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: none; /* Sin translación para el botón secundario */
+    box-shadow: none;
+}
+
+/* Icono de OAuth */
+.oauth-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-sm);
+}
+
+/* Separador 'O' */
+.auth-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-sm) 0;
+    color: var(--color-purple-light);
+    font-size: 0.85rem;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-separator:not(:empty)::before {
+    margin-right: var(--spacing-sm);
+}
+
+.auth-separator:not(:empty)::after {
+    margin-left: var(--spacing-sm);
+}
+
 /* --- ESTILOS DE AUTENTICACIÓN (Copia de login.css) --- */
 
 .auth-section {
@@ -172,38 +218,8 @@
     display: none;
 }
 
-/* --- Estilos Específicos de Register (AÑADIDOS) --- */
+/* --- Estilos Específicos de Register --- */
 
 .form-group--password {
     position: relative;
-}
-
-/* Barra de fortaleza de contraseña */
-.password-strength-bar {
-    height: 4px;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    margin-top: 4px; /* Espacio sutil */
-    overflow: hidden;
-}
-
-.password-strength-indicator {
-    display: block;
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-/* Clases de estado (Para ser aplicadas con JS) */
-.strength-weak {
-    background-color: var(--color-error); /* Rojo */
-}
-
-.strength-medium {
-    background-color: orange;
-}
-
-.strength-strong {
-    background-color: var(--color-success); /* Blanco/Acento */
 }

@@ -2,10 +2,12 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
+    const googleLoginBtn = document.getElementById('google-login-btn'); 
     const errorMessage = document.getElementById('login-error-message');
 
     if (!loginForm) return;
 
+    // Lógica para Email/Password
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMessage.classList.add('u-hidden');
@@ -24,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await api.loginUser({ email, password });
 
             if (response.success) {
-                // Guardar datos de autenticación
-                setAuthData(response.token, response.role, response.full_name);
                 // Redirigir según el rol
                 redirectAfterLogin(response.role);
             } else {
@@ -43,4 +43,36 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Acceder a SWAM';
         }
     });
+
+    // Lógica para Google Sign-In
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('u-hidden');
+            errorMessage.textContent = '';
+            
+            googleLoginBtn.disabled = true;
+            googleLoginBtn.textContent = 'Redirigiendo a Google...';
+
+            try {
+                const response = await api.signInWithGoogle();
+                
+                if (response.success && response.url) {
+                    // Redirigir al usuario a la URL de autenticación de Google
+                    window.location.href = response.url;
+                } else {
+                    errorMessage.textContent = response.error || 'Error al iniciar sesión con Google.';
+                    errorMessage.classList.remove('u-hidden');
+                    googleLoginBtn.disabled = false;
+                    googleLoginBtn.innerHTML = '<img src="../../assets/icons/google.svg" alt="Google Icon" class="oauth-icon"> Acceder con Google';
+                }
+            } catch (error) {
+                console.error('Error al iniciar sesión con Google:', error);
+                errorMessage.textContent = 'Error de conexión. Intenta más tarde.';
+                errorMessage.classList.remove('u-hidden');
+                googleLoginBtn.disabled = false;
+                googleLoginBtn.innerHTML = '<img src="../../assets/icons/google.svg" alt="Google Icon" class="oauth-icon"> Acceder con Google';
+            }
+        });
+    }
 });

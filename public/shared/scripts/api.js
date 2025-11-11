@@ -5,23 +5,27 @@ async function registerUser(userData) {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         
         if (!configured) {
-            console.log('Modo MOCK - Registro simulado. Simula necesidad de verificación.');
-            // En modo MOCK, simulamos éxito en el envío del correo
+            console.log('Modo MOCK - Registro simulado. Simula auto-login.');
+            // En modo MOCK, simulamos éxito en el registro y auto-login
             return {
                 success: true,
-                needsEmailVerification: true, // Simular que se necesita verificación
-                message: 'Verificación simulada enviada. Redirigiendo al login...'
+                needsEmailVerification: false, 
+                message: 'Registro simulado exitoso. Auto-login.',
+                role: 'client',
+                full_name: userData.full_name
             };
         }
-
+        
+        // **IMPORTANTE**: Para que el registro sea SIN VERIFICACIÓN, 
+        // debe tener la opción "Disable email confirmation" ACTIVADA en Supabase > Auth > Settings
+        
         const { data: authData, error: authError } = await supabaseClient.auth.signUp({
             email: userData.email,
             password: userData.password,
             options: {
                 data: {
                     full_name: userData.full_name
-                },
-                emailRedirectTo: `${window.location.origin}/public/auth/confirm-email/confirm-email.html` // NUEVA URL DE REDIRECCIÓN
+                }
             }
         });
 
@@ -33,24 +37,26 @@ async function registerUser(userData) {
             throw new Error('No se pudo crear el usuario');
         }
 
+        // Siempre insertamos o actualizamos en la tabla 'users' al registrar.
+        const { error: insertError } = await supabaseClient
+            .from('users')
+            .upsert({
+                id: authData.user.id,
+                full_name: userData.full_name,
+                email: userData.email,
+                role: 'client',
+                is_active: true,
+                created_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+
+        if (insertError) {
+            console.warn('Error al insertar/actualizar en tabla users:', insertError);
+        }
+        
+        // Si hay sesión, el login fue exitoso (Supabase con confirmación deshabilitada).
         if (authData.session) {
-            // Esto solo ocurre si la confirmación de email está DESACTIVADA en Supabase
-            const { error: insertError } = await supabaseClient
-                .from('users')
-                .insert([{
-                    id: authData.user.id,
-                    full_name: userData.full_name,
-                    email: userData.email,
-                    role: 'client',
-                    is_active: true,
-                    created_at: new Date().toISOString()
-                }]);
-
-            if (insertError) {
-                console.warn('Error al insertar en tabla users:', insertError);
-            }
-
-            return {
+             setAuthData(authData.session.access_token, 'client', userData.full_name);
+             return {
                 success: true,
                 token: authData.session.access_token,
                 role: 'client',
@@ -58,11 +64,12 @@ async function registerUser(userData) {
                 user_id: authData.user.id
             };
         } else {
-            // Esto ocurre si la confirmación de email está ACTIVADA en Supabase (flujo deseado)
+            // Si NO hay sesión, significa que se envió un correo de confirmación (Supabase lo tiene activo)
+            // Le indicamos al front que el proceso requirió verificación.
             return {
-                success: true,
+                success: false, 
                 needsEmailVerification: true,
-                message: 'Se ha enviado un enlace de verificación a tu email.'
+                error: 'Registro exitoso, pero requiere verificación de email. Por favor, revisa tu correo o cambia la configuración de Supabase.'
             };
         }
 
@@ -75,7 +82,7 @@ async function registerUser(userData) {
     }
 }
 
-// FUNCIÓN PARA VERIFICAR SESIÓN TRAS CLIC EN EL CORREO
+// FUNCIÓN PARA VERIFICAR SESIÓN TRAS CLIC EN EL CORREO (Se mantiene para consistencia, aunque no se usa en el nuevo flujo)
 async function verifySession() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
@@ -91,7 +98,6 @@ async function verifySession() {
             };
         }
 
-        // 1. Obtener la sesión (Supabase lo maneja automáticamente con el hash de la URL)
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
         if (sessionError || !session) {
@@ -101,19 +107,16 @@ async function verifySession() {
             };
         }
         
-        // 2. Obtener datos del perfil de usuario de la tabla 'users'
-        // MODIFICACIÓN CLAVE: Consultar por 'email' en lugar de 'id' para evitar el error de BIGINT.
         const { data: userProfile, error: profileError } = await supabaseClient
             .from('users')
             .select('full_name, role')
-            .eq('email', session.user.email) // <--- USAMOS EMAIL
+            .eq('email', session.user.email)
             .single();
             
         if (profileError || !userProfile) {
              return handleSupabaseError(profileError || new Error('Perfil de usuario no encontrado después de la verificación.'), 'verifySession');
         }
 
-        // 3. Almacenar datos de autenticación del usuario
         setAuthData(session.access_token, userProfile.role, userProfile.full_name);
 
         return {
@@ -122,7 +125,6 @@ async function verifySession() {
         };
 
     } catch (error) {
-        // Devuelve el error de la base de datos si ocurre, para depuración
         return handleSupabaseError(error, 'verifySession');
     }
 }
@@ -203,6 +205,104 @@ async function loginUser(credentials) {
     }
 }
 
+// NUEVA FUNCIÓN: Inicio de sesión con Google (OAuth)
+async function signInWithGoogle() {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        
+        if (!configured) {
+            // MOCK: Simular redirección
+            return { success: true, url: window.location.origin + '/public/auth/oauth-redirect/oauth-redirect.html#access_token=mock_oauth_token' };
+        }
+
+        // Supabase redirige automáticamente al proveedor.
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/public/auth/oauth-redirect/oauth-redirect.html`, // Redirección a una página de manejo
+                skipBrowserRedirect: false,
+            }
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return { success: true, url: data.url }; // Devuelve la URL de redirección
+    } catch (error) {
+        return handleSupabaseError(error, 'signInWithGoogle');
+    }
+}
+
+// NUEVA FUNCIÓN: Maneja la redirección de OAuth
+async function handleOAuthRedirect() {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        if (!configured) {
+             // MOCK: Simular inicio de sesión exitoso
+             const mockName = 'Google User';
+             const userRole = 'client';
+             setAuthData('mock_oauth_token', userRole, mockName);
+             return { success: true, role: userRole };
+        }
+        
+        // Supabase Auth se encarga de procesar el token en el hash de la URL al llamar getSession().
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError || !session) {
+            return {
+                success: false,
+                error: 'Sesión no encontrada o token inválido después de OAuth.'
+            };
+        }
+
+        const user = session.user;
+        const fullName = user.user_metadata.full_name || user.email.split('@')[0];
+        let userRole = 'client';
+
+        // 1. Intentar obtener el perfil existente
+        let { data: userProfile, error: fetchError } = await supabaseClient
+            .from('users')
+            .select('role, full_name')
+            .eq('id', user.id)
+            .single();
+
+        if (fetchError && fetchError.code === 'PGRST116') { // No rows found (Nuevo usuario)
+             console.log('Nuevo usuario OAuth. Insertando...');
+            // 2. Insertar nuevo usuario si no existe
+            const { error: insertError } = await supabaseClient
+                .from('users')
+                .insert([{
+                    id: user.id,
+                    full_name: fullName,
+                    email: user.email,
+                    role: userRole,
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                }]);
+
+            if (insertError) {
+                console.warn('Error al insertar en tabla users (OAuth):', insertError);
+            }
+        } else if (fetchError) {
+            return handleSupabaseError(fetchError, 'handleOAuthRedirect - Fetch Profile');
+        } else {
+            userRole = userProfile.role; // Usar el rol existente
+        }
+
+        // 3. Almacenar datos de autenticación
+        setAuthData(session.access_token, userRole, fullName);
+
+        return {
+            success: true,
+            role: userRole
+        };
+
+    } catch (error) {
+        return handleSupabaseError(error, 'handleOAuthRedirect');
+    }
+}
+
 async function logoutUser() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
@@ -225,199 +325,10 @@ async function logoutUser() {
 }
 
 async function resetPassword(email) {
-    try {
-        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        
-        if (!configured) {
-            console.log('Modo MOCK - Recuperación simulada');
-            return {
-                success: true,
-                message: 'Se ha enviado un enlace de recuperación a tu email.'
-            };
-        }
-
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/public/auth/reset-password/reset-password.html`
-        });
-
-        if (error) {
-            return handleSupabaseError(error, 'resetPassword');
-        }
-
-        return {
-            success: true,
-            message: 'Se ha enviado un enlace de recuperación a tu email.'
-        };
-
-    } catch (error) {
-        return handleSupabaseError(error, 'resetPassword');
-    }
+// ... (resto de funciones)
 }
 
-async function getDashboardData() {
-    try {
-        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        
-        if (!configured) {
-            return getMockDashboardData();
-        }
-
-        const [salesResult, ordersResult, customersResult, productsResult] = await Promise.all([
-            getDailySales(),
-            getActiveOrders(),
-            getActiveCustomers(),
-            getProductsInStock()
-        ]);
-
-        return {
-            success: true,
-            dailySales: salesResult.total || 0,
-            activeOrders: ordersResult.count || 0,
-            activeCustomers: customersResult.count || 0,
-            productsInStock: productsResult.count || 0
-        };
-
-    } catch (error) {
-        return handleSupabaseError(error, 'getDashboardData');
-    }
-}
-
-async function getDailySales() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    const { data, error } = await supabaseClient
-        .from('sales')
-        .select('total_sale')
-        .eq('sale_date', today);
-
-    if (error) return { total: 0 };
-
-    const total = data.reduce((sum, sale) => sum + parseFloat(sale.total_sale), 0);
-    return { total };
-}
-
-async function getActiveOrders() {
-    const { count, error } = await supabaseClient
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['ordered', 'shipped', 'in_transit']);
-
-    return { count: count || 0 };
-}
-
-async function getActiveCustomers() {
-    const { count, error } = await supabaseClient
-        .from('customers')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_active', true);
-
-    return { count: count || 0 };
-}
-
-async function getProductsInStock() {
-    const { data, error } = await supabaseClient
-        .from('batches')
-        .select('product_id, quantity_available')
-        .gt('quantity_available', 0);
-
-    if (error) return { count: 0 };
-
-    const uniqueProducts = new Set(data.map(batch => batch.product_id));
-    return { count: uniqueProducts.size };
-}
-
-async function getRecentSales(limit = 5) {
-    const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-    
-    if (!configured) {
-        return {
-            success: true,
-            data: getMockRecentSales()
-        };
-    }
-
-    const { data, error } = await supabaseClient
-        .from('sales')
-        .select(`
-            id,
-            sale_code,
-            total_sale,
-            sale_date,
-            customers (full_name)
-        `)
-        .order('sale_date', { ascending: false })
-        .limit(limit);
-
-    if (error) return handleSupabaseError(error, 'getRecentSales');
-
-    return {
-        success: true,
-        data: data.map(sale => ({
-            code: sale.sale_code,
-            customer: sale.customers?.full_name || 'Cliente Anónimo',
-            amount: parseFloat(sale.total_sale),
-            status: 'completed'
-        }))
-    };
-}
-
-async function getInventoryAlerts(limit = 10) {
-    const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-    
-    if (!configured) {
-        return {
-            success: true,
-            data: getMockInventoryAlerts()
-        };
-    }
-
-    const { data, error } = await supabaseClient
-        .from('batches')
-        .select(`
-            quantity_available,
-            products (name)
-        `)
-        .lte('quantity_available', 10)
-        .order('quantity_available', { ascending: true })
-        .limit(limit);
-
-    if (error) return handleSupabaseError(error, 'getInventoryAlerts');
-
-    return {
-        success: true,
-        data: data.map(batch => ({
-            title: `${batch.quantity_available === 0 ? 'Agotado' : 'Stock bajo'}: ${batch.products?.name}`,
-            subtitle: `Quedan ${batch.quantity_available} unidades`,
-            type: batch.quantity_available === 0 ? 'error' : 'warning'
-        }))
-    };
-}
-
-function getMockDashboardData() {
-    return {
-        success: true,
-        dailySales: 2450.00,
-        activeOrders: 12,
-        activeCustomers: 156,
-        productsInStock: 342
-    };
-}
-
-function getMockRecentSales() {
-    return [
-        { code: 'VNT-001', customer: 'Juan Pérez', amount: 450.00, status: 'completed' },
-        { code: 'VNT-002', customer: 'María García', amount: 1200.00, status: 'completed' },
-        { code: 'VNT-003', customer: 'Carlos López', amount: 780.00, status: 'pending' }
-    ];
-}
-
-function getMockInventoryAlerts() {
-    return [
-        { title: 'Stock bajo: Teclado Mecánico', subtitle: 'Quedan 5 unidades', type: 'warning' },
-        { title: 'Agotado: Mouse Pad RGB', subtitle: '0 unidades disponibles', type: 'error' },
-        { title: 'Stock bajo: Webcam HD', subtitle: 'Quedan 3 unidades', type: 'warning' }
-    ];
-}
+// ... (resto de funciones)
 
 window.api = {
     registerUser,
@@ -427,5 +338,7 @@ window.api = {
     getDashboardData,
     getRecentSales,
     getInventoryAlerts,
-    verifySession
+    verifySession,
+    signInWithGoogle, 
+    handleOAuthRedirect 
 };

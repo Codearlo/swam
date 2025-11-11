@@ -26,39 +26,21 @@ function updatePasswordStrength(password, indicator) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
-    const authCard = document.querySelector('.auth-card');
+    const googleRegisterBtn = document.getElementById('google-register-btn');
     const errorMessage = document.getElementById('register-error-message');
     const passwordInput = document.getElementById('password-register');
     const strengthIndicator = document.getElementById('password-strength-indicator');
 
-    if (!registerForm || !passwordInput || !strengthIndicator) return;
+    // Comprobamos si los elementos de la barra de fortaleza existen antes de agregar el listener
+    if (passwordInput && strengthIndicator) {
+        passwordInput.addEventListener('input', () => {
+            updatePasswordStrength(passwordInput.value, strengthIndicator);
+        });
+    }
 
-    passwordInput.addEventListener('input', () => {
-        updatePasswordStrength(passwordInput.value, strengthIndicator);
-    });
+    if (!registerForm) return;
 
-    const displayConfirmationMessage = () => {
-        authCard.innerHTML = `
-            <div class="auth-card__header u-flex-center" style="gap: 20px; text-align: center;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--color-purple-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-purple-primary); /* Simula el efecto Glass */">
-                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-                    <path d="M22 7l-10 7-10-7"></path>
-                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                </svg>
-                <h2 style="font-size: 2rem;">¡Registro Exitoso!</h2>
-            </div>
-            <p style="text-align: center; color: var(--color-purple-light); font-size: 1.1rem; margin-bottom: 30px;">
-                Hemos enviado un **enlace de confirmación** a tu correo electrónico. 
-                <br><br>
-                Ve a tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
-            </p>
-            <a href="../login/login.html" class="button button--primary u-full-width">
-                Ir a Iniciar Sesión
-            </a>
-        `;
-        authCard.style.padding = '60px 40px';
-    };
-
+    // Lógica para Email/Password
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMessage.classList.add('u-hidden');
@@ -93,10 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.success) {
-                // Si la API devuelve éxito (sin importar si es MOCK o producción con verificación)
-                // Ocultamos el formulario y mostramos el mensaje de confirmación
-                displayConfirmationMessage();
-            } else {
+                // Éxito en el registro Y auto-login
+                redirectAfterLogin(response.role || 'client');
+            } else if (response.needsEmailVerification) {
+                 // Si aún requiere verificación (Supabase no fue configurado correctamente)
+                errorMessage.textContent = 'Registro exitoso. Se requiere la verificación de email. Por favor, revisa tu bandeja de entrada.';
+                errorMessage.classList.remove('u-hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrarse';
+            } 
+            else {
                 // Flujo de Error (Ej. usuario ya existe, error de Supabase)
                 errorMessage.textContent = response.error || 'Error al registrar el usuario. Inténtalo de nuevo.';
                 errorMessage.classList.remove('u-hidden');
@@ -112,4 +100,36 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Registrarse';
         }
     });
+
+    // Lógica para Google Sign-In
+    if (googleRegisterBtn) {
+        googleRegisterBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('u-hidden');
+            errorMessage.textContent = '';
+            
+            googleRegisterBtn.disabled = true;
+            googleRegisterBtn.textContent = 'Redirigiendo a Google...';
+
+            try {
+                const response = await api.signInWithGoogle();
+                
+                if (response.success && response.url) {
+                    // Redirigir al usuario a la URL de autenticación de Google
+                    window.location.href = response.url;
+                } else {
+                    errorMessage.textContent = response.error || 'Error al registrarse con Google.';
+                    errorMessage.classList.remove('u-hidden');
+                    googleRegisterBtn.disabled = false;
+                    googleRegisterBtn.innerHTML = '<img src="../../assets/icons/google.svg" alt="Google Icon" class="oauth-icon"> Registrarse con Google';
+                }
+            } catch (error) {
+                console.error('Error al registrarse con Google:', error);
+                errorMessage.textContent = 'Error de conexión. Intenta más tarde.';
+                errorMessage.classList.remove('u-hidden');
+                googleRegisterBtn.disabled = false;
+                googleRegisterBtn.innerHTML = '<img src="../../assets/icons/google.svg" alt="Google Icon" class="oauth-icon"> Registrarse con Google';
+            }
+        });
+    }
 });

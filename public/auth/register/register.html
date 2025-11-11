@@ -44,13 +44,19 @@
                     <div class="form-group form-group--password">
                         <label for="password-register">Contraseña</label>
                         <input type="password" id="password-register" name="password" required>
-                        <div class="password-strength-bar">
-                            <span id="password-strength-indicator" class="password-strength-indicator"></span>
-                        </div>
                     </div>
                     
                     <button type="submit" class="button button--primary u-full-width">
                         Registrarse
+                    </button>
+
+                    <div class="auth-separator">
+                        <span>O</span>
+                    </div>
+
+                    <button type="button" id="google-register-btn" class="button button--secondary u-full-width u-flex-center">
+                        <img src="../../assets/icons/google.svg" alt="Google Icon" class="oauth-icon">
+                        Registrarse con Google
                     </button>
                     
                     <p class="auth-card__link">
