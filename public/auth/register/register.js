@@ -31,6 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password-register');
     const strengthIndicator = document.getElementById('password-strength-indicator');
 
+    // NUEVO: Redirigir si ya está autenticado
+    if (typeof isAuthenticated === 'function' && isAuthenticated()) {
+        const userRole = typeof getUserRole === 'function' ? getUserRole() : 'client';
+        redirectAfterLogin(userRole);
+        return; // Detener la ejecución del resto del script
+    }
+    
     // Comprobamos si los elementos de la barra de fortaleza existen antes de agregar el listener
     if (passwordInput && strengthIndicator) {
         passwordInput.addEventListener('input', () => {

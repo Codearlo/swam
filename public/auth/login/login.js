@@ -1,6 +1,13 @@
 /* public/auth/login/login.js */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // NUEVO: Redirigir si ya está autenticado
+    if (typeof isAuthenticated === 'function' && isAuthenticated()) {
+        const userRole = typeof getUserRole === 'function' ? getUserRole() : 'client';
+        redirectAfterLogin(userRole);
+        return; // Detener la ejecución del resto del script
+    }
+    
     const loginForm = document.getElementById('login-form');
     const googleLoginBtn = document.getElementById('google-login-btn'); 
     const errorMessage = document.getElementById('login-error-message');

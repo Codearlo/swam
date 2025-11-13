@@ -50,15 +50,16 @@ function logout() {
 
 /**
  * Redirige al usuario según su rol después de iniciar sesión.
- * - 'admin' va a /admin/dashboard.html
+ * - 'admin' va a /admin/dashboard/dashboard.html
  * - 'client' va a /index.html
  * @param {string} role - El rol del usuario ('admin' o 'client').
  */
 function redirectAfterLogin(role) {
+    // Las rutas son relativas porque se llama desde public/auth/login/ o public/auth/register/
     if (role === 'admin') {
-        window.location.href = '/admin/dashboard.html'; // Redirección al Dashboard de Admin
+        window.location.href = '../../../admin/dashboard/dashboard.html'; 
     } else {
-        window.location.href = '/index.html'; // Redirección a la tienda (Cliente)
+        window.location.href = '../../../index.html'; 
     }
 }
 
