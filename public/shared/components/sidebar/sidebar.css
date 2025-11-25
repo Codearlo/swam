@@ -1,5 +1,15 @@
 /* public/shared/components/sidebar/sidebar.css */
 
+/* NUEVA ANIMACIÓN DE BRILLO EN ONDA (Copiado de store-header.css) */
+@keyframes slideShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 150%; /* Se mueve más allá del borde derecho para desaparecer */
+    }
+}
+
 .admin-sidebar {
     display: flex;
     flex-direction: column;
@@ -61,6 +71,22 @@
     font-weight: 500;
     transition: all 0.2s ease;
     position: relative;
+    overflow: hidden; /* Nuevo: Necesario para el efecto de brillo en onda */
+    z-index: 1; /* Nuevo: Asegura que el link esté por encima del fondo */
+}
+
+/* Pseudo-elemento para el brillo en onda */
+.sidebar-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%; /* Empieza completamente a la izquierda */
+    width: 25%; /* Ancho del brillo */
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: skewX(-20deg); /* Inclinación diagonal del brillo */
+    z-index: 2;
+    transition: all 0.3s ease;
 }
 
 .sidebar-link::before {
@@ -74,11 +100,17 @@
     background: var(--color-purple-primary);
     border-radius: 0 3px 3px 0;
     transition: height 0.2s ease;
+    z-index: 3; /* Nuevo: Asegura que la barra activa esté por encima del brillo */
 }
 
 .sidebar-link:hover {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--color-text-light);
+}
+
+/* Animación de brillo al hacer hover */
+.sidebar-link:hover::after {
+    animation: slideShine 1s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
 .sidebar-link:hover::before {

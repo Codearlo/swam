@@ -109,12 +109,13 @@
     padding: var(--spacing-sm);
     color: var(--color-text-light);
     border-radius: 50%;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease, box-shadow 0.2s ease;
 }
 
 .admin-header__logout-btn:hover {
     background-color: rgba(239, 68, 68, 0.2);
     color: var(--color-error);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
 
 /* DASHBOARD CONTAINER */
@@ -144,12 +145,16 @@
     padding: var(--spacing-lg);
     display: flex;
     gap: var(--spacing-md);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Modificado: Añadido border-color para la transición y forzar el borde base */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
+    border: var(--glass-border);
 }
 
 .metric-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+    /* Modificado: Nuevo box-shadow para el efecto glow */
+    box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
+    border-color: var(--color-purple-primary); /* Nuevo: Acento en el borde */
 }
 
 .metric-card__icon {
@@ -250,6 +255,16 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    /* Nuevo: Añadido transición y borde base */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
+    border: var(--glass-border);
+}
+
+.chart-card:hover {
+    transform: translateY(-4px);
+    /* Nuevo: Efecto glow al pasar el ratón */
+    box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
+    border-color: var(--color-purple-primary);
 }
 
 .chart-card__header {
@@ -358,6 +373,16 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    /* Nuevo: Añadido transición y borde base */
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
+    border: var(--glass-border);
+}
+
+.list-card:hover {
+    transform: translateY(-4px);
+    /* Nuevo: Efecto glow al pasar el ratón */
+    box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
+    border-color: var(--color-purple-primary);
 }
 
 .list-card__header {
