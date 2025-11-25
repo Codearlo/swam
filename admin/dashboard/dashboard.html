@@ -63,7 +63,7 @@
                                 <h3 class="metric-card__value" id="daily-sales">S/. 0.00</h3>
                                 <span class="metric-card__change metric-card__change--positive">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                    +12% vs ayer
+                                    Hoy
                                 </span>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                                 <p class="metric-card__label">Órdenes Activas</p>
                                 <h3 class="metric-card__value" id="active-orders">0</h3>
                                 <span class="metric-card__change metric-card__change--neutral">
-                                    3 en tránsito
+                                    En proceso
                                 </span>
                             </div>
                         </div>
@@ -89,8 +89,7 @@
                                 <p class="metric-card__label">Clientes Activos</p>
                                 <h3 class="metric-card__value" id="active-customers">0</h3>
                                 <span class="metric-card__change metric-card__change--positive">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                    +5 este mes
+                                    Total registrados
                                 </span>
                             </div>
                         </div>
@@ -100,11 +99,10 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             </div>
                             <div class="metric-card__content">
-                                <p class="metric-card__label">Productos en Stock</p>
+                                <p class="metric-card__label">Stock Bajo</p>
                                 <h3 class="metric-card__value" id="products-stock">0</h3>
                                 <span class="metric-card__change metric-card__change--negative">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
-                                    8 con stock bajo
+                                    Productos en alerta
                                 </span>
                             </div>
                         </div>
@@ -132,63 +130,17 @@
                         <div class="dashboard-col dashboard-col--4">
                             <div class="chart-card u-glass-effect">
                                 <div class="chart-card__header">
-                                    <h3 class="chart-card__title">Productos Más Vendidos</h3>
+                                    <h3 class="chart-card__title">Más Vendidos</h3>
+                                    <div class="chart-card__actions">
+                                        <button class="chart-btn chart-btn--active" onclick="changeTopProductsFilter('week', this)">Semana</button>
+                                        <button class="chart-btn" onclick="changeTopProductsFilter('month', this)">Mes</button>
+                                        <button class="chart-btn" onclick="changeTopProductsFilter('year', this)">Año</button>
+                                    </div>
                                 </div>
                                 <div class="chart-card__body">
                                     <div class="top-products-list" id="top-products-list">
-                                        <div class="top-product-item">
-                                            <div class="top-product-item__info">
-                                                <span class="top-product-item__rank">#1</span>
-                                                <div>
-                                                    <p class="top-product-item__name">Teclado Mecánico RGB</p>
-                                                    <span class="top-product-item__sales">45 ventas</span>
-                                                </div>
-                                            </div>
-                                            <span class="top-product-item__amount">S/. 3,240</span>
-                                        </div>
-
-                                        <div class="top-product-item">
-                                            <div class="top-product-item__info">
-                                                <span class="top-product-item__rank">#2</span>
-                                                <div>
-                                                    <p class="top-product-item__name">Mouse Gamer Inalámbrico</p>
-                                                    <span class="top-product-item__sales">38 ventas</span>
-                                                </div>
-                                            </div>
-                                            <span class="top-product-item__amount">S/. 2,850</span>
-                                        </div>
-
-                                        <div class="top-product-item">
-                                            <div class="top-product-item__info">
-                                                <span class="top-product-item__rank">#3</span>
-                                                <div>
-                                                    <p class="top-product-item__name">Monitor 27" 144Hz</p>
-                                                    <span class="top-product-item__sales">32 ventas</span>
-                                                </div>
-                                            </div>
-                                            <span class="top-product-item__amount">S/. 9,600</span>
-                                        </div>
-
-                                        <div class="top-product-item">
-                                            <div class="top-product-item__info">
-                                                <span class="top-product-item__rank">#4</span>
-                                                <div>
-                                                    <p class="top-product-item__name">Auriculares Gamer</p>
-                                                    <span class="top-product-item__sales">28 ventas</span>
-                                                </div>
-                                            </div>
-                                            <span class="top-product-item__amount">S/. 1,960</span>
-                                        </div>
-
-                                        <div class="top-product-item">
-                                            <div class="top-product-item__info">
-                                                <span class="top-product-item__rank">#5</span>
-                                                <div>
-                                                    <p class="top-product-item__name">Silla Gamer Ergonómica</p>
-                                                    <span class="top-product-item__sales">22 ventas</span>
-                                                </div>
-                                            </div>
-                                            <span class="top-product-item__amount">S/. 6,600</span>
+                                        <div class="u-flex-center" style="height: 100%; color: var(--color-purple-light);">
+                                            Cargando...
                                         </div>
                                     </div>
                                 </div>
@@ -217,22 +169,7 @@
                                         </thead>
                                         <tbody id="recent-sales-table">
                                             <tr>
-                                                <td><span class="table-code">VNT-001</span></td>
-                                                <td>Juan Pérez</td>
-                                                <td>S/. 450.00</td>
-                                                <td><span class="status-badge status-badge--success">Completado</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="table-code">VNT-002</span></td>
-                                                <td>María García</td>
-                                                <td>S/. 1,200.00</td>
-                                                <td><span class="status-badge status-badge--success">Completado</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="table-code">VNT-003</span></td>
-                                                <td>Carlos López</td>
-                                                <td>S/. 780.00</td>
-                                                <td><span class="status-badge status-badge--warning">Pendiente</span></td>
+                                                <td colspan="4" style="text-align: center; padding: 20px;">Cargando ventas...</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -248,35 +185,7 @@
                                 </div>
                                 <div class="list-card__body">
                                     <div class="alerts-list" id="inventory-alerts-list">
-                                        <div class="alert-item alert-item--warning">
-                                            <div class="alert-item__icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                            </div>
-                                            <div class="alert-item__content">
-                                                <p class="alert-item__title">Stock bajo: Teclado Mecánico</p>
-                                                <span class="alert-item__subtitle">Quedan 5 unidades</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="alert-item alert-item--error">
-                                            <div class="alert-item__icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                            </div>
-                                            <div class="alert-item__content">
-                                                <p class="alert-item__title">Agotado: Mouse Pad RGB</p>
-                                                <span class="alert-item__subtitle">0 unidades disponibles</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="alert-item alert-item--warning">
-                                            <div class="alert-item__icon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                            </div>
-                                            <div class="alert-item__content">
-                                                <p class="alert-item__title">Stock bajo: Webcam HD</p>
-                                                <span class="alert-item__subtitle">Quedan 3 unidades</span>
-                                            </div>
-                                        </div>
+                                        <p style="text-align: center; padding: 20px;">Cargando alertas...</p>
                                     </div>
                                 </div>
                             </div>

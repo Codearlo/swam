@@ -1,5 +1,7 @@
 /* public/shared/scripts/api.js */
 
+// --- SECCIÓN 1: AUTENTICACIÓN Y USUARIOS ---
+
 async function registerUser(userData) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
@@ -13,6 +15,7 @@ async function registerUser(userData) {
             };
         }
         
+        // 1. Crear usuario en Auth
         const { data: authData, error: authError } = await supabaseClient.auth.signUp({
             email: userData.email,
             password: userData.password,
@@ -23,28 +26,25 @@ async function registerUser(userData) {
             }
         });
 
-        if (authError) {
-            throw authError;
-        }
+        if (authError) throw authError;
 
-        if (!authData.user) {
-            throw new Error('No se pudo crear el usuario');
-        }
+        if (!authData.user) throw new Error('No se pudo crear el usuario');
 
-        // ¡CORREGIDO! Insertar en la nueva tabla 'profiles'
+        // 2. Insertar perfil en tabla pública 'profiles'
         const { error: insertError } = await supabaseClient
             .from('profiles')
             .insert({
-                id: authData.user.id, // El UUID de auth.users
+                id: authData.user.id,
                 full_name: userData.full_name,
                 email: userData.email,
                 role: 'client' // Rol por defecto
             });
 
         if (insertError) {
-            console.warn('Error al insertar en tabla profiles:', insertError);
+            console.warn('Error al crear perfil público:', insertError);
         }
         
+        // 3. Manejar sesión
         if (authData.session) {
              setAuthData(authData.session.access_token, 'client', userData.full_name);
              return {
@@ -63,52 +63,7 @@ async function registerUser(userData) {
         }
 
     } catch (error) {
-        console.error('Error en registerUser:', error);
-        return {
-            success: false,
-            error: error.message || 'Error al registrar usuario'
-        };
-    }
-}
-
-// FUNCIÓN PARA VERIFICAR SESIÓN (Ej. confirmación de email, si la activaras)
-async function verifySession() {
-    try {
-        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-
-        if (!configured) {
-            console.log('Modo MOCK - Sesión verificada.');
-            const mockName = 'Usuario Confirmado';
-            setAuthData('mock_verified_token', 'client', mockName);
-            return { success: true, full_name: mockName };
-        }
-
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-        
-        if (sessionError || !session) {
-            return { success: false, error: 'Sesión no encontrada.' };
-        }
-        
-        // ¡CORREGIDO! Consultar la nueva tabla 'profiles'
-        const { data: userProfile, error: profileError } = await supabaseClient
-            .from('profiles')
-            .select('full_name, role')
-            .eq('id', session.user.id) // Usar el UUID
-            .single();
-            
-        if (profileError || !userProfile) {
-             return handleSupabaseError(profileError || new Error('Perfil de usuario no encontrado.'), 'verifySession');
-        }
-
-        setAuthData(session.access_token, userProfile.role, userProfile.full_name);
-
-        return {
-            success: true,
-            full_name: userProfile.full_name
-        };
-
-    } catch (error) {
-        return handleSupabaseError(error, 'verifySession');
+        return handleSupabaseError(error, 'registerUser');
     }
 }
 
@@ -116,36 +71,27 @@ async function loginUser(credentials) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         
-        if (!configured) {
-            // ... (MOCK login se mantiene igual)
-            console.log('Modo MOCK - Login simulado');
-            if (credentials.email === 'admin@swam.com') {
-                return { success: true, token: 'mock_admin_token_123', role: 'admin', full_name: 'Admin User' };
-            } else if (credentials.email === 'client@swam.com') {
-                return { success: true, token: 'mock_client_token_456', role: 'client', full_name: 'Client User' };
-            }
-            return { success: false, error: 'Credenciales inválidas.' };
-        }
+        if (!configured) return mockLogin(credentials);
 
         const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
             email: credentials.email,
             password: credentials.password
         });
 
-        if (authError) {
-            return { success: false, error: 'Credenciales inválidas. Inténtalo de nuevo.' };
-        }
+        if (authError) return { success: false, error: 'Credenciales inválidas.' };
 
-        // ¡CORREGIDO! Consultar la nueva tabla 'profiles'
+        // Obtener rol y nombre desde 'profiles'
         const { data: userProfile, error: userError } = await supabaseClient
             .from('profiles')
             .select('id, full_name, role')
-            .eq('id', authData.user.id) // Usar el UUID
+            .eq('id', authData.user.id)
             .single();
 
         if (userError || !userProfile) {
-            return handleSupabaseError(userError || new Error('Perfil no encontrado'), 'loginUser');
+            return { success: false, error: 'Perfil de usuario no encontrado.' };
         }
+
+        setAuthData(authData.session.access_token, userProfile.role, userProfile.full_name);
 
         return {
             success: true,
@@ -160,14 +106,39 @@ async function loginUser(credentials) {
     }
 }
 
-// NUEVA FUNCIÓN: Inicio de sesión con Google (OAuth)
+async function verifySession() {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+
+        if (!configured) {
+            return { success: true, full_name: 'Usuario Mock' };
+        }
+
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError || !session) return { success: false, error: 'Sesión no encontrada.' };
+        
+        const { data: userProfile, error: profileError } = await supabaseClient
+            .from('profiles')
+            .select('full_name, role')
+            .eq('id', session.user.id)
+            .single();
+            
+        if (profileError) return { success: false, error: 'Perfil no encontrado.' };
+
+        setAuthData(session.access_token, userProfile.role, userProfile.full_name);
+
+        return { success: true, full_name: userProfile.full_name };
+
+    } catch (error) {
+        return handleSupabaseError(error, 'verifySession');
+    }
+}
+
 async function signInWithGoogle() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        
-        if (!configured) {
-            return { success: true, url: window.location.origin + '/public/auth/oauth-redirect/oauth-redirect.html#access_token=mock_oauth_token' };
-        }
+        if (!configured) return { success: true, url: '#' }; // Mock
 
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
@@ -177,89 +148,63 @@ async function signInWithGoogle() {
             }
         });
 
-        if (error) {
-            throw error;
-        }
-
+        if (error) throw error;
         return { success: true, url: data.url };
     } catch (error) {
         return handleSupabaseError(error, 'signInWithGoogle');
     }
 }
 
-// ¡ESTA ES LA FUNCIÓN QUE DABA EL ERROR!
 async function handleOAuthRedirect() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        if (!configured) {
-             const mockName = 'Google User';
-             const userRole = 'client';
-             setAuthData('mock_oauth_token', userRole, mockName);
-             return { success: true, role: userRole };
-        }
+        if (!configured) return { success: true, role: 'client' }; // Mock
         
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
-        if (sessionError || !session) {
-            return { success: false, error: 'Sesión no encontrada (OAuth).' };
-        }
+        if (sessionError || !session) return { success: false, error: 'Sesión OAuth no encontrada.' };
 
         const user = session.user;
         const fullName = user.user_metadata.full_name || user.email.split('@')[0];
         let userRole = 'client';
 
-        // ¡CORREGIDO! Consultar la nueva tabla 'profiles'
-        // Esto ya no fallará, porque la tabla 'profiles' SÍ usa UUID.
+        // Verificar o crear perfil
         let { data: userProfile, error: fetchError } = await supabaseClient
             .from('profiles')
             .select('role, full_name')
-            .eq('id', user.id) // Buscar por UUID
+            .eq('id', user.id)
             .single();
 
-        if (fetchError && fetchError.code === 'PGRST116') { // No rows found (Nuevo usuario)
-             console.log('Nuevo usuario OAuth. Insertando en profiles...');
-            // ¡CORREGIDO! Insertar en la nueva tabla 'profiles'
+        if (fetchError && fetchError.code === 'PGRST116') {
+            // Nuevo usuario, insertar perfil
             const { error: insertError } = await supabaseClient
                 .from('profiles')
                 .insert([{
-                    id: user.id, // El UUID de auth.users
+                    id: user.id,
                     full_name: fullName,
                     email: user.email,
                     role: userRole
                 }]);
-
-            if (insertError) {
-                // Si la inserción falla (ej. RLS), lanza el error
-                throw insertError;
-            }
+            if (insertError) throw insertError;
         } else if (fetchError) {
-            // Si falla la consulta
-            return handleSupabaseError(fetchError, 'handleOAuthRedirect - Fetch Profile');
+            throw fetchError;
         } else {
-            userRole = userProfile.role; // Usar el rol existente
+            userRole = userProfile.role;
         }
 
         setAuthData(session.access_token, userRole, fullName);
-
-        return {
-            success: true,
-            role: userRole
-        };
+        return { success: true, role: userRole };
 
     } catch (error) {
-        // El error 'invalid input syntax for type bigint' ya NO debería ocurrir
-        // El error 'violates row-level security policy' (RLS) SÍ será capturado aquí
         return handleSupabaseError(error, 'handleOAuthRedirect');
     }
 }
 
 async function logoutUser() {
-    // ... (Esta función se mantiene igual, es correcta)
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        if (!configured) return { success: true };
-        const { error } = await supabaseClient.auth.signOut();
-        if (error) return handleSupabaseError(error, 'logoutUser');
+        if (configured) await supabaseClient.auth.signOut();
+        logout(); // Limpia localStorage y redirige
         return { success: true };
     } catch (error) {
         return handleSupabaseError(error, 'logoutUser');
@@ -267,139 +212,251 @@ async function logoutUser() {
 }
 
 async function resetPassword(email) {
-    // ... (Esta función se mantiene igual, es correcta)
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        if (!configured) {
-            return { success: true, message: 'Enlace simulado enviado.' };
-        }
+        if (!configured) return { success: true, message: 'Simulación: Email enviado.' };
+
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: `${window.location.origin}/public/auth/reset-password/reset-password.html`
         });
-        if (error) return handleSupabaseError(error, 'resetPassword');
-        return { success: true, message: 'Se ha enviado un enlace de recuperación a tu email.' };
+        if (error) throw error;
+        return { success: true, message: 'Enlace de recuperación enviado.' };
     } catch (error) {
         return handleSupabaseError(error, 'resetPassword');
     }
 }
 
-// --- FUNCIONES DEL DASHBOARD (Se mantienen igual) ---
+// --- SECCIÓN 2: DATOS DEL DASHBOARD (CONEXIÓN REAL) ---
 
+// 1. Obtener Métricas Generales (Usando RPC para optimizar)
 async function getDashboardData() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        if (!configured) {
-            return getMockDashboardData();
-        }
-        const [salesResult, ordersResult, customersResult, productsResult] = await Promise.all([
-            getDailySales(),
-            getActiveOrders(),
-            getActiveCustomers(),
-            getProductsInStock()
-        ]);
+        if (!configured) return getMockDashboardData();
+        
+        // Llamada a la función SQL 'get_dashboard_metrics' creada en Supabase
+        const { data, error } = await supabaseClient.rpc('get_dashboard_metrics');
+        
+        if (error) throw error;
+        
         return {
             success: true,
-            dailySales: salesResult.total || 0,
-            activeOrders: ordersResult.count || 0,
-            activeCustomers: customersResult.count || 0,
-            productsInStock: productsResult.count || 0
+            ...data 
         };
     } catch (error) {
-        return handleSupabaseError(error, 'getDashboardData');
+        console.error('Error dashboard metrics:', error);
+        return { success: false, error: error.message };
     }
-}
-async function getDailySales() {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabaseClient.from('sales').select('total_sale').eq('sale_date', today);
-    if (error) return { total: 0 };
-    const total = data.reduce((sum, sale) => sum + parseFloat(sale.total_sale), 0);
-    return { total };
-}
-async function getActiveOrders() {
-    const { count, error } = await supabaseClient.from('orders').select('*', { count: 'exact', head: true }).in('status', ['ordered', 'shipped', 'in_transit']);
-    return { count: count || 0 };
-}
-async function getActiveCustomers() {
-    const { count, error } = await supabaseClient.from('customers').select('*', { count: 'exact', head: true }).eq('is_active', true);
-    return { count: count || 0 };
-}
-async function getProductsInStock() {
-    const { data, error } = await supabaseClient.from('batches').select('product_id, quantity_available').gt('quantity_available', 0);
-    if (error) return { count: 0 };
-    const uniqueProducts = new Set(data.map(batch => batch.product_id));
-    return { count: uniqueProducts.size };
-}
-async function getRecentSales(limit = 5) {
-    const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-    if (!configured) {
-        return { success: true, data: getMockRecentSales() };
-    }
-    const { data, error } = await supabaseClient
-        .from('sales')
-        .select(`id, sale_code, total_sale, sale_date, customers (full_name)`)
-        .order('sale_date', { ascending: false })
-        .limit(limit);
-    if (error) return handleSupabaseError(error, 'getRecentSales');
-    return {
-        success: true,
-        data: data.map(sale => ({
-            code: sale.sale_code,
-            customer: sale.customers?.full_name || 'Cliente Anónimo',
-            amount: parseFloat(sale.total_sale),
-            status: 'completed'
-        }))
-    };
-}
-async function getInventoryAlerts(limit = 10) {
-    const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-    if (!configured) {
-        return { success: true, data: getMockInventoryAlerts() };
-    }
-    const { data, error } = await supabaseClient
-        .from('batches')
-        .select(`quantity_available, products (name)`)
-        .lte('quantity_available', 10)
-        .order('quantity_available', { ascending: true })
-        .limit(limit);
-    if (error) return handleSupabaseError(error, 'getInventoryAlerts');
-    return {
-        success: true,
-        data: data.map(batch => ({
-            title: `${batch.quantity_available === 0 ? 'Agotado' : 'Stock bajo'}: ${batch.products?.name}`,
-            subtitle: `Quedan ${batch.quantity_available} unidades`,
-            type: batch.quantity_available === 0 ? 'error' : 'warning'
-        }))
-    };
-}
-function getMockDashboardData() {
-    return { success: true, dailySales: 2450.00, activeOrders: 12, activeCustomers: 156, productsInStock: 342 };
-}
-function getMockRecentSales() {
-    return [
-        { code: 'VNT-001', customer: 'Juan Pérez', amount: 450.00, status: 'completed' },
-        { code: 'VNT-002', customer: 'María García', amount: 1200.00, status: 'completed' },
-        { code: 'VNT-003', customer: 'Carlos López', amount: 780.00, status: 'pending' }
-    ];
-}
-function getMockInventoryAlerts() {
-    return [
-        { title: 'Stock bajo: Teclado Mecánico', subtitle: 'Quedan 5 unidades', type: 'warning' },
-        { title: 'Agotado: Mouse Pad RGB', subtitle: '0 unidades disponibles', type: 'error' },
-        { title: 'Stock bajo: Webcam HD', subtitle: 'Quedan 3 unidades', type: 'warning' }
-    ];
 }
 
+// 2. Obtener Ventas Recientes (Para el Dashboard Home)
+async function getRecentSales(limit = 5) {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        if (!configured) return { success: true, data: getMockRecentSales() };
+
+        const { data, error } = await supabaseClient
+            .from('sales')
+            .select(`
+                sale_code, 
+                total_sale, 
+                customers (full_name)
+            `)
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (error) throw error;
+
+        return {
+            success: true,
+            data: data.map(sale => ({
+                code: sale.sale_code,
+                customer: sale.customers?.full_name || 'Cliente General',
+                amount: parseFloat(sale.total_sale),
+                status: 'completed' 
+            }))
+        };
+    } catch (error) {
+        return handleSupabaseError(error, 'getRecentSales');
+    }
+}
+
+// 3. Obtener Alertas de Inventario
+async function getInventoryAlerts(limit = 5) {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        if (!configured) return { success: true, data: getMockInventoryAlerts() };
+
+        // Buscamos lotes con stock menor o igual a 10
+        const { data, error } = await supabaseClient
+            .from('batches')
+            .select(`quantity_available, products (name)`)
+            .lte('quantity_available', 10)
+            .gt('quantity_available', 0) 
+            .order('quantity_available', { ascending: true })
+            .limit(limit);
+        
+        if (error) throw error;
+
+        return {
+            success: true,
+            data: data.map(batch => ({
+                title: `Stock bajo: ${batch.products?.name || 'Producto'}`,
+                subtitle: `Quedan ${batch.quantity_available} unidades`,
+                type: 'warning'
+            }))
+        };
+    } catch (error) {
+        return handleSupabaseError(error, 'getInventoryAlerts');
+    }
+}
+
+// 4. Obtener Productos Top (Con filtro de tiempo y corrección de tipos)
+async function getTopProducts(limit = 5, period = 'week') {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        
+        // Si no hay Supabase, devolvemos datos falsos para prueba
+        if (!configured) return { success: true, data: [] }; 
+
+        // Llamada a la función SQL actualizada con el parámetro 'time_period'
+        const { data, error } = await supabaseClient.rpc('get_top_products', { 
+            limit_count: limit,
+            time_period: period 
+        });
+
+        if (error) throw error;
+
+        return {
+            success: true,
+            data: data.map((item, index) => ({
+                rank: index + 1,
+                name: item.product_name,
+                sales: `${item.total_sold} ventas`,
+                amount: parseFloat(item.total_revenue)
+            }))
+        };
+    } catch (error) {
+        return handleSupabaseError(error, 'getTopProducts');
+    }
+}
+
+// --- SECCIÓN 3: MÓDULO DE VENTAS ---
+
+// 5. Obtener Listado de Ventas Completo (Paginado y Filtrado)
+async function getSalesList(page = 1, pageSize = 10, filters = {}) {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        if (!configured) return { success: true, data: [], total: 0 };
+
+        // Llamada a la función RPC para obtener lista filtrada
+        const { data, error } = await supabaseClient.rpc('get_sales_list', {
+            p_page_number: page,
+            p_page_size: pageSize,
+            p_search: filters.search || null,
+            p_start_date: filters.startDate || null,
+            p_end_date: filters.endDate || null
+        });
+
+        if (error) throw error;
+
+        // Si no hay datos, el totalCount es 0
+        const totalCount = data.length > 0 ? data[0].total_count : 0;
+
+        return {
+            success: true,
+            data: data.map(sale => ({
+                id: sale.id,
+                code: sale.sale_code,
+                customer: sale.customer_name,
+                paymentMethod: sale.payment_method || 'No especificado',
+                date: sale.sale_date, // Formato YYYY-MM-DD devuelto por SQL
+                total: parseFloat(sale.total_sale)
+            })),
+            total: parseInt(totalCount)
+        };
+
+    } catch (error) {
+        return handleSupabaseError(error, 'getSalesList');
+    }
+}
+
+// --- SECCIÓN 4: REALTIME SUBSCRIPTION ---
+
+/**
+ * Se suscribe a cambios en las tablas clave y ejecuta callbacks específicos.
+ */
+function subscribeToDashboard(callbacks) {
+    const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+    if (!configured) return;
+
+    const channel = supabaseClient.channel('dashboard-realtime');
+
+    channel
+        // Escuchar cambios en VENTAS
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'sales' },
+            (payload) => {
+                console.log('Cambio en ventas detectado:', payload);
+                if (callbacks.onSalesChange) callbacks.onSalesChange();
+            }
+        )
+        // Escuchar cambios en ÓRDENES
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'orders' },
+            (payload) => {
+                if (callbacks.onOrdersChange) callbacks.onOrdersChange();
+            }
+        )
+        // Escuchar cambios en INVENTARIO
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'batches' },
+            (payload) => {
+                if (callbacks.onInventoryChange) callbacks.onInventoryChange();
+            }
+        )
+        // Escuchar cambios en CLIENTES
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'customers' },
+            (payload) => {
+                if (callbacks.onCustomersChange) callbacks.onCustomersChange();
+            }
+        )
+        .subscribe();
+        
+    console.log('📡 Dashboard suscrito a cambios en tiempo real');
+    return channel;
+}
+
+// --- UTILS & MOCKS DE RESPALDO ---
+function mockLogin(c) {
+    if (c.email === 'admin@swam.com') return { success: true, role: 'admin', full_name: 'Admin Mock' };
+    return { success: true, role: 'client', full_name: 'Client Mock' };
+}
+function getMockDashboardData() { return { success: true, dailySales: 0, activeOrders: 0, activeCustomers: 0, productsInStock: 0 }; }
+function getMockRecentSales() { return []; }
+function getMockInventoryAlerts() { return []; }
+
+// Exportar al objeto global `api`
 (function(window) {
     window.api = {
         registerUser,
         loginUser,
         logoutUser,
         resetPassword,
+        verifySession,
+        signInWithGoogle, 
+        handleOAuthRedirect,
+        // Funciones de datos
         getDashboardData,
         getRecentSales,
         getInventoryAlerts,
-        verifySession,
-        signInWithGoogle, 
-        handleOAuthRedirect 
+        getTopProducts,
+        getSalesList, // <--- Función exportada para el módulo de ventas
+        subscribeToDashboard
     };
 })(window);
