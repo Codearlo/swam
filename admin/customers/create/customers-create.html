@@ -1,0 +1,67 @@
+<div class="form-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+    <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--color-text-light);">Nuevo Cliente</h2>
+    <button type="button" onclick="closeModal()" style="background: none; border: none; color: var(--color-text-light); cursor: pointer; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+</div>
+
+<form id="create-customer-form" class="admin-form">
+    
+    <div class="form-section-title">Información Personal</div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="full-name">Nombre Completo *</label>
+            <input type="text" id="full-name" name="full_name" required placeholder="Ej. Juan Pérez">
+        </div>
+        <div class="form-group">
+            <label for="email">Correo Electrónico</label>
+            <input type="email" id="email" name="email" placeholder="cliente@email.com">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="document-type">Tipo Documento</label>
+            <select id="document-type" name="document_type">
+                <option value="DNI">DNI</option>
+                <option value="RUC">RUC</option>
+                <option value="CE">CE</option>
+                <option value="Passport">Pasaporte</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="document-number">Número Documento</label>
+            <input type="text" id="document-number" name="document_number" placeholder="Ej. 12345678">
+        </div>
+    </div>
+
+    <div class="form-section-title">Información de Contacto</div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="phone">Teléfono / Celular</label>
+            <input type="text" id="phone" name="phone" placeholder="Ej. 999 999 999">
+        </div>
+        <div class="form-group">
+            <label for="address">Dirección</label>
+            <input type="text" id="address" name="address" placeholder="Ej. Av. Principal 123">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="notes">Notas Adicionales</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Información extra sobre el cliente..."></textarea>
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="button button--secondary" onclick="closeModal()">Cancelar</button>
+        
+        <button type="submit" class="button button--primary" id="btn-save">
+            <span id="btn-text">Guardar Cliente</span>
+            <div id="btn-loader" class="loader u-hidden"></div>
+        </button>
+    </div>
+
+    <p id="form-error" class="error-message u-hidden" style="margin-top: 16px; text-align: center; color: var(--color-error);"></p>
+</form>

@@ -1,0 +1,162 @@
+/* admin/customers/list/customers-list-responsive.css */
+
+/* TABLET (1024px hacia abajo) */
+@media (max-width: 1024px) {
+    .filters-row {
+        flex-wrap: wrap;
+    }
+    
+    /* La barra de búsqueda ocupa todo el ancho en tablets */
+    .search-group {
+        flex: 0 0 100%; 
+        min-width: 100%;
+        order: 1;
+    }
+    
+    /* Los botones pasan abajo */
+    .filter-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+        order: 2;
+        margin-top: var(--spacing-sm);
+    }
+}
+
+/* MÓVIL (768px hacia abajo) */
+@media (max-width: 768px) {
+    
+    /* --- Filtros en columna --- */
+    .filters-section {
+        padding: var(--spacing-md);
+    }
+
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .filter-actions {
+        width: 100%;
+        justify-content: space-between; /* Distribuir botones */
+        gap: var(--spacing-sm);
+    }
+
+    /* Botones en móvil */
+    .button {
+        flex: 1; /* Que ocupen espacio disponible */
+        padding: 10px;
+    }
+
+    /* Los iconos (limpiar/agregar) mantienen su tamaño cuadrado para no deformarse */
+    .button--icon {
+        flex: 0 0 42px; 
+    }
+    
+    /* Excepción: El botón Buscar puede ser más ancho si se desea, o igual */
+    #btn-search {
+        flex: 1;
+    }
+
+    /* --- Tabla y Contenedor --- */
+    .list-card {
+        padding: var(--spacing-sm);
+        margin-top: var(--spacing-md) !important; /* Ajuste de margen */
+    }
+
+    .list-card__body {
+        padding: 0;
+    }
+
+    /* Forzar scroll horizontal suave en la tabla */
+    .table-responsive {
+        margin: 0 -4px; /* Ganar un poco de espacio lateral */
+        padding-bottom: var(--spacing-sm);
+    }
+
+    /* --- Paginación Apilada --- */
+    .pagination-container {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: center;
+        margin-top: var(--spacing-md);
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        text-align: center;
+        order: 1; /* Info arriba */
+    }
+
+    .pagination-controls {
+        width: 100%;
+        justify-content: center;
+        gap: var(--spacing-md);
+        order: 2; /* Botones abajo */
+    }
+    
+    .pagination-btn {
+        flex: 1;
+        max-width: 100px;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* --- Ajustes del MODAL en Móvil --- */
+    .modal-overlay {
+        align-items: flex-end; /* El modal sale desde abajo o se pega abajo */
+        padding: 0;
+    }
+
+    .modal-container {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 90vh; /* Ocupa casi toda la pantalla */
+        border-radius: var(--spacing-md) var(--spacing-md) 0 0; /* Solo bordes superiores redondeados */
+        padding: var(--spacing-md);
+        margin: 0;
+    }
+}
+
+/* MÓVIL PEQUEÑO (480px hacia abajo) */
+@media (max-width: 480px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+
+    .admin-header__left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .admin-header__right {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: var(--spacing-sm);
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .admin-header__user span {
+        display: none; /* Ocultar nombre de usuario en pantallas muy pequeñas */
+    }
+    
+    /* Reorganizar botones de filtro para que sean más fáciles de tocar */
+    .filter-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* 3 columnas iguales */
+    }
+    
+    .button, .button--icon {
+        flex: unset;
+        width: 100%;
+    }
+}
