@@ -228,13 +228,12 @@ async function resetPassword(email) {
 
 // --- SECCIÓN 2: DATOS DEL DASHBOARD (CONEXIÓN REAL) ---
 
-// 1. Obtener Métricas Generales (Usando RPC para optimizar)
+// 1. Obtener Métricas Generales
 async function getDashboardData() {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         if (!configured) return getMockDashboardData();
         
-        // Llamada a la función SQL 'get_dashboard_metrics' creada en Supabase
         const { data, error } = await supabaseClient.rpc('get_dashboard_metrics');
         
         if (error) throw error;
@@ -249,7 +248,7 @@ async function getDashboardData() {
     }
 }
 
-// 2. Obtener Ventas Recientes (Para el Dashboard Home)
+// 2. Obtener Ventas Recientes
 async function getRecentSales(limit = 5) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
@@ -287,7 +286,6 @@ async function getInventoryAlerts(limit = 5) {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         if (!configured) return { success: true, data: getMockInventoryAlerts() };
 
-        // Buscamos lotes con stock menor o igual a 10
         const { data, error } = await supabaseClient
             .from('batches')
             .select(`quantity_available, products (name)`)
@@ -311,15 +309,12 @@ async function getInventoryAlerts(limit = 5) {
     }
 }
 
-// 4. Obtener Productos Top (Con filtro de tiempo y corrección de tipos)
+// 4. Obtener Productos Top
 async function getTopProducts(limit = 5, period = 'week') {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
-        
-        // Si no hay Supabase, devolvemos datos falsos para prueba
         if (!configured) return { success: true, data: [] }; 
 
-        // Llamada a la función SQL actualizada con el parámetro 'time_period'
         const { data, error } = await supabaseClient.rpc('get_top_products', { 
             limit_count: limit,
             time_period: period 
@@ -343,13 +338,11 @@ async function getTopProducts(limit = 5, period = 'week') {
 
 // --- SECCIÓN 3: MÓDULO DE VENTAS ---
 
-// 5. Obtener Listado de Ventas Completo (Paginado y Filtrado)
 async function getSalesList(page = 1, pageSize = 10, filters = {}) {
     try {
         const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
         if (!configured) return { success: true, data: [], total: 0 };
 
-        // Llamada a la función RPC para obtener lista filtrada
         const { data, error } = await supabaseClient.rpc('get_sales_list', {
             p_page_number: page,
             p_page_size: pageSize,
@@ -359,8 +352,6 @@ async function getSalesList(page = 1, pageSize = 10, filters = {}) {
         });
 
         if (error) throw error;
-
-        // Si no hay datos, el totalCount es 0
         const totalCount = data.length > 0 ? data[0].total_count : 0;
 
         return {
@@ -370,22 +361,53 @@ async function getSalesList(page = 1, pageSize = 10, filters = {}) {
                 code: sale.sale_code,
                 customer: sale.customer_name,
                 paymentMethod: sale.payment_method || 'No especificado',
-                date: sale.sale_date, // Formato YYYY-MM-DD devuelto por SQL
+                date: sale.sale_date,
                 total: parseFloat(sale.total_sale)
             })),
             total: parseInt(totalCount)
         };
-
     } catch (error) {
         return handleSupabaseError(error, 'getSalesList');
     }
 }
 
-// --- SECCIÓN 4: REALTIME SUBSCRIPTION ---
+// --- SECCIÓN 4: MÓDULO DE CLIENTES (NUEVO) ---
 
-/**
- * Se suscribe a cambios en las tablas clave y ejecuta callbacks específicos.
- */
+async function getCustomersList(page = 1, pageSize = 10, search = '') {
+    try {
+        const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
+        if (!configured) return { success: true, data: [], total: 0 };
+
+        // Llamada a la función RPC creada en el paso SQL
+        const { data, error } = await supabaseClient.rpc('get_customers_list', {
+            p_page_number: page,
+            p_page_size: pageSize,
+            p_search: search || null
+        });
+
+        if (error) throw error;
+        const totalCount = data.length > 0 ? data[0].total_count : 0;
+
+        return {
+            success: true,
+            data: data.map(cust => ({
+                id: cust.id,
+                name: cust.full_name,
+                docType: cust.document_type,
+                docNumber: cust.document_number || '-',
+                email: cust.email || '-',
+                phone: cust.phone || '-',
+                isActive: cust.is_active
+            })),
+            total: parseInt(totalCount)
+        };
+    } catch (error) {
+        return handleSupabaseError(error, 'getCustomersList');
+    }
+}
+
+// --- SECCIÓN 5: REALTIME SUBSCRIPTION ---
+
 function subscribeToDashboard(callbacks) {
     const configured = typeof isSupabaseConfigured === 'function' ? isSupabaseConfigured() : false;
     if (!configured) return;
@@ -393,7 +415,6 @@ function subscribeToDashboard(callbacks) {
     const channel = supabaseClient.channel('dashboard-realtime');
 
     channel
-        // Escuchar cambios en VENTAS
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'sales' },
@@ -402,7 +423,6 @@ function subscribeToDashboard(callbacks) {
                 if (callbacks.onSalesChange) callbacks.onSalesChange();
             }
         )
-        // Escuchar cambios en ÓRDENES
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'orders' },
@@ -410,7 +430,6 @@ function subscribeToDashboard(callbacks) {
                 if (callbacks.onOrdersChange) callbacks.onOrdersChange();
             }
         )
-        // Escuchar cambios en INVENTARIO
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'batches' },
@@ -418,7 +437,6 @@ function subscribeToDashboard(callbacks) {
                 if (callbacks.onInventoryChange) callbacks.onInventoryChange();
             }
         )
-        // Escuchar cambios en CLIENTES
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'customers' },
@@ -456,7 +474,8 @@ function getMockInventoryAlerts() { return []; }
         getRecentSales,
         getInventoryAlerts,
         getTopProducts,
-        getSalesList, // <--- Función exportada para el módulo de ventas
+        getSalesList,
+        getCustomersList, // <--- Exportación de la nueva función
         subscribeToDashboard
     };
 })(window);
