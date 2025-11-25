@@ -75,14 +75,13 @@
     min-width: 120px;
 }
 
-/* CORRECCIÓN: Asegura que el loader no se muestre por defecto */
 .u-hidden {
     display: none !important;
 }
 
 .loader {
-    border: 2px solid rgba(255, 255, 255, 0.2); /* Un poco más visible */
-    border-left-color: var(--color-text-dark); /* Color oscuro porque el botón primario es blanco/claro */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-left-color: var(--color-text-dark);
     border-radius: 50%;
     width: 16px;
     height: 16px;
@@ -98,4 +97,49 @@
     .form-row { flex-direction: column; gap: var(--spacing-md); }
     .form-actions { flex-direction: column-reverse; }
     .button { width: 100%; }
+}
+
+/* --- NOTIFICACIÓN FLOTANTE (TOAST) --- */
+.toast-notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    padding: 16px 24px;
+    border-radius: var(--spacing-sm);
+    color: #fff;
+    font-weight: 600;
+    z-index: 10000; /* Por encima del modal */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    /* Animación de entrada */
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Glassmorphism base */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.toast-notification.is-visible {
+    transform: translateX(0);
+}
+
+.toast-notification.toast-success {
+    background-color: rgba(16, 185, 129, 0.9); /* Verde con transparencia */
+    border: 1px solid #10b981;
+}
+
+.toast-notification.toast-error {
+    background-color: rgba(239, 68, 68, 0.9); /* Rojo con transparencia */
+    border: 1px solid #ef4444;
+}
+
+/* Icono dentro del toast */
+.toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
