@@ -1,4 +1,6 @@
-/* Container principal del Header (Glassmorphism aplicado en el contenedor padre o aquí) */
+/* public/shared/components/admin-header/admin-header.css */
+
+/* --- ESTILOS BASE (Desktop) --- */
 .admin-header {
     display: flex;
     align-items: center;
@@ -9,22 +11,29 @@
     top: 0;
     z-index: 40;
     transition: all 0.3s ease;
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Sección Izquierda */
+/* Izquierda: Menú + Título */
 .admin-header__left {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    flex: 1;      /* Ocupa el espacio disponible */
+    min-width: 0; /* CRÍTICO: Permite que el contenedor se encoja si el texto es largo */
 }
 
 .admin-header__menu-btn {
-    display: none; /* Oculto en desktop por defecto */
+    display: none;
     padding: var(--spacing-sm);
     color: var(--color-text-light);
     border-radius: var(--spacing-sm);
     transition: background-color 0.2s ease;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .admin-header__menu-btn:hover {
@@ -36,16 +45,20 @@
     font-weight: 700;
     margin: 0;
     color: var(--color-text-light);
+    white-space: nowrap;      /* Evita saltos de línea */
+    overflow: hidden;         /* Oculta el texto sobrante */
+    text-overflow: ellipsis;  /* Añade "..." al final */
 }
 
-/* Sección Derecha */
+/* Derecha: Notificaciones + Usuario */
 .admin-header__right {
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
+    flex-shrink: 0; /* Evita que los iconos se aplasten */
+    margin-left: var(--spacing-sm);
 }
 
-/* Notificaciones */
 .admin-header__notification-btn {
     position: relative;
     padding: var(--spacing-sm);
@@ -53,6 +66,9 @@
     border-radius: 50%;
     transition: background-color 0.2s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .admin-header__notification-btn:hover {
@@ -73,7 +89,6 @@
     text-align: center;
 }
 
-/* Usuario */
 .admin-header__user {
     display: flex;
     align-items: center;
@@ -89,59 +104,95 @@
     padding: var(--spacing-sm);
     color: var(--color-text-light);
     border-radius: 50%;
-    transition: all 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .admin-header__logout-btn:hover {
     background-color: rgba(239, 68, 68, 0.2);
     color: var(--color-error);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
 
 /* --- RESPONSIVE --- */
 
-/* Tablet y Móvil */
+/* Tablet (hasta 768px) */
 @media (max-width: 768px) {
     .admin-header {
-        padding: var(--spacing-md);
+        padding: 12px var(--spacing-md);
     }
-
     .admin-header__menu-btn {
-        display: block; /* Mostrar botón de menú */
+        display: flex;
     }
-
-    .admin-header__title {
-        font-size: 1.5rem;
-    }
-
-    .admin-header__user span {
-        display: none; /* Ocultar nombre en móvil */
-    }
-}
-
-/* Móvil Pequeño */
-@media (max-width: 480px) {
-    .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-    }
-
-    .admin-header__left {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
     .admin-header__title {
         font-size: 1.25rem;
     }
+    .admin-header__user span {
+        display: none;
+    }
+}
 
+/* MÓVIL ULTRA COMPACTO (hasta 480px) */
+@media (max-width: 480px) {
+    .admin-header {
+        height: 48px; /* Altura fija y diminuta */
+        padding: 0 8px; /* Padding mínimo */
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: nowrap;
+    }
+
+    /* Ajuste Izquierda */
+    .admin-header__left {
+        gap: 4px;
+        margin-right: 4px;
+    }
+
+    .admin-header__menu-btn {
+        padding: 4px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .admin-header__title {
+        font-size: 1rem; /* Tamaño de letra reducido para que quepa más texto */
+        line-height: 1;
+    }
+
+    /* Ajuste Derecha */
     .admin-header__right {
-        width: 100%;
-        justify-content: flex-end;
-        padding-top: var(--spacing-sm);
-        border-top: 1px solid rgba(255,255,255,0.05);
-        gap: var(--spacing-sm);
+        gap: 2px; /* Iconos pegados */
+        border: none;
+        padding: 0;
+    }
+
+    .admin-header__user {
+        gap: 0;
+    }
+
+    /* Iconos más pequeños */
+    .admin-header__notification-btn,
+    .admin-header__logout-btn {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+    }
+
+    .admin-header__notification-btn svg,
+    .admin-header__logout-btn svg,
+    .admin-header__menu-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .notification-badge {
+        top: 2px;
+        right: 2px;
+        font-size: 9px;
+        padding: 1px 3px;
+        min-width: 12px;
+        border: 1px solid var(--glass-background); /* Borde para separar visualmente */
     }
 }
