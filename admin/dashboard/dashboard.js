@@ -15,14 +15,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. UI Inicial y Sidebar
+    // 2. UI Inicial y Componentes de Layout
     const fullName = getUserFullName();
     if (fullName) {
         const nameDisplay = document.getElementById('user-name-display');
         if (nameDisplay) nameDisplay.textContent = fullName;
     }
     
-    await loadSidebar();
+    // Cargar Sidebar y Bottom Nav
+    await loadLayoutComponents();
+    
     initializeSidebarToggle();
     initializeLogout();
 
@@ -40,26 +42,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Carga el sidebar del administrador
+ * Carga los componentes de navegación (Sidebar y Bottom Nav)
  */
-async function loadSidebar() {
+async function loadLayoutComponents() {
+    // 1. Cargar Sidebar (Escritorio y Drawer Móvil)
     const sidebarContainer = document.getElementById('sidebar-container');
-    if (!sidebarContainer) return;
-
-    try {
-        const response = await fetch('/public/shared/components/sidebar/sidebar.html');
-        if (!response.ok) throw new Error('Error al cargar sidebar');
-        
-        const html = await response.text();
-        sidebarContainer.innerHTML = html;
-        
-        // Marcar la opción activa
-        const dashboardLink = sidebarContainer.querySelector('[href*="dashboard"]');
-        if (dashboardLink) {
-            dashboardLink.classList.add('is-active');
+    if (sidebarContainer) {
+        try {
+            const response = await fetch('/public/shared/components/sidebar/sidebar.html');
+            if (response.ok) {
+                const html = await response.text();
+                sidebarContainer.innerHTML = html;
+                
+                // Marcar la opción activa en el Sidebar
+                const dashboardLink = sidebarContainer.querySelector('[href*="dashboard"]');
+                if (dashboardLink) {
+                    dashboardLink.classList.add('is-active');
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar el sidebar:', error);
         }
-    } catch (error) {
-        console.error('Error al cargar el sidebar:', error);
+    }
+
+    // 2. Cargar Bottom Navigation (Móvil)
+    const bottomNavContainer = document.getElementById('bottom-nav-container');
+    if (bottomNavContainer) {
+        try {
+            const response = await fetch('/public/shared/components/bottom-nav/bottom-nav.html');
+            if (response.ok) {
+                const html = await response.text();
+                bottomNavContainer.innerHTML = html;
+
+                // Marcar la opción activa en el Bottom Nav
+                const activeLink = bottomNavContainer.querySelector('[href*="dashboard"]');
+                if (activeLink) {
+                    activeLink.classList.add('is-active');
+                }
+
+                // Lógica del botón "Menú" en la barra inferior para abrir el Sidebar
+                const menuTrigger = document.getElementById('mobile-menu-trigger');
+                if (menuTrigger) {
+                    menuTrigger.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const sidebar = document.querySelector('.admin-sidebar');
+                        if (sidebar) {
+                            sidebar.classList.add('is-open');
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar el bottom nav:', error);
+        }
     }
 }
 
@@ -123,8 +158,6 @@ async function changeTopProductsFilter(period, btnElement) {
     const listContainer = document.getElementById('top-products-list');
     if(listContainer) {
         listContainer.style.opacity = '0.5';
-        // Opcional: mostrar mensaje de carga si se desea
-        // listContainer.innerHTML = '<p style="text-align:center; padding: 20px;">Cargando...</p>';
     }
 
     await refreshTopProducts(period);
@@ -266,7 +299,9 @@ function initializeSidebarToggle() {
     // Cerrar sidebar al hacer clic fuera en móvil
     document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+            // Se añade una condición extra para no cerrar si se hizo clic en el trigger del menú móvil
+            const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && (!mobileMenuTrigger || !mobileMenuTrigger.contains(e.target))) {
                 sidebar.classList.remove('is-open');
             }
         }

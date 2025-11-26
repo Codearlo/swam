@@ -1,0 +1,94 @@
+/* public/shared/components/bottom-nav/bottom-nav.css */
+
+/* Oculto en PC/Tablet */
+.bottom-nav-container {
+    display: none;
+}
+
+/* Visible solo en Móvil */
+@media (max-width: 768px) {
+    /* Espacio extra al final del body para que la barra no tape contenido */
+    body {
+        padding-bottom: 80px; 
+    }
+
+    .bottom-nav-container {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100; /* Por encima del contenido normal */
+        
+        /* Estilo Glassmorphism oscuro */
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* Ajuste para iPhone X+ */
+        padding-bottom: env(safe-area-inset-bottom);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+    }
+
+    .bottom-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 65px;
+        padding: 0 16px;
+    }
+
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--color-purple-light);
+        text-decoration: none;
+        font-size: 0.7rem;
+        font-weight: 500;
+        width: 60px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .bottom-nav-item svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Estado Activo */
+    .bottom-nav-item.is-active {
+        color: var(--color-text-light);
+    }
+    
+    .bottom-nav-item.is-active svg {
+        stroke: var(--color-purple-primary);
+    }
+
+    /* Botón Central Destacado */
+    .bottom-nav-item--main {
+        position: relative;
+        top: -20px; 
+    }
+
+    .main-btn-circle {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--color-purple-primary); 
+        color: var(--color-text-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .bottom-nav-item--main svg {
+        stroke: var(--color-text-dark);
+    }
+}
