@@ -22,8 +22,8 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    flex: 1;      /* Ocupa el espacio disponible */
-    min-width: 0; /* CRÍTICO: Permite que el contenedor se encoja si el texto es largo */
+    flex: 1;
+    min-width: 0;
 }
 
 .admin-header__menu-btn {
@@ -45,9 +45,9 @@
     font-weight: 700;
     margin: 0;
     color: var(--color-text-light);
-    white-space: nowrap;      /* Evita saltos de línea */
-    overflow: hidden;         /* Oculta el texto sobrante */
-    text-overflow: ellipsis;  /* Añade "..." al final */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Derecha: Notificaciones + Usuario */
@@ -55,7 +55,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
-    flex-shrink: 0; /* Evita que los iconos se aplasten */
+    flex-shrink: 0;
     margin-left: var(--spacing-sm);
 }
 
@@ -134,65 +134,55 @@
     }
 }
 
-/* MÓVIL ULTRA COMPACTO (hasta 480px) */
+/* MÓVIL (hasta 480px) */
 @media (max-width: 480px) {
     .admin-header {
-        height: 48px; /* Altura fija y diminuta */
-        padding: 0 8px; /* Padding mínimo */
-        gap: 8px;
-        margin-bottom: 12px;
-        flex-wrap: nowrap;
+        height: 56px; /* Altura estándar de App Bar cómoda */
+        padding: 0 12px;
+        gap: 12px; /* Un poco más de aire entre elementos */
+        margin-bottom: 16px;
     }
 
-    /* Ajuste Izquierda */
     .admin-header__left {
-        gap: 4px;
-        margin-right: 4px;
+        gap: 8px;
     }
 
     .admin-header__menu-btn {
-        padding: 4px;
-        width: 32px;
-        height: 32px;
+        padding: 6px; /* Area de toque más cómoda */
     }
 
+    /* Ahora que el texto es corto, podemos usar un tamaño decente */
     .admin-header__title {
-        font-size: 1rem; /* Tamaño de letra reducido para que quepa más texto */
-        line-height: 1;
+        font-size: 1.15rem; 
+        line-height: 1.2;
     }
 
-    /* Ajuste Derecha */
     .admin-header__right {
-        gap: 2px; /* Iconos pegados */
+        gap: 4px;
         border: none;
         padding: 0;
     }
 
-    .admin-header__user {
-        gap: 0;
-    }
-
-    /* Iconos más pequeños */
     .admin-header__notification-btn,
     .admin-header__logout-btn {
-        width: 32px;
-        height: 32px;
-        padding: 6px;
+        width: 40px; /* Tamaño táctil óptimo */
+        height: 40px;
+        padding: 8px;
     }
 
     .admin-header__notification-btn svg,
     .admin-header__logout-btn svg,
     .admin-header__menu-btn svg {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
     }
 
     .notification-badge {
-        top: 2px;
-        right: 2px;
-        font-size: 9px;
-        padding: 1px 3px;
-        min-width: 12px;
-        border: 1px solid var(--glass-background); /* Borde para separar visualmente */
+        top: 4px;
+        right: 4px;
+        font-size: 0.65rem;
+        padding: 1px 4px;
+        min-width: 14px;
+        border: 2px solid var(--color-purple-bg); /* Borde más notable */
     }
 }

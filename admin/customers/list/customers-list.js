@@ -16,14 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 2. UI Init (Header y Sidebar)
-    // Cargar Header dinámico
+    // Cargar Header dinámico con nombre CORTO
     if (typeof loadAdminHeader === 'function') {
-        await loadAdminHeader('Lista de Clientes');
+        await loadAdminHeader('Clientes');
     }
 
     await loadSidebar();
-    // Nota: initializeSidebarToggle y initializeLogout ahora son manejados por admin-header.js
-
+    
     // 3. Listeners
     setupSearchListeners();
     setupActionListeners();
@@ -89,7 +88,6 @@ async function loadCustomers() {
         btnPrev.disabled = currentPage === 1;
         btnNext.disabled = currentPage >= totalPages || total === 0;
 
-        // Reasignar eventos onclick para evitar duplicación de listeners
         btnPrev.onclick = () => { if (currentPage > 1) { currentPage--; loadCustomers(); } };
         btnNext.onclick = () => { if (currentPage < totalPages) { currentPage++; loadCustomers(); } };
 
@@ -127,13 +125,12 @@ function setupSearchListeners() {
     }
 }
 
-// --- LÓGICA DEL MODAL (COMPONENT LOADING) ---
+// --- LÓGICA DEL MODAL ---
 
 function setupActionListeners() {
     const btnAdd = document.getElementById('btn-add-customer');
     const modalOverlay = document.getElementById('modal-overlay');
 
-    // Precargar los recursos del formulario para que esté listo rápido
     preloadCreateResources();
 
     if (btnAdd) {
@@ -142,7 +139,6 @@ function setupActionListeners() {
         });
     }
 
-    // Cerrar al hacer clic fuera del contenido
     if (modalOverlay) {
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) {
@@ -153,14 +149,12 @@ function setupActionListeners() {
 }
 
 function preloadCreateResources() {
-    // Cargar CSS si no existe
     if (!document.querySelector('link[href*="customers-create.css"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = '../create/customers-create.css'; 
         document.head.appendChild(link);
     }
-    // Cargar JS si no existe
     if (!document.querySelector('script[src*="customers-create.js"]')) {
         const script = document.createElement('script');
         script.src = '../create/customers-create.js';
@@ -172,24 +166,19 @@ async function openCreateCustomerModal() {
     const modalOverlay = document.getElementById('modal-overlay');
     const modalContent = document.getElementById('modal-content');
     
-    // Mostrar overlay con loader temporal
     modalOverlay.classList.remove('u-hidden');
     modalContent.innerHTML = '<div class="u-flex-center" style="height:300px;"><div class="modal-loader"></div></div>';
 
     try {
-        // Fetch del HTML del componente
         const response = await fetch('../create/customers-create.html');
         if (!response.ok) throw new Error('Error cargando el formulario');
         const html = await response.text();
 
-        // Inyectar HTML
         modalContent.innerHTML = html;
 
-        // Inicializar la lógica del JS (esperar un poco para asegurar que el script se cargó)
         if (typeof window.initCreateCustomerForm === 'function') {
             window.initCreateCustomerForm();
         } else {
-            // Reintento breve por si el script está cargando por red
             setTimeout(() => {
                 if (typeof window.initCreateCustomerForm === 'function') {
                     window.initCreateCustomerForm();
@@ -210,11 +199,9 @@ function closeModal() {
     modalOverlay.classList.add('u-hidden');
 }
 
-// Exponer funciones globales para que el modal (que está en otro archivo) pueda usarlas
 window.closeModal = closeModal;
 window.loadCustomers = loadCustomers;
 
-// --- UTILS LAYOUT ---
 async function loadSidebar() {
     const container = document.getElementById('sidebar-container');
     if (!container) return;

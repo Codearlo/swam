@@ -1,6 +1,5 @@
 /* admin/sales/list/sales-list.js */
 
-// Estado local
 let currentPage = 1;
 const pageSize = 10;
 let currentFilters = {
@@ -10,7 +9,6 @@ let currentFilters = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Verificar Autenticación
     if (!isAuthenticated()) {
         window.location.href = '/public/auth/login/login.html';
         return;
@@ -20,45 +18,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. Inicializar UI (Header y Sidebar)
-    // Cargar el Header dinámico con el título específico
+    // MODIFICADO: Nombre corto
     if (typeof loadAdminHeader === 'function') {
-        await loadAdminHeader('Historial de Ventas');
+        await loadAdminHeader('Ventas');
     }
 
     await loadSidebar();
-    // Nota: initializeSidebarToggle e initializeLogout ya no son necesarios aquí
-    // porque son manejados por el componente admin-header.
 
-    // 3. Configurar Filtros
     setupFilterListeners();
-
-    // 4. Cargar Datos Iniciales
     await loadSales();
 });
 
-/**
- * Carga las ventas desde la API según la página y filtros actuales.
- */
 async function loadSales() {
     const tableBody = document.getElementById('sales-table-body');
     const paginationInfo = document.getElementById('pagination-info');
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
 
-    // Mostrar estado de carga
     tableBody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 20px;">Cargando...</td></tr>';
     btnPrev.disabled = true;
     btnNext.disabled = true;
 
-    // Llamada a la API
     const response = await api.getSalesList(currentPage, pageSize, currentFilters);
 
     if (response.success) {
         const sales = response.data;
         const total = response.total;
 
-        // Renderizar filas de la tabla
         if (sales.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 20px; color: var(--color-purple-light);">No se encontraron ventas.</td></tr>';
         } else {
@@ -78,18 +64,14 @@ async function loadSales() {
             `).join('');
         }
 
-        // Calcular y actualizar paginación
         const totalPages = Math.ceil(total / pageSize);
         const startItem = total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
         const endItem = Math.min(currentPage * pageSize, total);
 
         paginationInfo.textContent = `Mostrando ${startItem} - ${endItem} de ${total}`;
-
-        // Habilitar/Deshabilitar botones
         btnPrev.disabled = currentPage === 1;
         btnNext.disabled = currentPage >= totalPages || total === 0;
 
-        // Configurar eventos de los botones
         btnPrev.onclick = () => {
             if (currentPage > 1) {
                 currentPage--;
@@ -108,9 +90,6 @@ async function loadSales() {
     }
 }
 
-/**
- * Configura los listeners para los botones de filtro y búsqueda.
- */
 function setupFilterListeners() {
     const btnFilter = document.getElementById('btn-filter');
     const btnClear = document.getElementById('btn-clear');
@@ -123,7 +102,7 @@ function setupFilterListeners() {
             currentFilters.search = searchInput.value.trim();
             currentFilters.startDate = dateStart.value;
             currentFilters.endDate = dateEnd.value;
-            currentPage = 1; // Volver a la página 1 al filtrar
+            currentPage = 1; 
             loadSales();
         });
     }
@@ -139,7 +118,6 @@ function setupFilterListeners() {
         });
     }
 
-    // Permitir buscar al presionar Enter
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') btnFilter.click();
@@ -147,16 +125,11 @@ function setupFilterListeners() {
     }
 }
 
-// --- Funciones Auxiliares ---
-
 function formatDate(dateString) {
     if (!dateString) return '-';
-    // Asegurar interpretación correcta de la zona horaria local
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString + 'T00:00:00').toLocaleDateString('es-PE', options);
 }
-
-// --- Configuración del Sidebar (Solo carga, la interacción la maneja el Header) ---
 
 async function loadSidebar() {
     const container = document.getElementById('sidebar-container');
@@ -165,8 +138,6 @@ async function loadSidebar() {
         const res = await fetch('/public/shared/components/sidebar/sidebar.html');
         if (!res.ok) throw new Error('Error loading sidebar');
         container.innerHTML = await res.text();
-        
-        // Marcar activo el enlace de Ventas
         const links = container.querySelectorAll('.sidebar-link');
         links.forEach(link => {
             if(link.href.includes('sales-list')) link.classList.add('is-active');
