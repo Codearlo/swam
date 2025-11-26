@@ -1,0 +1,147 @@
+/* Container principal del Header (Glassmorphism aplicado en el contenedor padre o aquí) */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    transition: all 0.3s ease;
+}
+
+/* Sección Izquierda */
+.admin-header__left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.admin-header__menu-btn {
+    display: none; /* Oculto en desktop por defecto */
+    padding: var(--spacing-sm);
+    color: var(--color-text-light);
+    border-radius: var(--spacing-sm);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.admin-header__menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-header__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-text-light);
+}
+
+/* Sección Derecha */
+.admin-header__right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+/* Notificaciones */
+.admin-header__notification-btn {
+    position: relative;
+    padding: var(--spacing-sm);
+    color: var(--color-text-light);
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.admin-header__notification-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: var(--color-error);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Usuario */
+.admin-header__user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.admin-header__user span {
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.admin-header__logout-btn {
+    padding: var(--spacing-sm);
+    color: var(--color-text-light);
+    border-radius: 50%;
+    transition: all 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.admin-header__logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--color-error);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* --- RESPONSIVE --- */
+
+/* Tablet y Móvil */
+@media (max-width: 768px) {
+    .admin-header {
+        padding: var(--spacing-md);
+    }
+
+    .admin-header__menu-btn {
+        display: block; /* Mostrar botón de menú */
+    }
+
+    .admin-header__title {
+        font-size: 1.5rem;
+    }
+
+    .admin-header__user span {
+        display: none; /* Ocultar nombre en móvil */
+    }
+}
+
+/* Móvil Pequeño */
+@media (max-width: 480px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .admin-header__left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .admin-header__title {
+        font-size: 1.25rem;
+    }
+
+    .admin-header__right {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: var(--spacing-sm);
+        border-top: 1px solid rgba(255,255,255,0.05);
+        gap: var(--spacing-sm);
+    }
+}

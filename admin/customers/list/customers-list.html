@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="../../../public/shared/components/sidebar/sidebar.css">
     <link rel="stylesheet" href="../../../public/shared/components/sidebar/sidebar-responsive.css">
     
+    <link rel="stylesheet" href="../../../public/shared/components/admin-header/admin-header.css">
+    
     <link rel="stylesheet" href="../../dashboard/dashboard.css">
     <link rel="stylesheet" href="../../dashboard/dashboard-responsive.css">
     
@@ -28,23 +30,7 @@
         <aside id="sidebar-container" class="admin-sidebar"></aside>
         
         <main class="admin-main">
-            <header class="admin-header u-glass-effect">
-                <div class="admin-header__left">
-                    <button id="sidebar-toggle" class="admin-header__menu-btn" aria-label="Toggle Menu">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                    </button>
-                    <h1 class="admin-header__title">Lista de Clientes</h1>
-                </div>
-                
-                <div class="admin-header__right">
-                    <div class="admin-header__user">
-                        <span id="user-name-display">Admin User</span>
-                        <button id="logout-btn" class="admin-header__logout-btn" aria-label="Cerrar sesión">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <header id="admin-header-container" class="admin-header u-glass-effect"></header>
 
             <div class="dashboard-container">
                 
@@ -121,6 +107,9 @@
     <script src="../../../public/shared/scripts/helpers.js"></script>
     <script src="../../../public/shared/scripts/api.js"></script>
     <script src="../../../public/shared/scripts/auth-utils.js"></script>
+    
+    <script src="../../../public/shared/components/admin-header/admin-header.js"></script>
+    
     <script src="customers-list.js" defer></script>
 </body>
 </html>

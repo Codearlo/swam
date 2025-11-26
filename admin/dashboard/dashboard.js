@@ -1,7 +1,7 @@
 /* admin/dashboard/dashboard.js */
 
 let dashboardSubscription = null;
-let currentTopProductsFilter = 'week'; // Estado global para el filtro
+let currentTopProductsFilter = 'week'; 
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Verificaciones de Seguridad
@@ -15,18 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. UI Inicial y Componentes de Layout
-    const fullName = getUserFullName();
-    if (fullName) {
-        const nameDisplay = document.getElementById('user-name-display');
-        if (nameDisplay) nameDisplay.textContent = fullName;
-    }
-    
-    // Cargar Sidebar y Bottom Nav
+    // 2. Cargar Componentes de Layout
     await loadLayoutComponents();
-    
-    initializeSidebarToggle();
-    initializeLogout();
 
     // 3. Carga Inicial de Datos
     await loadAllDashboardData();
@@ -37,15 +27,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 5. Inicializar Gráficos
     initializeCharts(); 
     
-    // Exponer función de filtro al window para que el HTML pueda llamarla
+    // Exponer función de filtro al window
     window.changeTopProductsFilter = changeTopProductsFilter;
 });
 
 /**
- * Carga los componentes de navegación (Sidebar y Bottom Nav)
+ * Carga los componentes de navegación (Header, Sidebar y Bottom Nav)
  */
 async function loadLayoutComponents() {
-    // 1. Cargar Sidebar (Escritorio y Drawer Móvil)
+    // A. Cargar Header Admin (NUEVO)
+    // Se pasa el título específico de esta página
+    if (typeof loadAdminHeader === 'function') {
+        await loadAdminHeader('Dashboard');
+    }
+
+    // B. Cargar Sidebar
     const sidebarContainer = document.getElementById('sidebar-container');
     if (sidebarContainer) {
         try {
@@ -65,7 +61,7 @@ async function loadLayoutComponents() {
         }
     }
 
-    // 2. Cargar Bottom Navigation (Móvil)
+    // C. Cargar Bottom Navigation (Móvil)
     const bottomNavContainer = document.getElementById('bottom-nav-container');
     if (bottomNavContainer) {
         try {
@@ -74,21 +70,15 @@ async function loadLayoutComponents() {
                 const html = await response.text();
                 bottomNavContainer.innerHTML = html;
 
-                // Marcar la opción activa en el Bottom Nav
                 const activeLink = bottomNavContainer.querySelector('[href*="dashboard"]');
-                if (activeLink) {
-                    activeLink.classList.add('is-active');
-                }
+                if (activeLink) activeLink.classList.add('is-active');
 
-                // Lógica del botón "Menú" en la barra inferior para abrir el Sidebar
                 const menuTrigger = document.getElementById('mobile-menu-trigger');
                 if (menuTrigger) {
                     menuTrigger.addEventListener('click', (e) => {
                         e.preventDefault();
                         const sidebar = document.querySelector('.admin-sidebar');
-                        if (sidebar) {
-                            sidebar.classList.add('is-open');
-                        }
+                        if (sidebar) sidebar.classList.add('is-open');
                     });
                 }
             }
@@ -96,6 +86,9 @@ async function loadLayoutComponents() {
             console.error('Error al cargar el bottom nav:', error);
         }
     }
+    
+    // NOTA: Se eliminaron initializeSidebarToggle() e initializeLogout() de aquí
+    // porque ahora esas funciones están dentro del componente admin-header.js
 }
 
 /**
@@ -106,7 +99,7 @@ async function loadAllDashboardData() {
         refreshMetrics(),
         refreshRecentSales(),
         refreshInventoryAlerts(),
-        refreshTopProducts(currentTopProductsFilter) // Usar el filtro por defecto
+        refreshTopProducts(currentTopProductsFilter)
     ]);
 }
 
@@ -119,7 +112,6 @@ function initializeRealtimeUpdates() {
             console.log('♻️ Actualizando datos por nueva venta...');
             refreshMetrics();       
             refreshRecentSales();   
-            // Al actualizar por realtime, respetamos el filtro que el usuario tenga seleccionado
             refreshTopProducts(currentTopProductsFilter); 
         },
         onOrdersChange: () => {
@@ -140,21 +132,14 @@ function initializeRealtimeUpdates() {
 }
 
 // --- LÓGICA DEL FILTRO DE PRODUCTOS ---
-
-/**
- * Función llamada al hacer clic en los botones de Semana/Mes/Año
- */
 async function changeTopProductsFilter(period, btnElement) {
-    // 1. Actualizar estado visual de los botones
     const container = btnElement.parentElement;
     const buttons = container.querySelectorAll('.chart-btn');
     buttons.forEach(btn => btn.classList.remove('chart-btn--active'));
     btnElement.classList.add('chart-btn--active');
 
-    // 2. Actualizar variable global
     currentTopProductsFilter = period;
 
-    // 3. Recargar datos con efecto de carga
     const listContainer = document.getElementById('top-products-list');
     if(listContainer) {
         listContainer.style.opacity = '0.5';
@@ -282,41 +267,6 @@ function updateTopProductsList(products) {
             <span class="top-product-item__amount">S/. ${prod.amount.toFixed(2)}</span>
         </div>
     `).join('');
-}
-
-// --- UTILIDADES DEL LAYOUT ---
-
-function initializeSidebarToggle() {
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.admin-sidebar');
-    
-    if (!toggleBtn || !sidebar) return;
-
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('is-open');
-    });
-
-    // Cerrar sidebar al hacer clic fuera en móvil
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            // Se añade una condición extra para no cerrar si se hizo clic en el trigger del menú móvil
-            const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
-            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && (!mobileMenuTrigger || !mobileMenuTrigger.contains(e.target))) {
-                sidebar.classList.remove('is-open');
-            }
-        }
-    });
-}
-
-function initializeLogout() {
-    const logoutBtn = document.getElementById('logout-btn');
-    if (!logoutBtn) return;
-
-    logoutBtn.addEventListener('click', () => {
-        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            api.logoutUser();
-        }
-    });
 }
 
 function initializeCharts() {

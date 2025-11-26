@@ -15,16 +15,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. UI Init
-    const fullName = getUserFullName();
-    if (fullName) {
-        const userDisplay = document.getElementById('user-name-display');
-        if (userDisplay) userDisplay.textContent = fullName;
+    // 2. UI Init (Header y Sidebar)
+    // Cargar Header dinámico
+    if (typeof loadAdminHeader === 'function') {
+        await loadAdminHeader('Lista de Clientes');
     }
 
     await loadSidebar();
-    initializeSidebarToggle();
-    initializeLogout();
+    // Nota: initializeSidebarToggle y initializeLogout ahora son manejados por admin-header.js
 
     // 3. Listeners
     setupSearchListeners();
@@ -91,6 +89,7 @@ async function loadCustomers() {
         btnPrev.disabled = currentPage === 1;
         btnNext.disabled = currentPage >= totalPages || total === 0;
 
+        // Reasignar eventos onclick para evitar duplicación de listeners
         btnPrev.onclick = () => { if (currentPage > 1) { currentPage--; loadCustomers(); } };
         btnNext.onclick = () => { if (currentPage < totalPages) { currentPage++; loadCustomers(); } };
 
@@ -104,22 +103,28 @@ function setupSearchListeners() {
     const btnClear = document.getElementById('btn-clear');
     const inputSearch = document.getElementById('search-input');
 
-    btnSearch.addEventListener('click', () => {
-        searchTerm = inputSearch.value.trim();
-        currentPage = 1;
-        loadCustomers();
-    });
+    if (btnSearch) {
+        btnSearch.addEventListener('click', () => {
+            searchTerm = inputSearch.value.trim();
+            currentPage = 1;
+            loadCustomers();
+        });
+    }
 
-    btnClear.addEventListener('click', () => {
-        inputSearch.value = '';
-        searchTerm = '';
-        currentPage = 1;
-        loadCustomers();
-    });
+    if (btnClear) {
+        btnClear.addEventListener('click', () => {
+            inputSearch.value = '';
+            searchTerm = '';
+            currentPage = 1;
+            loadCustomers();
+        });
+    }
 
-    inputSearch.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') btnSearch.click();
-    });
+    if (inputSearch) {
+        inputSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnSearch.click();
+        });
+    }
 }
 
 // --- LÓGICA DEL MODAL (COMPONENT LOADING) ---
@@ -222,24 +227,4 @@ async function loadSidebar() {
             if(link.href.includes('customers-list')) link.classList.add('is-active');
         });
     } catch(e) { console.error(e); }
-}
-
-function initializeSidebarToggle() {
-    const btn = document.getElementById('sidebar-toggle');
-    const bar = document.querySelector('.admin-sidebar');
-    if(btn && bar) {
-        btn.addEventListener('click', () => bar.classList.toggle('is-open'));
-        document.addEventListener('click', (e) => {
-            if(window.innerWidth <= 768 && !bar.contains(e.target) && !btn.contains(e.target)) {
-                bar.classList.remove('is-open');
-            }
-        });
-    }
-}
-
-function initializeLogout() {
-    const btn = document.getElementById('logout-btn');
-    if(btn) btn.addEventListener('click', () => {
-        if(confirm('¿Cerrar sesión?')) api.logoutUser();
-    });
 }

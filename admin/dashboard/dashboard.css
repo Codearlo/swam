@@ -26,97 +26,7 @@
     width: calc(100% - 260px);
 }
 
-/* HEADER */
-.admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-    position: sticky;
-    top: 0;
-    z-index: 40;
-}
-
-.admin-header__left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.admin-header__menu-btn {
-    display: none;
-    padding: var(--spacing-sm);
-    color: var(--color-text-light);
-    border-radius: var(--spacing-sm);
-    transition: background-color 0.2s ease;
-}
-
-.admin-header__menu-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.admin-header__title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.admin-header__right {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-}
-
-.admin-header__notification-btn {
-    position: relative;
-    padding: var(--spacing-sm);
-    color: var(--color-text-light);
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
-}
-
-.admin-header__notification-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.notification-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background-color: var(--color-error);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-}
-
-.admin-header__user {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.admin-header__user span {
-    font-weight: 600;
-    color: var(--color-text-light);
-}
-
-.admin-header__logout-btn {
-    padding: var(--spacing-sm);
-    color: var(--color-text-light);
-    border-radius: 50%;
-    transition: all 0.2s ease, box-shadow 0.2s ease;
-}
-
-.admin-header__logout-btn:hover {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: var(--color-error);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-}
+/* NOTA: Los estilos de .admin-header se movieron a /shared/components/admin-header/admin-header.css */
 
 /* DASHBOARD CONTAINER */
 .dashboard-container {
@@ -145,16 +55,14 @@
     padding: var(--spacing-lg);
     display: flex;
     gap: var(--spacing-md);
-    /* Modificado: Añadido border-color para la transición y forzar el borde base */
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
     border: var(--glass-border);
 }
 
 .metric-card:hover {
     transform: translateY(-4px);
-    /* Modificado: Nuevo box-shadow para el efecto glow */
     box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
-    border-color: var(--color-purple-primary); /* Nuevo: Acento en el borde */
+    border-color: var(--color-purple-primary); 
 }
 
 .metric-card__icon {
@@ -255,14 +163,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    /* Nuevo: Añadido transición y borde base */
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
     border: var(--glass-border);
 }
 
 .chart-card:hover {
     transform: translateY(-4px);
-    /* Nuevo: Efecto glow al pasar el ratón */
     box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
     border-color: var(--color-purple-primary);
 }
@@ -373,14 +279,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    /* Nuevo: Añadido transición y borde base */
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
     border: var(--glass-border);
 }
 
 .list-card:hover {
     transform: translateY(-4px);
-    /* Nuevo: Efecto glow al pasar el ratón */
     box-shadow: 0 0 15px rgba(243, 244, 246, 0.4), var(--glass-shadow); 
     border-color: var(--color-purple-primary);
 }

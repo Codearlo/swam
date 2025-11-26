@@ -20,16 +20,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. Inicializar UI
-    const fullName = getUserFullName();
-    if (fullName) {
-        const userDisplay = document.getElementById('user-name-display');
-        if (userDisplay) userDisplay.textContent = fullName;
+    // 2. Inicializar UI (Header y Sidebar)
+    // Cargar el Header dinámico con el título específico
+    if (typeof loadAdminHeader === 'function') {
+        await loadAdminHeader('Historial de Ventas');
     }
 
     await loadSidebar();
-    initializeSidebarToggle();
-    initializeLogout();
+    // Nota: initializeSidebarToggle e initializeLogout ya no son necesarios aquí
+    // porque son manejados por el componente admin-header.
 
     // 3. Configurar Filtros
     setupFilterListeners();
@@ -90,7 +89,7 @@ async function loadSales() {
         btnPrev.disabled = currentPage === 1;
         btnNext.disabled = currentPage >= totalPages || total === 0;
 
-        // Configurar eventos de los botones (limpiando anteriores para evitar duplicados)
+        // Configurar eventos de los botones
         btnPrev.onclick = () => {
             if (currentPage > 1) {
                 currentPage--;
@@ -119,27 +118,33 @@ function setupFilterListeners() {
     const dateStart = document.getElementById('date-start');
     const dateEnd = document.getElementById('date-end');
 
-    btnFilter.addEventListener('click', () => {
-        currentFilters.search = searchInput.value.trim();
-        currentFilters.startDate = dateStart.value;
-        currentFilters.endDate = dateEnd.value;
-        currentPage = 1; // Volver a la página 1 al filtrar
-        loadSales();
-    });
+    if (btnFilter) {
+        btnFilter.addEventListener('click', () => {
+            currentFilters.search = searchInput.value.trim();
+            currentFilters.startDate = dateStart.value;
+            currentFilters.endDate = dateEnd.value;
+            currentPage = 1; // Volver a la página 1 al filtrar
+            loadSales();
+        });
+    }
 
-    btnClear.addEventListener('click', () => {
-        searchInput.value = '';
-        dateStart.value = '';
-        dateEnd.value = '';
-        currentFilters = { search: '', startDate: '', endDate: '' };
-        currentPage = 1;
-        loadSales();
-    });
+    if (btnClear) {
+        btnClear.addEventListener('click', () => {
+            searchInput.value = '';
+            dateStart.value = '';
+            dateEnd.value = '';
+            currentFilters = { search: '', startDate: '', endDate: '' };
+            currentPage = 1;
+            loadSales();
+        });
+    }
 
     // Permitir buscar al presionar Enter
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') btnFilter.click();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnFilter.click();
+        });
+    }
 }
 
 // --- Funciones Auxiliares ---
@@ -151,7 +156,7 @@ function formatDate(dateString) {
     return new Date(dateString + 'T00:00:00').toLocaleDateString('es-PE', options);
 }
 
-// --- Configuración del Sidebar y Layout (Compartido) ---
+// --- Configuración del Sidebar (Solo carga, la interacción la maneja el Header) ---
 
 async function loadSidebar() {
     const container = document.getElementById('sidebar-container');
@@ -167,25 +172,4 @@ async function loadSidebar() {
             if(link.href.includes('sales-list')) link.classList.add('is-active');
         });
     } catch(e) { console.error(e); }
-}
-
-function initializeSidebarToggle() {
-    const btn = document.getElementById('sidebar-toggle');
-    const bar = document.querySelector('.admin-sidebar');
-    if(btn && bar) {
-        btn.addEventListener('click', () => bar.classList.toggle('is-open'));
-        // Cerrar al hacer clic fuera en móvil
-        document.addEventListener('click', (e) => {
-            if(window.innerWidth <= 768 && !bar.contains(e.target) && !btn.contains(e.target)) {
-                bar.classList.remove('is-open');
-            }
-        });
-    }
-}
-
-function initializeLogout() {
-    const btn = document.getElementById('logout-btn');
-    if(btn) btn.addEventListener('click', () => {
-        if(confirm('¿Deseas cerrar la sesión?')) api.logoutUser();
-    });
 }
