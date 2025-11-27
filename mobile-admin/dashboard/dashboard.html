@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAM Móvil</title>
+    <link rel="stylesheet" href="../../public/shared/styles/reset.css">
+    <link rel="stylesheet" href="../../public/shared/styles/variables.css">
+    <link rel="stylesheet" href="../../public/shared/styles/typography.css">
+    <link rel="stylesheet" href="../../public/shared/styles/utilities.css">
+    
+    <link rel="stylesheet" href="mobile-dashboard.css">
+    
+    <link rel="stylesheet" href="../../public/shared/components/bottom-nav/bottom-nav.css">
+</head>
+<body>
+    
+    <header class="mobile-header u-glass-effect">
+        <img src="../../public/assets/logo.png" alt="Logo" width="30">
+        <h3>Dashboard</h3>
+        <div class="user-avatar">AD</div>
+    </header>
+
+    <main class="mobile-content">
+        <div class="kpi-card u-glass-effect">
+            <span>Ventas Hoy</span>
+            <h2>S/. 1,250.00</h2>
+        </div>
+        
+        <div class="kpi-card u-glass-effect">
+            <span>Pedidos</span>
+            <h2>5 Activos</h2>
+        </div>
+    </main>
+
+    <div id="bottom-nav-container"></div>
+
+    <script src="../../public/shared/scripts/auth-utils.js"></script>
+    <script>
+        // Cargar el bottom nav
+        fetch('../../public/shared/components/bottom-nav/bottom-nav.html')
+            .then(r => r.text())
+            .then(html => document.getElementById('bottom-nav-container').innerHTML = html);
+    </script>
+</body>
+</html>
