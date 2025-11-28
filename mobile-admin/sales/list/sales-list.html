@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Historial de Ventas - SWAM</title>
     
-    <link rel="stylesheet" href="../../../public/shared/styles/reset.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/variables.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/typography.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/utilities.css">
+    <link rel="stylesheet" href="/public/shared/styles/reset.css">
+    <link rel="stylesheet" href="/public/shared/styles/variables.css">
+    <link rel="stylesheet" href="/public/shared/styles/typography.css">
+    <link rel="stylesheet" href="/public/shared/styles/utilities.css">
     
-    <link rel="stylesheet" href="../../styles/mobile-theme.css">
-    <link rel="stylesheet" href="../../components/bottom-nav/bottom-nav.css">
-    <link rel="stylesheet" href="../../components/mobile-header/mobile-header.css">
+    <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
+    <link rel="stylesheet" href="/mobile-admin/components/mobile-header/mobile-header.css">
     
     <link rel="stylesheet" href="sales-list.css">
     
-    <script src="../../../public/shared/scripts/cache-buster.js"></script>
+    <script src="/public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
     
@@ -51,18 +51,17 @@
 
     </main>
 
-    <a href="../create/sales-create.html" class="fab-btn" aria-label="Crear Venta">
+    <a href="/mobile-admin/sales/create/sales-create.html" class="fab-btn" aria-label="Crear Venta">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </a>
 
     <div id="bottom-nav-container" class="bottom-nav-container"></div>
 
-    <script src="../../../public/shared/scripts/supabase-client.js"></script>
-    <script src="../../../public/shared/scripts/auth-utils.js"></script>
-    
-    <script src="../../scripts/mobile-api.js"></script>
-    
-    <script src="../../components/mobile-header/mobile-header.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/public/shared/scripts/auth-utils.js"></script>
+    <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script src="/mobile-admin/components/mobile-header/mobile-header.js"></script>
     <script src="sales-list.js"></script> 
 </body>
 </html>

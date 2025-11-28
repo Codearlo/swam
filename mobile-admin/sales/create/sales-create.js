@@ -1,72 +1,75 @@
 /* mobile-admin/sales/create/sales-create.js */
 
 let cart = [];
-// Mock de productos para demo (En producción usar api.searchProducts)
-const productsMock = [
-    { id: 101, name: "Mouse Gamer Logitech G502", price: 189.90, stock: 12 },
-    { id: 102, name: "Teclado Mecánico Redragon", price: 240.00, stock: 5 },
-    { id: 103, name: "Monitor Samsung 24 Curvo", price: 650.00, stock: 2 },
-    { id: 104, name: "Cable HDMI 2.0 2m", price: 25.00, stock: 50 },
-    { id: 105, name: "Silla Gamer Ergonómica", price: 899.00, stock: 0 }
-];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Cargar Componentes
     if(typeof loadMobileHeader === 'function') await loadMobileHeader();
-    await loadBottomNav();
+    
+    try {
+        const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
+        if(resp.ok) document.getElementById('bottom-nav-container').innerHTML = await resp.text();
+    } catch(e) {}
 
-    // 2. Fecha
-    const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    const dateStr = new Date().toLocaleDateString('es-ES', options);
+    // Fecha
+    const dateStr = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
     document.getElementById('sale-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
-    // 3. Inicializar Lógica
-    loadCustomers();
+    // Inicializar datos
+    await loadInitialData();
     setupSearch();
     setupCartActions();
 });
 
-async function loadBottomNav() {
-    try {
-        const resp = await fetch('../../components/bottom-nav/bottom-nav.html');
-        if(resp.ok) document.getElementById('bottom-nav-container').innerHTML = await resp.text();
-    } catch(e) { console.error(e); }
-}
-
-// --- CLIENTES ---
-function loadCustomers() {
+async function loadInitialData() {
+    // 1. Clientes
+    const customersRes = await mobileApi.getCustomers();
     const select = document.getElementById('customer-select');
-    // Mock
-    const customers = [
-        { id: 1, name: "Cliente General" },
-        { id: 2, name: "Juan Pérez (DNI)" },
-        { id: 3, name: "Empresa SAC (RUC)" }
-    ];
-    customers.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
-        select.appendChild(opt);
-    });
+    select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
+    
+    if (customersRes.success) {
+        customersRes.data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.full_name;
+            select.appendChild(opt);
+        });
+    }
+
+    // 2. Métodos de Pago
+    const pmRes = await mobileApi.getPaymentMethods();
+    const pmSelect = document.getElementById('payment-method');
+    if (pmRes.success && pmRes.data.length > 0) {
+        pmSelect.innerHTML = '';
+        pmRes.data.forEach(pm => {
+            const opt = document.createElement('option');
+            opt.value = pm.id;
+            opt.textContent = pm.name;
+            pmSelect.appendChild(opt);
+        });
+    }
 }
 
 // --- BUSCADOR ---
 function setupSearch() {
     const input = document.getElementById('product-search');
     const resultsBox = document.getElementById('search-results');
+    let debounceTimer;
 
     input.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
+        clearTimeout(debounceTimer);
+        const term = e.target.value.trim();
+        
         if (term.length < 2) {
             resultsBox.classList.add('u-hidden');
             return;
         }
 
-        const found = productsMock.filter(p => p.name.toLowerCase().includes(term));
-        renderSearchResults(found);
+        debounceTimer = setTimeout(async () => {
+            const res = await mobileApi.searchProducts(term);
+            renderSearchResults(res.data || []);
+        }, 300);
     });
 
-    // Cerrar al hacer click fuera
     document.addEventListener('click', (e) => {
         if (!input.contains(e.target) && !resultsBox.contains(e.target)) {
             resultsBox.classList.add('u-hidden');
@@ -87,45 +90,27 @@ function renderSearchResults(products) {
     products.forEach(p => {
         const div = document.createElement('div');
         div.className = 'search-result-item';
-        // Deshabilitar visualmente si no hay stock
-        const noStock = p.stock <= 0;
-        if(noStock) div.style.opacity = '0.5';
-
         div.innerHTML = `
             <div>
                 <div class="result-name">${p.name}</div>
-                <div class="result-stock">${noStock ? 'Sin Stock' : 'Stock: ' + p.stock}</div>
+                <div style="font-size:0.75rem; color:#666">${p.sku}</div>
             </div>
             <div class="result-price">S/. ${p.price.toFixed(2)}</div>
         `;
-        
-        if(!noStock) {
-            div.addEventListener('click', () => {
-                addToCart(p);
-                document.getElementById('product-search').value = '';
-                container.classList.add('u-hidden');
-            });
-        }
-        
+        div.addEventListener('click', () => {
+            addToCart(p);
+            document.getElementById('product-search').value = '';
+            container.classList.add('u-hidden');
+        });
         container.appendChild(div);
     });
     container.classList.remove('u-hidden');
 }
 
 // --- CARRITO ---
-function setupCartActions() {
-    document.getElementById('btn-clear-cart').addEventListener('click', () => {
-        if(cart.length > 0 && confirm('¿Vaciar carrito?')) {
-            cart = [];
-            renderCart();
-        }
-    });
-}
-
 function addToCart(product) {
     const existing = cart.find(item => item.id === product.id);
     if (existing) {
-        // Validar stock real aquí si fuera necesario
         existing.qty++;
     } else {
         cart.push({ ...product, qty: 1 });
@@ -141,9 +126,7 @@ function updateQty(index, change) {
     }
     renderCart();
 }
-
-// Exponer globalmente para onclick en HTML generado
-window.updateQty = updateQty;
+window.updateQty = updateQty; // Exponer
 
 function renderCart() {
     const container = document.getElementById('cart-items-container');
@@ -157,23 +140,17 @@ function renderCart() {
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-icon-bg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                </div>
-                <p style="color:#a1a1aa; font-size:0.9rem;">Tu carrito está vacío</p>
+                <p>Tu carrito está vacío</p>
             </div>
         `;
         totalEl.textContent = 'S/. 0.00';
         btnCheckout.disabled = true;
-        btnCheckout.textContent = 'Confirmar Venta';
         return;
     }
 
     let total = 0;
-
     cart.forEach((item, index) => {
         total += item.price * item.qty;
-        
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
@@ -190,8 +167,56 @@ function renderCart() {
         container.appendChild(div);
     });
 
-    const totalFormatted = `S/. ${total.toFixed(2)}`;
-    totalEl.textContent = totalFormatted;
-    btnCheckout.textContent = `Cobrar ${totalFormatted}`;
+    totalEl.textContent = `S/. ${total.toFixed(2)}`;
     btnCheckout.disabled = false;
+    btnCheckout.onclick = handleCheckout;
+}
+
+// --- GUARDAR VENTA ---
+async function handleCheckout() {
+    const customerId = document.getElementById('customer-select').value;
+    const paymentMethodId = document.getElementById('payment-method').value;
+    const btn = document.getElementById('btn-checkout');
+
+    if (!customerId) {
+        alert('Por favor selecciona un cliente');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Procesando...';
+
+    const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    
+    // Obtener ID usuario (si auth-utils.js guarda user_id, úsalo, sino null o mock)
+    // Aquí asumimos que auth-utils o login guardaron algo, o enviamos null
+    const userId = null; 
+
+    const result = await mobileApi.createSale({
+        customerId: customerId,
+        paymentMethodId: paymentMethodId,
+        total: total,
+        userId: userId
+    });
+
+    if (result.success) {
+        alert('¡Venta realizada con éxito!');
+        cart = [];
+        renderCart();
+        btn.textContent = 'Confirmar Venta';
+    } else {
+        alert('Error al guardar: ' + result.error);
+        btn.disabled = false;
+        btn.textContent = 'Confirmar Venta';
+    }
+}
+
+// Botón limpiar
+function setupCartActions() {
+    document.getElementById('btn-clear-cart').addEventListener('click', () => {
+        if(cart.length > 0 && confirm('¿Vaciar carrito?')) {
+            cart = [];
+            renderCart();
+        }
+    });
 }

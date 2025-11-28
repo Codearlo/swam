@@ -5,14 +5,15 @@ async function loadMobileHeader() {
     if (!container) return;
 
     try {
-        const response = await fetch('../../mobile-admin/components/mobile-header/mobile-header.html');
+        // CORRECCIÓN: Ruta Absoluta para evitar errores 404
+        const response = await fetch('/mobile-admin/components/mobile-header/mobile-header.html');
         
         if (response.ok) {
             container.innerHTML = await response.text();
             initializeHeaderData();
-            initializeNotifications(); // Nueva función
+            initializeNotifications();
         } else {
-            console.error('Error cargando mobile-header.html');
+            console.error('Error cargando header:', response.status);
         }
     } catch (error) {
         console.error('Error en loadMobileHeader:', error);
@@ -37,13 +38,11 @@ function initializeNotifications() {
     const modal = document.getElementById('notifications-modal');
 
     if (btnNotif && modal) {
-        // Toggle abrir/cerrar
         btnNotif.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evitar que el click cierre inmediatamente
+            e.stopPropagation();
             modal.classList.toggle('u-hidden');
         });
 
-        // Botón cerrar interno
         if (btnClose) {
             btnClose.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -51,7 +50,6 @@ function initializeNotifications() {
             });
         }
 
-        // Cerrar al hacer click fuera
         document.addEventListener('click', (e) => {
             if (!modal.contains(e.target) && !btnNotif.contains(e.target)) {
                 modal.classList.add('u-hidden');
@@ -60,5 +58,4 @@ function initializeNotifications() {
     }
 }
 
-// Exponer globalmente
 window.loadMobileHeader = loadMobileHeader;

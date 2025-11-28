@@ -5,25 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nueva Venta - SWAM</title>
     
-    <link rel="stylesheet" href="../../../public/shared/styles/reset.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/variables.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/typography.css">
-    <link rel="stylesheet" href="../../../public/shared/styles/utilities.css">
+    <link rel="stylesheet" href="/public/shared/styles/reset.css">
+    <link rel="stylesheet" href="/public/shared/styles/variables.css">
+    <link rel="stylesheet" href="/public/shared/styles/typography.css">
+    <link rel="stylesheet" href="/public/shared/styles/utilities.css">
     
-    <link rel="stylesheet" href="../../styles/mobile-theme.css">
-    <link rel="stylesheet" href="../../components/bottom-nav/bottom-nav.css">
-    <link rel="stylesheet" href="../../components/mobile-header/mobile-header.css">
+    <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
+    <link rel="stylesheet" href="/mobile-admin/components/mobile-header/mobile-header.css">
     
     <link rel="stylesheet" href="sales-create.css">
     
-    <script src="../../../public/shared/scripts/cache-buster.js"></script>
+    <script src="/public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
     
     <div id="mobile-header-container"></div>
 
     <main class="mobile-main-content">
-        
         <div class="page-header">
             <div>
                 <h2 class="page-title">Nueva Venta</h2>
@@ -41,14 +40,10 @@
                 </div>
                 <h3 class="card-title">Cliente</h3>
             </div>
-            
             <div class="form-row">
                 <select id="customer-select" class="dark-input dark-select">
-                    <option value="" disabled selected>Seleccionar Cliente...</option>
-                    </select>
-                <button class="action-btn-small" aria-label="Añadir Cliente">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
+                    <option value="" disabled selected>Cargando clientes...</option>
+                </select>
             </div>
         </section>
 
@@ -59,33 +54,25 @@
                 </div>
                 <h3 class="card-title">Agregar Productos</h3>
             </div>
-
             <div class="search-container">
                 <div class="search-input-box">
-                    <input type="text" id="product-search" class="dark-input" placeholder="Buscar por nombre o código..." autocomplete="off">
-                    <button class="scan-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><line x1="7" y1="12" x2="17" y2="12"></line></svg>
-                    </button>
+                    <input type="text" id="product-search" class="dark-input" placeholder="Buscar por nombre..." autocomplete="off">
                 </div>
-                
                 <div id="search-results" class="search-results-dropdown u-hidden"></div>
             </div>
         </section>
 
-        <h3 class="section-subtitle">Ítems en Carrito (<span id="cart-count">0</span>)</h3>
-        
+        <h3 class="section-subtitle">Ítems (<span id="cart-count">0</span>)</h3>
         <div id="cart-items-container" class="cart-list">
             <div class="empty-state">
                 <div class="empty-icon-bg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 </div>
                 <p>Tu carrito está vacío</p>
-                <span>Agrega productos para comenzar</span>
             </div>
         </div>
 
-        <div style="height: 120px;"></div>
-
+        <div style="height: 140px;"></div>
     </main>
 
     <footer class="sale-footer-fixed">
@@ -93,9 +80,7 @@
             <div class="payment-method-box">
                 <span class="pm-label">Método Pago</span>
                 <select id="payment-method" class="pm-select">
-                    <option value="cash">Efectivo</option>
-                    <option value="yape">Yape / Plin</option>
-                    <option value="card">Tarjeta</option>
+                    <option value="1">Efectivo</option>
                 </select>
             </div>
             <div class="total-box">
@@ -103,7 +88,6 @@
                 <span class="total-amount" id="footer-total">S/. 0.00</span>
             </div>
         </div>
-        
         <button id="btn-checkout" class="action-btn action-btn--primary u-full-width" disabled>
             Confirmar Venta
         </button>
@@ -111,10 +95,11 @@
 
     <div id="bottom-nav-container" class="bottom-nav-container"></div>
 
-    <script src="../../../public/shared/scripts/supabase-client.js"></script>
-    <script src="../../../public/shared/scripts/auth-utils.js"></script>
-    <script src="../../../public/shared/scripts/api.js"></script>
-    <script src="../../components/mobile-header/mobile-header.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/public/shared/scripts/auth-utils.js"></script>
+    <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script src="/mobile-admin/components/mobile-header/mobile-header.js"></script>
     <script src="sales-create.js"></script> 
 </body>
 </html>

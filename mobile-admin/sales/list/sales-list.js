@@ -1,32 +1,32 @@
 /* mobile-admin/sales/list/sales-list.js */
 
-let allSales = []; // Caché local para filtrado rápido en cliente (opcional)
+let allSales = []; 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Cargar Componentes UI
     if(typeof loadMobileHeader === 'function') await loadMobileHeader();
     
     try {
-        const resp = await fetch('../../components/bottom-nav/bottom-nav.html');
+        const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
         if(resp.ok) {
             document.getElementById('bottom-nav-container').innerHTML = await resp.text();
             document.getElementById('nav-sales')?.classList.add('is-active');
         }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
 
-    // 2. Inicializar Listeners
     setupFilters();
     setupSearch();
-
-    // 3. Cargar Datos Reales
     loadSalesHistory();
 });
 
 async function loadSalesHistory() {
     const container = document.getElementById('sales-list-container');
     
-    // Llamada a la API Real
-    const response = await mobileApi.getSalesHistory(1, 50); // Traemos 50 últimas ventas
+    if (typeof mobileApi === 'undefined') {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">API no cargada</div>`;
+        return;
+    }
+
+    const response = await mobileApi.getSalesHistory(1, 50);
     
     if (response.success) {
         allSales = response.data;
@@ -45,15 +45,13 @@ function renderList(data) {
     
     if (!data || data.length === 0) {
         container.innerHTML = `
-            <div class="u-flex-center" style="flex-direction:column; padding:40px 0; color:#666; text-align:center;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px; opacity:0.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <div class="u-flex-center" style="flex-direction:column; padding:60px 0; color:#52525b; text-align:center;">
                 <p>No se encontraron ventas</p>
             </div>`;
         return;
     }
 
     container.innerHTML = data.map(sale => {
-        // Formateo de fecha seguro
         let dateStr = '-';
         if (sale.date) {
             const dateObj = new Date(sale.date);
@@ -62,12 +60,7 @@ function renderList(data) {
             }
         }
         
-        // Formato Moneda
         const amountStr = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(sale.amount);
-
-        // Clases de estado (si usas estados en tu BD)
-        const statusClass = sale.status === 'pending' ? 'status-pending' : 'status-completed';
-        const statusText = sale.status === 'pending' ? 'Pendiente' : 'Completado';
 
         return `
         <div class="sale-card-item">
@@ -86,14 +79,13 @@ function renderList(data) {
             </div>
             <div class="sale-card-right">
                 <div class="sale-amount">${amountStr}</div>
-                <span class="status-badge ${statusClass}">${statusText}</span>
+                <span class="status-badge status-completed">Completado</span>
             </div>
         </div>
         `;
     }).join('');
 }
 
-// --- FILTROS ---
 function setupFilters() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
@@ -101,9 +93,9 @@ function setupFilters() {
             tabs.forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
             
-            const filter = btn.dataset.filter; // 'all', 'today', 'month'
+            const filter = btn.dataset.filter;
             const now = new Date();
-            let filtered = [...allSales]; // Copia
+            let filtered = [...allSales];
 
             if (filter === 'today') {
                 filtered = allSales.filter(s => {
@@ -119,7 +111,6 @@ function setupFilters() {
                            d.getFullYear() === now.getFullYear();
                 });
             }
-            
             renderList(filtered);
         });
     });
@@ -129,12 +120,10 @@ function setupSearch() {
     const input = document.getElementById('search-input');
     input.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase().trim();
-        
         if (!term) {
-            renderList(allSales); // Restaurar lista completa
+            renderList(allSales);
             return;
         }
-
         const filtered = allSales.filter(s => 
             (s.customer && s.customer.toLowerCase().includes(term)) || 
             (s.code && s.code.toLowerCase().includes(term))
