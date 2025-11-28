@@ -29,8 +29,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    /* Crear un contexto de apilamiento para el contenido principal */
-    position: relative; 
+    position: relative;
     z-index: 1;
 }
 
@@ -43,7 +42,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: color 0.2s, opacity 0.2s;
 }
+
+.icon-btn-ghost { color: #ef4444; }
+.icon-btn-ghost:disabled { color: #52525b; cursor: not-allowed; opacity: 0.5; }
+
 .header-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
 
 /* --- INPUT CARDS --- */
@@ -57,14 +61,14 @@ body {
     gap: 12px;
     height: 56px;
     flex-shrink: 0;
-    /* CORRECCIÓN Z-INDEX: */
-    position: relative; 
-    z-index: 10; /* Nivel base */
+    /* Base z-index */
+    position: relative;
+    z-index: 10; 
 }
 
-/* Cuando es el buscador de cliente (primero), le damos más prioridad para que su dropdown tape al de abajo */
-.input-card:first-of-type {
-    z-index: 20; 
+/* CORRECCIÓN: Clase utilitaria para elevar la tarjeta de cliente */
+.z-high {
+    z-index: 50;
 }
 
 .input-icon-wrapper {
@@ -104,18 +108,17 @@ body {
     justify-content: center;
 }
 
-/* --- DROPDOWNS (Corrección de Solapamiento) --- */
+/* --- DROPDOWNS --- */
 .custom-select-wrapper {
     flex: 1;
-    position: static; /* Cambiado a static para que el absolute se base en la tarjeta padre */
+    position: relative; /* Cambiado a relative para posicionar el dropdown */
 }
 
 .custom-dropdown, .search-results-dropdown {
     position: absolute;
-    top: 100%; /* Justo debajo de la tarjeta */
-    left: 0;
-    width: 100%;
-    margin-top: 8px; /* Pequeño espacio */
+    top: 45px; /* Ajuste para que no tape el input */
+    left: -50px; /* Cubre el icono también si se quiere, o ajustar a 0 */
+    width: calc(100% + 90px); /* Ancho completo de la tarjeta */
     
     background-color: #18181b; 
     border: 1px solid rgba(139, 92, 246, 0.3);
@@ -123,9 +126,15 @@ body {
     max-height: 250px;
     overflow-y: auto;
     
-    /* CORRECCIÓN Z-INDEX ALTO */
-    z-index: 1000; 
+    z-index: 1000; /* Siempre encima */
     box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+}
+
+.search-results-dropdown {
+    left: 0;
+    width: 100%;
+    top: 100%;
+    margin-top: 10px;
 }
 
 .dropdown-item, .search-result-item {
@@ -140,14 +149,14 @@ body {
 }
 
 .dropdown-item:active, .search-result-item:active {
-    background-color: rgba(139, 92, 246, 0.15);
+    background-color: rgba(139, 92, 246, 0.15); 
 }
 
 .result-name { font-weight: 600; font-size: 0.95rem; }
 .result-price { font-weight: 700; color: #a78bfa; }
 
 /* --- CARRITO --- */
-.cart-section { flex: 1; display: flex; flex-direction: column; z-index: 5; } /* Menor z-index */
+.cart-section { flex: 1; display: flex; flex-direction: column; z-index: 5; }
 .cart-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .section-label { font-size: 0.85rem; font-weight: 600; color: #a1a1aa; text-transform: uppercase; }
 .cart-badge { background: #27272a; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
@@ -169,7 +178,7 @@ body {
 .qty-btn { width: 32px; height: 32px; background: transparent; border: none; color: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
 .qty-val { width: 24px; text-align: center; font-weight: 600; font-size: 0.9rem; }
 
-/* --- FOOTER GRANDE FIJO --- */
+/* --- FOOTER --- */
 .sale-footer-modern {
     position: fixed; bottom: 0; left: 0; width: 100%;
     background-color: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.1);

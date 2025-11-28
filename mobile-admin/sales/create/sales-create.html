@@ -24,21 +24,23 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </button>
         <h1 class="header-title">Nueva Venta</h1>
-        <button class="icon-btn-ghost" id="btn-clear-cart" aria-label="Limpiar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+        <button class="icon-btn-ghost" id="btn-clear-cart" aria-label="Limpiar" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
         </button>
     </header>
 
     <main class="mobile-main-content">
         
-        <div class="input-card" style="overflow: visible;"> <div class="input-icon-wrapper icon-purple">
+        <div class="input-card z-high" style="overflow: visible;">
+            <div class="input-icon-wrapper icon-purple">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
             
             <div class="custom-select-wrapper">
                 <input type="text" id="customer-search-input" class="clean-input" placeholder="Buscar Cliente..." autocomplete="off">
-                <input type="hidden" id="selected-customer-id"> <div id="customer-dropdown" class="custom-dropdown u-hidden">
-                    </div>
+                <input type="hidden" id="selected-customer-id">
+                
+                <div id="customer-dropdown" class="custom-dropdown u-hidden"></div>
             </div>
 
             <button class="add-btn-small">
