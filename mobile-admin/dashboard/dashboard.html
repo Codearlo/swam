@@ -2,45 +2,86 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWAM Móvil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SWAM Mobile Admin</title>
+    
     <link rel="stylesheet" href="../../public/shared/styles/reset.css">
     <link rel="stylesheet" href="../../public/shared/styles/variables.css">
     <link rel="stylesheet" href="../../public/shared/styles/typography.css">
     <link rel="stylesheet" href="../../public/shared/styles/utilities.css">
     
-    <link rel="stylesheet" href="mobile-dashboard.css">
+    <link rel="stylesheet" href="dashboard.css">
     
     <link rel="stylesheet" href="../../public/shared/components/bottom-nav/bottom-nav.css">
+    
+    <script src="../../public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
     
-    <header class="mobile-header u-glass-effect">
-        <img src="../../public/assets/logo.png" alt="Logo" width="30">
-        <h3>Dashboard</h3>
-        <div class="user-avatar">AD</div>
+    <header class="mobile-header">
+        <div class="header-left">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h1>Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-avatar-circle">AD</div>
+        </div>
     </header>
 
-    <main class="mobile-content">
-        <div class="kpi-card u-glass-effect">
-            <span>Ventas Hoy</span>
-            <h2>S/. 1,250.00</h2>
+    <main class="mobile-main-content">
+        <div class="mobile-card">
+            <div class="card-label">Ventas Hoy</div>
+            <div class="card-value" id="kpi-sales">S/. 1,250.00</div>
+        </div>
+
+        <div class="mobile-card">
+            <div class="card-label">Pedidos</div>
+            <div class="card-value-group">
+                <span class="card-value" id="kpi-orders">5</span>
+                <span class="card-subvalue">Activos</span>
+            </div>
+        </div>
+
+        <div class="mobile-card">
+            <div class="card-label">Clientes Nuevos</div>
+            <div class="card-value" id="kpi-customers">12</div>
         </div>
         
-        <div class="kpi-card u-glass-effect">
-            <span>Pedidos</span>
-            <h2>5 Activos</h2>
-        </div>
+        <div class="quick-actions u-flex-center">
+            </div>
     </main>
 
     <div id="bottom-nav-container"></div>
 
+    <script src="../../public/shared/scripts/supabase-client.js"></script>
     <script src="../../public/shared/scripts/auth-utils.js"></script>
+    <script src="../../public/shared/scripts/api.js"></script>
+    
     <script>
-        // Cargar el bottom nav
-        fetch('../../public/shared/components/bottom-nav/bottom-nav.html')
-            .then(r => r.text())
-            .then(html => document.getElementById('bottom-nav-container').innerHTML = html);
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Cargar el Bottom Nav
+            try {
+                const resp = await fetch('../../public/shared/components/bottom-nav/bottom-nav.html');
+                if(resp.ok) {
+                    document.getElementById('bottom-nav-container').innerHTML = await resp.text();
+                    // Marcar activo
+                    const links = document.querySelectorAll('.bottom-nav-item');
+                    if(links.length > 0) links[0].classList.add('is-active');
+                }
+            } catch(e) { console.error('Error loading nav', e); }
+
+            // 2. Cargar Datos Reales (O Mock si no hay Supabase)
+            if(typeof api !== 'undefined' && api.getDashboardData) {
+                const data = await api.getDashboardData();
+                if(data.success) {
+                    document.getElementById('kpi-sales').textContent = `S/. ${data.dailySales.toFixed(2)}`;
+                    document.getElementById('kpi-orders').textContent = data.activeOrders;
+                    document.getElementById('kpi-customers').textContent = data.activeCustomers || 0;
+                }
+            }
+        });
     </script>
 </body>
 </html>
