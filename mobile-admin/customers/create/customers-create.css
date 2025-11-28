@@ -54,6 +54,7 @@ body {
     font-weight: 600;
 }
 
+/* --- TARJETAS DE INPUT --- */
 .input-card {
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -65,12 +66,14 @@ body {
     height: 56px;
     flex-shrink: 0;
     transition: border-color 0.2s;
+    position: relative; /* Para el dropdown */
 }
 
 .input-card:focus-within {
     border-color: var(--mobile-accent, #8b5cf6);
 }
 
+/* Iconos */
 .input-icon-wrapper {
     width: 36px;
     height: 36px;
@@ -87,6 +90,7 @@ body {
 .icon-pink { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
 .icon-orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
 
+/* Input Limpio */
 .clean-input {
     flex: 1;
     background: transparent;
@@ -101,6 +105,7 @@ body {
 .clean-input::placeholder { color: #52525b; }
 .pointer { cursor: pointer; }
 
+/* Fila Doble */
 .form-row-card {
     display: flex;
     gap: 12px;
@@ -110,8 +115,9 @@ body {
     flex: 1;
 }
 
-/* Dropdown */
+/* --- DROPDOWN PERSONALIZADO --- */
 .custom-select-container {
+    /* Necesario para que el dropdown flote relativo a este contenedor */
     position: relative; 
     z-index: 20; 
 }
@@ -121,8 +127,8 @@ body {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #18181b; 
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background-color: #1c1c1e; /* Fondo más claro que el negro puro */
+    border: 1px solid rgba(59, 130, 246, 0.3); /* Borde azul suave */
     border-radius: 8px;
     margin-top: 4px;
     z-index: 1000;
@@ -143,11 +149,12 @@ body {
 }
 
 .dropdown-option:active {
-    background-color: rgba(59, 130, 246, 0.2); 
+    background-color: rgba(59, 130, 246, 0.2); /* Azul al tocar */
 }
 
 .u-hidden { display: none; }
 
+/* --- FOOTER FIJO --- */
 .form-footer {
     position: fixed;
     bottom: 0;
