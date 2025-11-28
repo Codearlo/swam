@@ -4,56 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Detalle Cliente</title>
+    
     <link rel="stylesheet" href="/public/shared/styles/reset.css">
     <link rel="stylesheet" href="/public/shared/styles/variables.css">
     <link rel="stylesheet" href="/public/shared/styles/typography.css">
     <link rel="stylesheet" href="/public/shared/styles/utilities.css">
+    
     <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
+    
     <link rel="stylesheet" href="customers-detail.css">
+    
+    <script src="/public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
-    <header class="detail-header">
-        <button onclick="history.back()" class="back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg></button>
-        <h1>Detalle Cliente</h1>
+    
+    <header class="page-header-bar">
+        <button onclick="history.back()" class="back-btn" aria-label="Volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+        </button>
+        <h1 class="header-title">Detalle Cliente</h1>
         <a id="btn-edit" href="#" class="edit-link">Editar</a>
     </header>
 
     <main class="mobile-main-content">
-        <div class="profile-card">
-            <div class="profile-avatar" id="detail-avatar">C</div>
+        
+        <div class="profile-section">
+            <div class="profile-avatar-large" id="detail-avatar">C</div>
             <h2 class="profile-name" id="detail-name">Cargando...</h2>
             <span class="profile-doc" id="detail-doc">...</span>
         </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <span class="label">Email</span>
-                <span class="value" id="detail-email">-</span>
+        <h3 class="section-label">Información de Contacto</h3>
+
+        <div class="info-card">
+            <div class="icon-wrapper icon-pink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
             </div>
-            <div class="info-item">
-                <span class="label">Teléfono</span>
-                <span class="value" id="detail-phone">-</span>
-            </div>
-            <div class="info-item full">
-                <span class="label">Dirección</span>
-                <span class="value" id="detail-address">-</span>
+            <div class="info-content">
+                <span class="info-label">Email</span>
+                <span class="info-value" id="detail-email">-</span>
             </div>
         </div>
 
-        <a id="btn-credits" href="#" class="action-card-btn">
-            <div class="action-icon icon-credits">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        <div class="info-card">
+            <div class="icon-wrapper icon-green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
             </div>
-            <div class="action-text">
-                <h4>Ver Créditos y Deudas</h4>
-                <p>Gestionar estado de cuenta</p>
+            <div class="info-content">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value" id="detail-phone">-</span>
             </div>
-            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+
+        <div class="info-card">
+            <div class="icon-wrapper icon-orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <div class="info-content">
+                <span class="info-label">Dirección</span>
+                <span class="info-value" id="detail-address">-</span>
+            </div>
+        </div>
+
+        <h3 class="section-label">Historial de Ventas</h3>
+        
+        <div id="last-sale-container">
+            <div class="loading-state">Cargando ventas...</div>
+        </div>
+
+        <a id="btn-full-history" href="#" class="action-card-link">
+            <div class="icon-wrapper icon-purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <div class="action-content">
+                <span class="action-title">Ver Historial Completo</span>
+                <span class="action-subtitle">Todas las compras realizadas</span>
+            </div>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#52525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </a>
+
+        <div style="height: 40px;"></div>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/public/shared/scripts/auth-utils.js"></script>
     <script src="/mobile-admin/scripts/mobile-api.js"></script>
     <script src="customers-detail.js"></script>
 </body>
