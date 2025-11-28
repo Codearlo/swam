@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detalle Cliente</title>
+    <link rel="stylesheet" href="/public/shared/styles/reset.css">
+    <link rel="stylesheet" href="/public/shared/styles/variables.css">
+    <link rel="stylesheet" href="/public/shared/styles/typography.css">
+    <link rel="stylesheet" href="/public/shared/styles/utilities.css">
+    <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="customers-detail.css">
+</head>
+<body>
+    <header class="detail-header">
+        <button onclick="history.back()" class="back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg></button>
+        <h1>Detalle Cliente</h1>
+        <a id="btn-edit" href="#" class="edit-link">Editar</a>
+    </header>
+
+    <main class="mobile-main-content">
+        <div class="profile-card">
+            <div class="profile-avatar" id="detail-avatar">C</div>
+            <h2 class="profile-name" id="detail-name">Cargando...</h2>
+            <span class="profile-doc" id="detail-doc">...</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Email</span>
+                <span class="value" id="detail-email">-</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Teléfono</span>
+                <span class="value" id="detail-phone">-</span>
+            </div>
+            <div class="info-item full">
+                <span class="label">Dirección</span>
+                <span class="value" id="detail-address">-</span>
+            </div>
+        </div>
+
+        <a id="btn-credits" href="#" class="action-card-btn">
+            <div class="action-icon icon-credits">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </div>
+            <div class="action-text">
+                <h4>Ver Créditos y Deudas</h4>
+                <p>Gestionar estado de cuenta</p>
+            </div>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script src="customers-detail.js"></script>
+</body>
+</html>

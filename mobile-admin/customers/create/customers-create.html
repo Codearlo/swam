@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuevo Cliente</title>
+    <link rel="stylesheet" href="/public/shared/styles/reset.css">
+    <link rel="stylesheet" href="/public/shared/styles/variables.css">
+    <link rel="stylesheet" href="/public/shared/styles/typography.css">
+    <link rel="stylesheet" href="/public/shared/styles/utilities.css">
+    <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="customers-create.css">
+</head>
+<body>
+    <header class="form-header">
+        <button onclick="history.back()" class="close-btn">✕</button>
+        <h1>Nuevo Cliente</h1>
+        <button id="btn-save" class="save-btn">Guardar</button>
+    </header>
+    <main class="form-content">
+        <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" id="full_name" class="dark-input" placeholder="Ej. Juan Perez">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Tipo Doc.</label>
+                <select id="document_type" class="dark-input">
+                    <option value="DNI">DNI</option>
+                    <option value="RUC">RUC</option>
+                </select>
+            </div>
+            <div class="form-group flex-2">
+                <label>Número Doc.</label>
+                <input type="text" id="document_number" class="dark-input">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" id="phone" class="dark-input">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" class="dark-input">
+        </div>
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" id="address" class="dark-input">
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script src="customers-create.js"></script>
+</body>
+</html>

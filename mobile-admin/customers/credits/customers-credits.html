@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Créditos</title>
+    <link rel="stylesheet" href="/public/shared/styles/reset.css">
+    <link rel="stylesheet" href="/public/shared/styles/variables.css">
+    <link rel="stylesheet" href="/public/shared/styles/typography.css">
+    <link rel="stylesheet" href="/public/shared/styles/utilities.css">
+    <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="customers-credits.css">
+</head>
+<body>
+    <header class="credits-header">
+        <button onclick="history.back()" class="back-btn">←</button>
+        <h1>Estado de Cuenta</h1>
+        <div style="width:24px"></div>
+    </header>
+    <main class="mobile-main-content">
+        <div class="debt-card">
+            <span class="label">Deuda Actual</span>
+            <h1 class="debt-amount" id="current-debt">S/. 0.00</h1>
+            <div class="limit-info">
+                <span>Límite de Crédito:</span>
+                <span id="credit-limit">S/. 0.00</span>
+            </div>
+        </div>
+        <h3 class="section-title">Movimientos Recientes</h3>
+        <div class="empty-list">No hay movimientos registrados</div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const id = new URLSearchParams(window.location.search).get('id');
+            const res = await mobileApi.getCustomerCredits(id);
+            if(res.success) {
+                document.getElementById('current-debt').textContent = `S/. ${parseFloat(res.data.debt).toFixed(2)}`;
+                document.getElementById('credit-limit').textContent = `S/. ${parseFloat(res.data.limit).toFixed(2)}`;
+            }
+        });
+    </script>
+</body>
+</html>

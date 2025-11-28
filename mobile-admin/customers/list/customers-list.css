@@ -1,0 +1,19 @@
+/* mobile-admin/customers/list/customers-list.css */
+body { background-color: var(--mobile-bg); color: var(--mobile-text-main); font-family: var(--font-family-base); padding-bottom: 90px; }
+.mobile-main-content { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+.page-title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.search-input-wrapper { display: flex; align-items: center; background-color: #0c0c0e; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 12px; }
+.search-input { width: 100%; background: transparent; border: none; color: #fff; padding: 14px 10px; font-size: 0.95rem; outline: none; }
+.customers-list { display: flex; flex-direction: column; gap: 10px; }
+/* Tarjeta de Cliente */
+.customer-card {
+    background-color: var(--mobile-card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;
+    display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit;
+}
+.customer-info { display: flex; align-items: center; gap: 12px; }
+.customer-avatar { width: 40px; height: 40px; background: rgba(139,92,246,0.15); color: #a78bfa; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+.customer-details h4 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.customer-details p { font-size: 0.75rem; color: #a1a1aa; }
+.arrow-icon { color: #52525b; }
+.fab-btn { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; background-color: var(--mobile-accent); color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(139,92,246,0.4); border: 1px solid rgba(255,255,255,0.2); z-index: 900; }
+.u-flex-center { display: flex; justify-content: center; align-items: center; width: 100%; }

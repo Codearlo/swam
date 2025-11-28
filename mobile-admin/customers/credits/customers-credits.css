@@ -1,0 +1,10 @@
+body { background-color: #000; color: #fff; font-family: var(--font-family-base); }
+.credits-header { display: flex; justify-content: space-between; padding: 16px 20px; background: #000; align-items: center; }
+.back-btn { background: none; border: none; color: #fff; font-size: 1.5rem; }
+.mobile-main-content { padding: 20px; }
+.debt-card { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-radius: 20px; padding: 24px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(239,68,68,0.3); }
+.debt-card .label { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }
+.debt-amount { font-size: 2.5rem; font-weight: 800; margin: 10px 0; }
+.limit-info { font-size: 0.85rem; background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; }
+.section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
+.empty-list { text-align: center; color: #666; padding: 20px; border: 1px dashed #333; border-radius: 12px; }
