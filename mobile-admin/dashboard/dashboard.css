@@ -7,83 +7,18 @@ body {
     padding-bottom: 90px;
 }
 
-/* --- HEADER PERFIL --- */
-.mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    background-color: transparent; /* Transparente para fundirse con el negro */
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    backdrop-filter: blur(10px);
-}
-
-.header-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.user-avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #333 0%, #111 100%);
-    border: 1px solid rgba(255,255,255,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    color: #fff;
-    font-size: 1rem;
-}
-
-.user-info {
+/* --- LAYOUT PRINCIPAL (SOLUCIÓN DE MÁRGENES) --- */
+.mobile-main-content {
+    /* Aumentamos el padding lateral a 24px para separar del borde */
+    padding: 10px 24px 30px 24px;
     display: flex;
     flex-direction: column;
+    gap: 24px;
 }
 
-.greeting-text {
-    font-size: 0.8rem;
-    color: #9ca3af;
-}
-
-.user-name {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.header-actions .icon-btn {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    position: relative;
-    cursor: pointer;
-}
-
-.notification-dot {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 8px;
-    height: 8px;
-    background-color: #ef4444;
-    border-radius: 50%;
-    border: 1px solid #000;
-}
-
-/* --- HERO SECTION (BALANCE) --- */
+/* --- HERO SECTION --- */
 .hero-section {
-    padding: 10px 0 30px 0;
+    padding: 10px 0 20px 0;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -93,121 +28,131 @@ body {
 .hero-label {
     font-size: 0.9rem;
     color: #9ca3af;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
 .hero-balance {
-    font-size: 2.8rem;
+    font-size: 3rem; /* Más grande */
     font-weight: 800;
     color: #ffffff;
-    margin: 0 0 20px 0;
-    letter-spacing: -1px;
+    margin: 0 0 24px 0;
+    letter-spacing: -1.5px;
+    line-height: 1;
 }
 
-/* Botones Pill (Píldora) */
 .hero-actions {
     display: flex;
-    gap: 12px;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
 }
 
 .pill-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 12px 24px; /* Botones más grandes y cómodos */
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
     text-decoration: none;
-    transition: transform 0.2s ease;
+    transition: transform 0.1s ease;
     cursor: pointer;
     border: none;
+    min-width: 140px;
 }
 
 .pill-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 .pill-btn--primary {
-    background-color: #ffffff; /* Blanco estilo Apple/Google */
+    background-color: #ffffff;
     color: #000000;
+    box-shadow: 0 4px 15px rgba(255,255,255,0.15);
 }
 
 .pill-btn--secondary {
     background-color: rgba(255,255,255,0.1);
     color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 /* --- GRID DE KPIs --- */
 .kpi-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 16px; /* Más espacio entre tarjetas */
+    margin-bottom: 12px;
 }
 
 .mobile-card {
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 16px;
+    border-radius: 24px; /* Bordes más redondeados */
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-/* Iconos de KPI */
 .card-icon-wrapper {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 4px;
 }
 
-.icon-sales { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.icon-orders { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.icon-sales { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.icon-orders { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 
 .card-data {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
 
 .card-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #9ca3af;
     font-weight: 500;
 }
 
 .card-value {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #ffffff;
+    letter-spacing: -0.5px;
 }
 
-/* --- LISTAS --- */
+/* --- TITULOS Y LISTAS --- */
 .section-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     padding-left: 4px;
 }
 
 .list-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     margin-bottom: 24px;
 }
 
-/* Item de Lista */
 .list-item {
     background-color: #0c0c0e;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -220,24 +165,32 @@ body {
     gap: 4px;
 }
 
-.sale-code, .alert-title {
-    font-size: 0.95rem;
+.sale-code {
+    font-size: 1rem;
     font-weight: 600;
     color: #fff;
 }
 
-.sale-customer, .alert-subtitle {
-    font-size: 0.8rem;
+.sale-customer {
+    font-size: 0.85rem;
     color: #9ca3af;
 }
 
 .sale-amount {
     font-weight: 700;
-    color: #fff; 
+    color: #10b981; 
     font-size: 1rem;
-    background: rgba(255,255,255,0.1);
-    padding: 4px 8px;
-    border-radius: 8px;
+}
+
+.alert-title {
+    color: #ef4444;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.alert-subtitle {
+    color: #9ca3af;
+    font-size: 0.85rem;
 }
 
 .u-flex-center {

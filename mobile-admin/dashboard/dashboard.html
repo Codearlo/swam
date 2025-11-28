@@ -9,28 +9,16 @@
     <link rel="stylesheet" href="../../public/shared/styles/variables.css">
     <link rel="stylesheet" href="../../public/shared/styles/typography.css">
     <link rel="stylesheet" href="../../public/shared/styles/utilities.css">
+    
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="../components/bottom-nav/bottom-nav.css">
+    <link rel="stylesheet" href="../components/mobile-header/mobile-header.css">
     
     <script src="../../public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
     
-    <header class="mobile-header">
-        <div class="header-user">
-            <div class="user-avatar-circle" id="header-avatar">U</div>
-            <div class="user-info">
-                <span class="greeting-text">Hola,</span>
-                <span class="user-name" id="header-username">Usuario</span>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button class="icon-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                <span class="notification-dot"></span>
-            </button>
-        </div>
-    </header>
+    <div id="mobile-header-container"></div>
 
     <main class="mobile-main-content">
         
@@ -40,11 +28,11 @@
             
             <div class="hero-actions">
                 <a href="../sales/create.html" class="pill-btn pill-btn--primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     Nueva Venta
                 </a>
                 <button class="pill-btn pill-btn--secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Reporte
                 </button>
             </div>
@@ -73,19 +61,15 @@
             </div>
         </section>
 
-        <section class="dashboard-section">
-            <h3 class="section-title">Últimos Movimientos</h3>
-            <div class="list-container" id="recent-sales-list">
-                <div class="u-flex-center" style="padding: 20px; color: #666;">Cargando...</div>
-            </div>
-        </section>
+        <h3 class="section-title">Últimos Movimientos</h3>
+        <div class="list-container" id="recent-sales-list">
+            <div class="u-flex-center" style="padding: 20px; color: #666;">Cargando...</div>
+        </div>
 
-        <section class="dashboard-section">
-            <h3 class="section-title">Alertas</h3>
-            <div class="list-container" id="inventory-alerts-list">
-                <div class="u-flex-center" style="padding: 20px; color: #666;">Cargando...</div>
-            </div>
-        </section>
+        <h3 class="section-title">Alertas</h3>
+        <div class="list-container" id="inventory-alerts-list">
+            <div class="u-flex-center" style="padding: 20px; color: #666;">Cargando...</div>
+        </div>
 
     </main>
 
@@ -94,6 +78,7 @@
     <script src="../../public/shared/scripts/supabase-client.js"></script>
     <script src="../../public/shared/scripts/auth-utils.js"></script>
     <script src="../../public/shared/scripts/api.js"></script>
+    <script src="../components/mobile-header/mobile-header.js"></script>
     <script src="dashboard.js"></script> 
 </body>
 </html>
