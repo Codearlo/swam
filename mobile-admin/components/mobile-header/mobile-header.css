@@ -5,13 +5,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 24px; 
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro */
+    background-color: rgba(0, 0, 0, 0.85); 
     position: sticky;
     top: 0;
     z-index: 1200;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    /* Línea inferior morada muy sutil */
     border-bottom: 1px solid rgba(139, 92, 246, 0.1); 
 }
 
@@ -24,8 +23,8 @@
 .user-avatar-circle {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
-    /* Avatar con degradado MORADO */
+    /* CAMBIO: De 50% a 10px para hacerlo cuadrado redondeado */
+    border-radius: 10px; 
     background: var(--mobile-gradient, linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%));
     border: 1px solid rgba(255,255,255,0.1);
     display: flex;
@@ -56,15 +55,18 @@
     color: var(--mobile-text-main, #fff);
 }
 
-/* Botones */
+/* Botones del Header (Campana) */
 .header-actions {
     position: relative;
 }
 
 .header-actions .icon-btn {
-    background: rgba(139, 92, 246, 0.05); /* Fondo morado muy suave */
-    border: 1px solid rgba(139, 92, 246, 0.2); /* Borde morado */
-    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.05); 
+    border: 1px solid rgba(139, 92, 246, 0.2); 
+    
+    /* CAMBIO: Botón cuadrado con bordes suaves */
+    border-radius: 10px; 
+    
     width: 38px;
     height: 38px;
     display: flex;
@@ -84,16 +86,15 @@
 .notification-dot {
     position: absolute;
     top: 8px;
-    right: 10px;
+    right: 8px; /* Ajuste ligero */
     width: 6px;
     height: 6px;
-    /* Mantenemos rojo para alerta, o cambiamos a un morado brillante/cian */
     background-color: #ef4444; 
-    border-radius: 50%;
+    border-radius: 50%; /* El punto sigue siendo circular */
     box-shadow: 0 0 5px #ef4444;
 }
 
-/* Modal de Notificaciones (Estilo Dark/Purple) */
+/* Modal de Notificaciones */
 .notifications-dropdown {
     position: absolute;
     top: 50px; 
@@ -101,13 +102,13 @@
     width: 280px;
     background-color: #09090b;
     border: 1px solid rgba(139, 92, 246, 0.2);
-    border-radius: 16px;
+    /* CAMBIO: Bordes del modal menos redondeados */
+    border-radius: 12px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.9);
     overflow: hidden;
     z-index: 1300;
 }
 
-/* ... resto del modal (puedes mantener la estructura anterior) ... */
 .notifications-dropdown.u-hidden { display: none; }
 .notifications-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; color: #fff; }
 .close-btn { background: none; border: none; color: #a1a1aa; }

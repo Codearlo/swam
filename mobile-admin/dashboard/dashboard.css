@@ -3,7 +3,6 @@
 body {
     background-color: var(--mobile-bg, #000000);
     color: var(--mobile-text-main, #ffffff);
-    /* Fuente Cal Sans importada globalmente */
     font-family: var(--font-family-base, sans-serif); 
     padding-bottom: 90px;
 }
@@ -15,7 +14,7 @@ body {
     gap: 24px;
 }
 
-/* --- HERO SECTION --- */
+/* --- HERO SECTION (Se mantiene grande y relevante) --- */
 .hero-section {
     padding: 10px 0 20px 0;
     text-align: center;
@@ -26,7 +25,7 @@ body {
 
 .hero-label {
     font-size: 0.75rem;
-    color: var(--mobile-accent, #8b5cf6); /* Etiqueta morada */
+    color: var(--mobile-accent, #8b5cf6);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -40,7 +39,6 @@ body {
     margin: 0 0 24px 0;
     letter-spacing: -1px;
     line-height: 1;
-    /* Sutil sombra de texto morada */
     text-shadow: 0 0 20px rgba(139, 92, 246, 0.15); 
 }
 
@@ -51,55 +49,67 @@ body {
     justify-content: center;
 }
 
-/* Botones Pill */
-.pill-btn {
+/* BOTONES DE ACCIÓN */
+.action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-size: 0.95rem;
+    gap: 10px;
+    padding: 14px 24px; 
+    border-radius: 8px; 
+    font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
-    transition: transform 0.1s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
     font-family: var(--font-family-base);
-}
-
-.pill-btn:active { transform: scale(0.96); }
-
-/* Botón Primario: Blanco o Morado? Vamos con blanco para contraste sobre negro, o morado */
-.pill-btn--primary {
-    background-color: var(--mobile-accent, #8b5cf6); /* Botón Morado */
-    color: #ffffff;
     border: none;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+    flex: 1;
+    max-width: 200px;
 }
 
-.pill-btn--secondary {
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.action-btn--primary {
+    background-color: var(--mobile-accent, #8b5cf6);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.action-btn--secondary {
     background-color: rgba(255, 255, 255, 0.05);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
+.action-btn--secondary:active {
+     background-color: rgba(255, 255, 255, 0.1);
+}
 
-/* --- GRID DE KPIs --- */
+
+/* --- GRID DE KPIs (Compacto) --- */
 .kpi-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 12px; /* Menos espacio entre tarjetas */
     margin-bottom: 12px;
 }
 
 .mobile-card {
     background-color: var(--mobile-card-bg, #09090b);
     border: var(--mobile-border, 1px solid rgba(139, 92, 246, 0.15));
-    border-radius: 24px;
-    padding: 20px;
+    border-radius: 16px; /* Radio reducido para tamaño compacto */
+    
+    /* CAMBIO: Padding reducido drásticamente */
+    padding: 12px 14px; 
+    
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px; /* Menos separación entre icono y texto */
     transition: border-color 0.2s;
+    min-height: 64px; /* Altura controlada */
 }
 
 .mobile-card:active {
@@ -107,43 +117,33 @@ body {
 }
 
 .card-icon-wrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    /* CAMBIO: Icono mucho más pequeño */
+    width: 36px; 
+    height: 36px;
+    border-radius: 8px; /* Ajuste proporcional */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 4px;
-    /* Fondos de iconos tintados de morado o color específico */
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
-/* Ventas: Morado */
+/* Ajustar el tamaño del SVG dentro del wrapper más pequeño */
+.card-icon-wrapper svg {
+    width: 20px;
+    height: 20px;
+}
+
 .icon-sales { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
-/* Pedidos: Cian/Azul para contraste */
 .icon-orders { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-/* Clientes: Rosa */
-.icon-customers { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
-/* Alertas: Rojo */
-.icon-alerts { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-
-
-.card-data {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.card-label {
-    font-size: 0.8rem;
-    color: var(--mobile-text-muted, #a1a1aa);
-    font-weight: 500;
-}
 
 .card-value {
-    font-size: 1.4rem;
+    /* CAMBIO: Texto más pequeño */
+    font-size: 1.1rem; 
     font-weight: 700;
     color: #ffffff;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
+    line-height: 1;
 }
 
 /* --- LISTAS --- */
@@ -152,9 +152,8 @@ body {
     font-weight: 700;
     color: #ffffff;
     margin-bottom: 16px;
-    padding-left: 4px;
-    border-left: 3px solid var(--mobile-accent, #8b5cf6); /* Acento lateral */
-    padding-left: 10px;
+    border-left: 3px solid var(--mobile-accent, #8b5cf6);
+    padding-left: 12px;
 }
 
 .list-container {
@@ -167,7 +166,7 @@ body {
 .list-item {
     background-color: var(--mobile-card-bg, #09090b);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    border-radius: 12px;
     padding: 18px;
     display: flex;
     justify-content: space-between;
@@ -180,7 +179,7 @@ body {
 
 .sale-amount {
     font-weight: 700;
-    color: #a78bfa; /* Morado claro para montos */
+    color: #a78bfa;
     font-size: 1rem;
 }
 

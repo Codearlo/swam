@@ -6,13 +6,9 @@
     left: 0;
     width: 100%;
     z-index: 1000;
-    
-    /* Fondo oscuro */
     background-color: rgba(9, 9, 11, 0.95); 
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    
-    /* Borde superior morado tenue */
     border-top: 1px solid rgba(139, 92, 246, 0.1);
     padding-bottom: env(safe-area-inset-bottom);
     box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
@@ -35,7 +31,6 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    
     color: #52525b; 
     text-decoration: none;
     font-size: 0.7rem;
@@ -53,45 +48,45 @@
     stroke-width: 2px;
 }
 
-/* ESTADO ACTIVO: Morado */
 .bottom-nav-item.is-active {
     color: var(--mobile-accent, #8b5cf6);
 }
 
 .bottom-nav-item.is-active svg {
     stroke: var(--mobile-accent, #8b5cf6);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); /* Resplandor morado */
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
     transform: translateY(-2px);
 }
 
-/* --- Botón Central Flotante (Morado) --- */
+/* --- Botón Central Flotante (Rectangular Redondeado) --- */
 .bottom-nav-item--main {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: -28px;
+    top: -20px; /* Ajustado ligeramente */
     width: auto;
     overflow: visible;
 }
 
 .main-btn-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
+    width: 56px; /* Ligeramente más compacto */
+    height: 56px;
     
-    /* Degradado Morado */
+    /* CAMBIO: De 50% a 14px para hacerlo cuadrado redondeado (Squircle) */
+    border-radius: 14px; 
+    
     background: var(--mobile-gradient, linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%));
     color: #ffffff;
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Sombra morada */
     box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
     
-    border: 5px solid #000000; /* Borde negro para recortar */
+    /* Borde negro más grueso para separar visualmente del fondo */
+    border: 4px solid #000000; 
+    
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Rotar ligeramente el cuadrado da un estilo diamante opcional, pero lo dejamos recto */
 }
 
 .bottom-nav-item--main:active .main-btn-circle {

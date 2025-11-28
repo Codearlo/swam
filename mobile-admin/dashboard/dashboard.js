@@ -1,26 +1,24 @@
 /* mobile-admin/dashboard/dashboard.js */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Cargar Componentes (Header y Nav)
     await Promise.all([
-        loadMobileHeader(), // Función global del componente header
+        loadMobileHeader(),
         loadBottomNav()
     ]);
 
-    // 2. Auth Check
     if (typeof isAuthenticated === 'function' && !isAuthenticated()) {
         window.location.href = '../../public/auth/login/login.html';
         return;
     }
 
-    // 3. Fecha del Mes (Solo visualización)
+    // --- Configurar Título del Mes (Sección de Abajo) ---
     const dateOptions = { month: 'long' };
     const monthName = new Date().toLocaleDateString('es-ES', dateOptions);
     const monthCapitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-    const heroLabel = document.querySelector('.hero-label');
-    if(heroLabel) heroLabel.textContent = `Ventas de ${monthCapitalized}`;
+    
+    const monthTitle = document.getElementById('month-section-title');
+    if(monthTitle) monthTitle.textContent = `Resumen de ${monthCapitalized}`;
 
-    // 4. Datos
     await loadDashboardData();
 });
 
@@ -40,22 +38,30 @@ async function loadBottomNav() {
 async function loadDashboardData() {
     if (typeof api === 'undefined') return;
 
-    // A. Métricas
+    // --- A. Métricas Generales ---
     try {
         const metricsData = await api.getDashboardData();
         if (metricsData.success) {
             const dailySales = metricsData.dailySales || 0;
             
-            // Diario
-            updateText('kpi-sales', formatMoney(dailySales));
-            updateText('kpi-orders', metricsData.activeOrders || '0');
+            // 1. ARRIBA (Hero): Ventas de HOY
+            updateText('hero-daily-sales', formatMoney(dailySales));
 
-            // Mensual (Simulado con el diario para demo, o 0)
-            updateText('monthly-sales', formatMoney(dailySales));
+            // 2. ABAJO (Grid): Resumen del MES (Simulado con daily * 30 o lógica de acumulado)
+            // En un escenario real, la API debería devolver 'monthlySales'
+            let monthlySales = dailySales; // Placeholder si es el primer día
+            
+            // Truco visual para demo: Si el diario es > 0, asumimos un acumulado mayor
+            if (dailySales > 0) {
+                monthlySales = dailySales * 1; // Aquí iría el valor real acumulado
+            }
+
+            updateText('kpi-monthly-sales', formatMoney(monthlySales));
+            updateText('kpi-orders', metricsData.activeOrders || '0');
         }
     } catch (e) { console.error(e); }
 
-    // B. Listas
+    // --- B. Listas ---
     await loadLists();
 }
 
@@ -63,12 +69,14 @@ async function loadLists() {
     // Ventas Recientes
     const salesListEl = document.getElementById('recent-sales-list');
     try {
-        const salesResponse = await api.getRecentSales(3); // Solo mostrar 3 para que no sature
+        const salesResponse = await api.getRecentSales(3);
         salesListEl.innerHTML = ''; 
         if (salesResponse.success && salesResponse.data.length > 0) {
-            // Recalcular total visual mensual basado en ventas traídas (truco visual)
+            
+            // Lógica visual: Sumar ventas recientes al acumulado mensual para realismo en demo
             let totalVisual = salesResponse.data.reduce((acc, curr) => acc + curr.amount, 0);
-            updateText('monthly-sales', formatMoney(totalVisual)); 
+            // Actualizamos la tarjeta del MES (abajo)
+            updateText('kpi-monthly-sales', formatMoney(totalVisual)); 
 
             salesListEl.innerHTML = salesResponse.data.map(sale => `
                 <div class="list-item">
