@@ -1,19 +1,179 @@
 /* mobile-admin/customers/list/customers-list.css */
-body { background-color: var(--mobile-bg); color: var(--mobile-text-main); font-family: var(--font-family-base); padding-bottom: 90px; }
-.mobile-main-content { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
-.page-title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.search-input-wrapper { display: flex; align-items: center; background-color: #0c0c0e; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0 12px; }
-.search-input { width: 100%; background: transparent; border: none; color: #fff; padding: 14px 10px; font-size: 0.95rem; outline: none; }
-.customers-list { display: flex; flex-direction: column; gap: 10px; }
-/* Tarjeta de Cliente */
-.customer-card {
-    background-color: var(--mobile-card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;
-    display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit;
+
+body {
+    background-color: var(--mobile-bg, #000000);
+    color: var(--mobile-text-main, #ffffff);
+    font-family: var(--font-family-base, sans-serif);
+    padding-bottom: 90px;
 }
-.customer-info { display: flex; align-items: center; gap: 12px; }
-.customer-avatar { width: 40px; height: 40px; background: rgba(139,92,246,0.15); color: #a78bfa; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
-.customer-details h4 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
-.customer-details p { font-size: 0.75rem; color: #a1a1aa; }
-.arrow-icon { color: #52525b; }
-.fab-btn { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; background-color: var(--mobile-accent); color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(139,92,246,0.4); border: 1px solid rgba(255,255,255,0.2); z-index: 900; }
+
+.mobile-main-content {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* NUEVO: Filtros (Copiado de Ventas) */
+.filter-tabs {
+    display: flex;
+    background-color: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px; 
+    padding: 4px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--mobile-text-muted, #a1a1aa);
+    padding: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.tab-btn.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Buscador */
+.search-container { margin-bottom: 4px; }
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0 12px;
+    transition: border-color 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--mobile-accent, #8b5cf6);
+}
+
+.search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 14px 10px;
+    font-size: 0.95rem;
+    outline: none;
+    font-family: inherit;
+}
+
+/* Lista (Adaptada al estilo de Ventas) */
+.customers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Tarjeta de Cliente (Estructura idéntica a sale-card-item) */
+.customer-card {
+    background-color: var(--mobile-card-bg, #09090b);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s;
+}
+
+.customer-card:active {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.customer-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Icon Box (Azul para clientes) */
+.customer-icon-box {
+    width: 42px;
+    height: 42px;
+    background: rgba(59, 130, 246, 0.15); /* Azul */
+    color: #60a5fa;
+    border-radius: 8px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.customer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.customer-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.customer-meta {
+    font-size: 0.75rem;
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Parte derecha con Badge */
+.customer-card-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-active { color: #10b981; background: rgba(16, 185, 129, 0.15); }
+.status-inactive { color: #9ca3af; background: rgba(156, 163, 175, 0.15); }
+
+
+/* Helpers */
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 .u-flex-center { display: flex; justify-content: center; align-items: center; width: 100%; }

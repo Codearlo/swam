@@ -3,54 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nuevo Cliente</title>
+    <title>Nuevo Cliente - SWAM</title>
+    
     <link rel="stylesheet" href="/public/shared/styles/reset.css">
     <link rel="stylesheet" href="/public/shared/styles/variables.css">
     <link rel="stylesheet" href="/public/shared/styles/typography.css">
     <link rel="stylesheet" href="/public/shared/styles/utilities.css">
+    
     <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
+    <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
+    
     <link rel="stylesheet" href="customers-create.css">
+    
+    <script src="/public/shared/scripts/cache-buster.js"></script>
 </head>
 <body>
-    <header class="form-header">
-        <button onclick="history.back()" class="close-btn">✕</button>
-        <h1>Nuevo Cliente</h1>
-        <button id="btn-save" class="save-btn">Guardar</button>
-    </header>
-    <main class="form-content">
-        <div class="form-group">
-            <label>Nombre Completo</label>
-            <input type="text" id="full_name" class="dark-input" placeholder="Ej. Juan Perez">
+    
+    <header class="page-header-bar">
+        <button class="back-btn" onclick="history.back()" aria-label="Volver">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+        </button>
+        <h1 class="header-title">Nuevo Cliente</h1>
+        <div style="width: 40px;"></div> </header>
+
+    <main class="mobile-main-content">
+        
+        <h3 class="section-label">Información Personal</h3>
+
+        <div class="input-card">
+            <div class="input-icon-wrapper icon-purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <input type="text" id="full_name" class="clean-input" placeholder="Nombre Completo" autocomplete="off">
         </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Tipo Doc.</label>
-                <select id="document_type" class="dark-input">
+
+        <div class="form-row-card">
+            <div class="input-card half-card">
+                <div class="input-icon-wrapper icon-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <select id="document_type" class="clean-input">
                     <option value="DNI">DNI</option>
                     <option value="RUC">RUC</option>
+                    <option value="CE">CE</option>
                 </select>
             </div>
-            <div class="form-group flex-2">
-                <label>Número Doc.</label>
-                <input type="text" id="document_number" class="dark-input">
+            
+            <div class="input-card half-card">
+                <input type="number" id="document_number" class="clean-input" placeholder="N° Documento">
             </div>
         </div>
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input type="tel" id="phone" class="dark-input">
+
+        <h3 class="section-label">Contacto</h3>
+
+        <div class="input-card">
+            <div class="input-icon-wrapper icon-green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <input type="tel" id="phone" class="clean-input" placeholder="Teléfono / Celular">
         </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" class="dark-input">
+
+        <div class="input-card">
+            <div class="input-icon-wrapper icon-pink">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <input type="email" id="email" class="clean-input" placeholder="Correo Electrónico">
         </div>
-        <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" id="address" class="dark-input">
+
+        <div class="input-card">
+            <div class="input-icon-wrapper icon-orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <input type="text" id="address" class="clean-input" placeholder="Dirección">
         </div>
-    </main>
+
+        <div style="height: 100px;"></div> </main>
+
+    <footer class="form-footer">
+        <button id="btn-save" class="action-btn action-btn--primary">
+            Guardar Cliente
+        </button>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/public/shared/scripts/supabase-client.js"></script>
+    <script src="/public/shared/scripts/auth-utils.js"></script>
     <script src="/mobile-admin/scripts/mobile-api.js"></script>
-    <script src="customers-create.js"></script>
+    <script src="customers-create.js"></script> 
 </body>
 </html>
