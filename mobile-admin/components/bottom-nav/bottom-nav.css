@@ -1,0 +1,106 @@
+/* mobile-admin/components/bottom-nav/bottom-nav.css */
+
+.bottom-nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    
+    /* Fondo semi-transparente oscuro con desenfoque (Efecto iOS/Glass) */
+    background-color: rgba(12, 12, 14, 0.9); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+}
+
+.bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px; /* Un poco más alto para comodidad táctil */
+    padding: 0 24px;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    
+    /* Color inactivo: Gris oscuro pero visible */
+    color: #52525b; 
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 60px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bottom-nav-item svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2px;
+}
+
+/* Estado Activo */
+.bottom-nav-item.is-active {
+    color: #ffffff;
+}
+
+.bottom-nav-item.is-active svg {
+    stroke: #ffffff;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+    transform: translateY(-2px);
+}
+
+/* --- Botón Central Flotante (Más grande y destacado) --- */
+.bottom-nav-item--main {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -25px; /* Flota sobre el borde */
+    width: auto;
+    overflow: visible;
+}
+
+.main-btn-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    
+    /* Blanco puro para máximo contraste */
+    background-color: #ffffff; 
+    color: #000000;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Sombra fuerte para dar profundidad */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    
+    /* Borde del color del fondo de la app para "recortar" la barra visualmente */
+    border: 5px solid #000000; 
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bottom-nav-item--main:active .main-btn-circle {
+    transform: scale(0.9);
+}
+
+.bottom-nav-item--main svg {
+    stroke: #000000;
+    width: 28px;
+    height: 28px;
+}

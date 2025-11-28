@@ -1,116 +1,245 @@
 /* mobile-admin/dashboard/dashboard.css */
 
 body {
-    background-color: #000000; /* Fondo totalmente negro como la imagen */
+    background-color: #000000;
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    padding-bottom: 80px; /* Espacio para el bottom nav */
+    padding-bottom: 90px;
 }
 
-/* --- HEADER --- */
+/* --- HEADER PERFIL --- */
 .mobile-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
-    background-color: #000000;
+    padding: 16px 20px;
+    background-color: transparent; /* Transparente para fundirse con el negro */
     position: sticky;
     top: 0;
     z-index: 50;
+    backdrop-filter: blur(10px);
 }
 
-.header-left {
+.header-user {
     display: flex;
-    flex-direction: column; /* Apilado como en la imagen (Icono arriba, texto abajo) o al lado */
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.logo-icon {
-    color: #ffffff;
-}
-
-.header-left h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-    color: #ffffff;
-    letter-spacing: -0.5px;
-}
-
-.header-right {
-    align-self: flex-start; /* Alinear arriba si hay diferencia de altura */
-    padding-top: 4px;
+    align-items: center;
+    gap: 12px;
 }
 
 .user-avatar-circle {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    /* Un degradado sutil o color sólido para el avatar */
-    background: #1c1c1e; 
-    border: 1px solid #333;
+    background: linear-gradient(135deg, #333 0%, #111 100%);
+    border: 1px solid rgba(255,255,255,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #a1a1a1;
+    font-weight: 700;
+    color: #fff;
+    font-size: 1rem;
 }
 
-/* --- MAIN CONTENT & CARDS --- */
-.mobile-main-content {
-    padding: 10px 16px;
+.user-info {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+}
+
+.greeting-text {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.header-actions .icon-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    border: 1px solid #000;
+}
+
+/* --- HERO SECTION (BALANCE) --- */
+.hero-section {
+    padding: 10px 0 30px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-label {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.hero-balance {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 20px 0;
+    letter-spacing: -1px;
+}
+
+/* Botones Pill (Píldora) */
+.hero-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.pill-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.pill-btn:active {
+    transform: scale(0.95);
+}
+
+.pill-btn--primary {
+    background-color: #ffffff; /* Blanco estilo Apple/Google */
+    color: #000000;
+}
+
+.pill-btn--secondary {
+    background-color: rgba(255,255,255,0.1);
+    color: #ffffff;
+}
+
+/* --- GRID DE KPIs --- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .mobile-card {
-    background-color: #0c0c0e; /* Un gris muy oscuro, casi negro, para diferenciar del fondo */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
-    border-radius: 20px; /* Bordes muy redondeados como la imagen */
-    padding: 24px;
+    background-color: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform 0.2s ease;
 }
 
-.mobile-card:active {
-    transform: scale(0.98);
-    background-color: #151517;
+/* Iconos de KPI */
+.card-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-sales { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.icon-orders { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+.card-data {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .card-label {
-    font-size: 0.95rem;
-    color: #9ca3af; /* Gris claro para etiquetas */
+    font-size: 0.75rem;
+    color: #9ca3af;
     font-weight: 500;
 }
 
 .card-value {
-    font-size: 2.2rem; /* Números grandes e impactantes */
+    font-size: 1.25rem;
     font-weight: 700;
     color: #ffffff;
-    letter-spacing: -1px;
-    line-height: 1.1;
 }
 
-.card-value-group {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-}
-
-.card-subvalue {
-    font-size: 1.2rem;
-    font-weight: 600;
+/* --- LISTAS --- */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
     color: #ffffff;
+    margin-bottom: 12px;
+    padding-left: 4px;
 }
 
-/* Ajustes específicos para pantallas muy pequeñas */
-@media (max-width: 360px) {
-    .card-value {
-        font-size: 1.8rem;
-    }
+.list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+/* Item de Lista */
+.list-item {
+    background-color: #0c0c0e;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sale-info, .alert-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sale-code, .alert-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.sale-customer, .alert-subtitle {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.sale-amount {
+    font-weight: 700;
+    color: #fff; 
+    font-size: 1rem;
+    background: rgba(255,255,255,0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+.u-flex-center {
+    display: flex; justify-content: center; align-items: center;
 }
