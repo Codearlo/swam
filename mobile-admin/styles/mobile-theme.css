@@ -1,0 +1,20 @@
+/* mobile-admin/styles/mobile-theme.css */
+
+:root {
+    /* Fondo Base */
+    --mobile-bg: #000000;
+    --mobile-card-bg: #09090b; /* Casi negro */
+    
+    /* Acentos Morados */
+    --mobile-accent: #8b5cf6; /* Violeta principal */
+    --mobile-accent-dark: #6d28d9; /* Violeta oscuro para bordes/hover */
+    --mobile-accent-glow: rgba(139, 92, 246, 0.25); /* Resplandor */
+    
+    /* Degradados */
+    --mobile-gradient: linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%);
+    
+    /* Bordes y Textos */
+    --mobile-border: 1px solid rgba(139, 92, 246, 0.15); /* Borde sutil morado */
+    --mobile-text-main: #ffffff;
+    --mobile-text-muted: #a1a1aa;
+}

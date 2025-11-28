@@ -1,0 +1,218 @@
+/* mobile-admin/sales/list/sales-list.css */
+
+body {
+    background-color: var(--mobile-bg, #000000);
+    color: var(--mobile-text-main, #ffffff);
+    font-family: var(--font-family-base, sans-serif);
+    padding-bottom: 90px;
+}
+
+.mobile-main-content {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* --- HEADER Y TABS --- */
+.page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.filter-tabs {
+    display: flex;
+    background-color: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px; /* Rectangular Rounded */
+    padding: 4px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--mobile-text-muted, #a1a1aa);
+    padding: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.tab-btn.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* --- BUSCADOR --- */
+.search-container {
+    margin-bottom: 4px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px; /* Rectangular Rounded */
+    padding: 0 12px;
+    transition: border-color 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--mobile-accent, #8b5cf6);
+}
+
+.search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 14px 10px;
+    font-size: 0.95rem;
+    outline: none;
+    font-family: inherit;
+}
+
+/* --- LISTA DE VENTAS --- */
+.sales-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sale-card-item {
+    background-color: var(--mobile-card-bg, #09090b);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px; /* Rectangular Rounded */
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.sale-card-item:active {
+    background-color: rgba(255,255,255,0.03);
+}
+
+.sale-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sale-icon-box {
+    width: 42px;
+    height: 42px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px; /* Rectangular Rounded */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+    flex-shrink: 0;
+}
+
+.sale-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sale-customer {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.sale-meta {
+    font-size: 0.75rem;
+    color: var(--mobile-text-muted, #a1a1aa);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sale-card-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.sale-amount {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+/* Badges de Estado */
+.status-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.status-completed {
+    color: #10b981; /* Verde */
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.status-pending {
+    color: #f59e0b; /* Amarillo */
+    background: rgba(245, 158, 11, 0.1);
+}
+
+/* --- BOTÓN FLOTANTE (FAB) --- */
+.fab-btn {
+    position: fixed;
+    bottom: 90px; /* Encima del bottom nav */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background-color: var(--mobile-accent, #8b5cf6);
+    color: #ffffff;
+    
+    /* CAMBIO: Rectángulo redondeado (Squircle) */
+    border-radius: 14px; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 900;
+    transition: transform 0.2s;
+    text-decoration: none;
+}
+
+.fab-btn:active {
+    transform: scale(0.9);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.u-flex-center {
+    display: flex; justify-content: center; align-items: center; width: 100%;
+}
