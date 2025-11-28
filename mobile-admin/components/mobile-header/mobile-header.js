@@ -5,9 +5,7 @@ async function loadMobileHeader() {
     if (!container) return;
 
     try {
-        // CORRECCIÓN: Ruta Absoluta para evitar errores 404
         const response = await fetch('/mobile-admin/components/mobile-header/mobile-header.html');
-        
         if (response.ok) {
             container.innerHTML = await response.text();
             initializeHeaderData();
@@ -38,21 +36,23 @@ function initializeNotifications() {
     const modal = document.getElementById('notifications-modal');
 
     if (btnNotif && modal) {
+        // CAMBIO: Toggle de clase 'is-open' para activar animación
         btnNotif.addEventListener('click', (e) => {
             e.stopPropagation();
-            modal.classList.toggle('u-hidden');
+            modal.classList.toggle('is-open');
         });
 
         if (btnClose) {
             btnClose.addEventListener('click', (e) => {
                 e.stopPropagation();
-                modal.classList.add('u-hidden');
+                modal.classList.remove('is-open');
             });
         }
 
+        // Cerrar al hacer click fuera
         document.addEventListener('click', (e) => {
             if (!modal.contains(e.target) && !btnNotif.contains(e.target)) {
-                modal.classList.add('u-hidden');
+                modal.classList.remove('is-open');
             }
         });
     }
