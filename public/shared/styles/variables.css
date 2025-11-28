@@ -23,5 +23,7 @@
     --spacing-sm: 8px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
-    --font-family-base: sans-serif;
+    
+    /* MODIFICADO: Aplicando Cal Sans como fuente base */
+    --font-family-base: "Cal Sans", sans-serif;
 }

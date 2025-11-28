@@ -1,5 +1,8 @@
 /* public/shared/styles/typography.css */
 
+/* Importar Cal Sans desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap');
+
 body {
     font-family: var(--font-family-base);
     color: var(--color-text-light);

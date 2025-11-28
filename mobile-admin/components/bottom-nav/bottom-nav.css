@@ -7,21 +7,22 @@
     width: 100%;
     z-index: 1000;
     
-    /* Fondo semi-transparente oscuro con desenfoque (Efecto iOS/Glass) */
-    background-color: rgba(12, 12, 14, 0.9); 
+    /* Fondo oscuro */
+    background-color: rgba(9, 9, 11, 0.95); 
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    /* Borde superior morado tenue */
+    border-top: 1px solid rgba(139, 92, 246, 0.1);
     padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
 }
 
 .bottom-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px; /* Un poco más alto para comodidad táctil */
+    height: 70px;
     padding: 0 24px;
     max-width: 600px;
     margin: 0 auto;
@@ -35,7 +36,6 @@
     justify-content: center;
     gap: 6px;
     
-    /* Color inactivo: Gris oscuro pero visible */
     color: #52525b; 
     text-decoration: none;
     font-size: 0.7rem;
@@ -44,7 +44,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .bottom-nav-item svg {
@@ -53,23 +53,23 @@
     stroke-width: 2px;
 }
 
-/* Estado Activo */
+/* ESTADO ACTIVO: Morado */
 .bottom-nav-item.is-active {
-    color: #ffffff;
+    color: var(--mobile-accent, #8b5cf6);
 }
 
 .bottom-nav-item.is-active svg {
-    stroke: #ffffff;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+    stroke: var(--mobile-accent, #8b5cf6);
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); /* Resplandor morado */
     transform: translateY(-2px);
 }
 
-/* --- Botón Central Flotante (Más grande y destacado) --- */
+/* --- Botón Central Flotante (Morado) --- */
 .bottom-nav-item--main {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: -25px; /* Flota sobre el borde */
+    top: -28px;
     width: auto;
     overflow: visible;
 }
@@ -79,28 +79,28 @@
     height: 64px;
     border-radius: 50%;
     
-    /* Blanco puro para máximo contraste */
-    background-color: #ffffff; 
-    color: #000000;
+    /* Degradado Morado */
+    background: var(--mobile-gradient, linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%));
+    color: #ffffff;
     
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* Sombra fuerte para dar profundidad */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    /* Sombra morada */
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
     
-    /* Borde del color del fondo de la app para "recortar" la barra visualmente */
-    border: 5px solid #000000; 
+    border: 5px solid #000000; /* Borde negro para recortar */
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .bottom-nav-item--main:active .main-btn-circle {
     transform: scale(0.9);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
 }
 
 .bottom-nav-item--main svg {
-    stroke: #000000;
+    stroke: #ffffff;
     width: 28px;
     height: 28px;
 }
