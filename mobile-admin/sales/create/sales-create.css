@@ -5,7 +5,6 @@ body {
     color: var(--mobile-text-main, #ffffff);
     font-family: var(--font-family-base, sans-serif);
     padding-bottom: 0;
-    /* Para que el carrito pueda crecer */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -13,7 +12,7 @@ body {
 }
 
 .sales-header {
-    flex-shrink: 0; /* No encoger header */
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -24,15 +23,17 @@ body {
 }
 
 .mobile-main-content {
-    flex: 1; /* Ocupar todo el espacio restante */
-    overflow-y: auto; /* Scroll solo en el contenido */
-    padding: 20px 20px 240px 20px; /* Padding bottom gigante para el footer */
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 240px 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    /* Crear un contexto de apilamiento para el contenido principal */
+    position: relative; 
+    z-index: 1;
 }
 
-/* Header Elements */
 .back-btn, .icon-btn-ghost {
     background: transparent;
     border: none;
@@ -45,7 +46,7 @@ body {
 }
 .header-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
 
-/* Input Cards */
+/* --- INPUT CARDS --- */
 .input-card {
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -56,7 +57,14 @@ body {
     gap: 12px;
     height: 56px;
     flex-shrink: 0;
-    position: relative;
+    /* CORRECCIÓN Z-INDEX: */
+    position: relative; 
+    z-index: 10; /* Nivel base */
+}
+
+/* Cuando es el buscador de cliente (primero), le damos más prioridad para que su dropdown tape al de abajo */
+.input-card:first-of-type {
+    z-index: 20; 
 }
 
 .input-icon-wrapper {
@@ -82,6 +90,8 @@ body {
     padding: 0;
     width: 100%;
 }
+.clean-input::placeholder { color: #52525b; }
+
 .add-btn-small {
     background: rgba(255,255,255,0.1);
     border: none;
@@ -94,177 +104,102 @@ body {
     justify-content: center;
 }
 
-/* Buscador Dropdown */
-.search-results-dropdown {
+/* --- DROPDOWNS (Corrección de Solapamiento) --- */
+.custom-select-wrapper {
+    flex: 1;
+    position: static; /* Cambiado a static para que el absolute se base en la tarjeta padre */
+}
+
+.custom-dropdown, .search-results-dropdown {
     position: absolute;
-    top: 100%;
+    top: 100%; /* Justo debajo de la tarjeta */
     left: 0;
     width: 100%;
-    background-color: #18181b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 8px; /* Pequeño espacio */
+    
+    background-color: #18181b; 
+    border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: 12px;
-    margin-top: 8px;
     max-height: 250px;
     overflow-y: auto;
-    z-index: 50;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    
+    /* CORRECCIÓN Z-INDEX ALTO */
+    z-index: 1000; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.9);
 }
-.search-result-item {
+
+.dropdown-item, .search-result-item {
     padding: 14px 16px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
 }
+
+.dropdown-item:active, .search-result-item:active {
+    background-color: rgba(139, 92, 246, 0.15);
+}
+
 .result-name { font-weight: 600; font-size: 0.95rem; }
 .result-price { font-weight: 700; color: #a78bfa; }
 
-/* CARRITO EXPANDIBLE */
-.cart-section {
-    flex: 1; /* Crece para ocupar espacio */
-    display: flex;
-    flex-direction: column;
-}
-
-.cart-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
+/* --- CARRITO --- */
+.cart-section { flex: 1; display: flex; flex-direction: column; z-index: 5; } /* Menor z-index */
+.cart-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .section-label { font-size: 0.85rem; font-weight: 600; color: #a1a1aa; text-transform: uppercase; }
 .cart-badge { background: #27272a; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
 
-.cart-list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    /* Min height para que no colapse */
-    min-height: 200px;
-}
+.cart-list { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
 
 .empty-state {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 12px;
-    color: #52525b;
-    font-size: 0.9rem;
-    min-height: 150px;
+    flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; color: #52525b; font-size: 0.9rem; min-height: 150px;
 }
 
 .cart-item {
-    background-color: #0c0c0e;
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background-color: #0c0c0e; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
 }
 .item-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
 .item-price { font-size: 0.85rem; color: #a1a1aa; }
-.item-actions {
-    display: flex;
-    align-items: center;
-    background: #000;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 2px;
-}
-.qty-btn {
-    width: 32px; height: 32px; background: transparent; border: none; color: #fff; font-size: 1.1rem;
-    display: flex; align-items: center; justify-content: center;
-}
+.item-actions { display: flex; align-items: center; background: #000; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 2px; }
+.qty-btn { width: 32px; height: 32px; background: transparent; border: none; color: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
 .qty-val { width: 24px; text-align: center; font-weight: 600; font-size: 0.9rem; }
 
-/* FOOTER GRANDE FIJO */
+/* --- FOOTER GRANDE FIJO --- */
 .sale-footer-modern {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #09090b; /* Fondo sólido */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 20px 30px 20px; /* Alto para iPhone */
-    z-index: 1100;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
-    border-radius: 24px 24px 0 0;
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background-color: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 20px 30px 20px; z-index: 1100;
+    display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 -10px 50px rgba(0,0,0,0.8); border-radius: 24px 24px 0 0;
 }
 
-.payment-section-footer {
-    width: 100%;
-}
-.footer-label-small {
-    font-size: 0.75rem; color: #a1a1aa; text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: 600;
-}
-
-.payment-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-}
+.payment-section-footer { width: 100%; }
+.footer-label-small { font-size: 0.75rem; color: #a1a1aa; text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: 600; }
+.payment-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
 .pay-btn {
-    background: #1c1c1e; /* Un poco más claro que el fondo */
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 12px;
-    color: #a1a1aa;
-    font-size: 0.8rem;
-    font-weight: 600;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-    font-family: inherit;
+    background: #1c1c1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;
+    color: #a1a1aa; font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column; align-items: center;
+    gap: 6px; transition: all 0.2s; font-family: inherit;
 }
-.pay-btn.active {
-    background: rgba(139, 92, 246, 0.15);
-    border-color: #8b5cf6;
-    color: #fff;
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
-}
+.pay-btn.active { background: rgba(139, 92, 246, 0.15); border-color: #8b5cf6; color: #fff; box-shadow: 0 0 15px rgba(139, 92, 246, 0.15); }
 .pay-icon { font-size: 1.2rem; }
 
-.footer-divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(255,255,255,0.05);
-}
-
-.checkout-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
+.footer-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
+.checkout-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .footer-info { display: flex; flex-direction: column; }
 .footer-label { font-size: 0.75rem; color: #a1a1aa; text-transform: uppercase; }
 .footer-total { font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1; margin-top: 2px; }
 
 .checkout-btn {
-    background-color: #8b5cf6;
-    color: #fff;
-    border: none;
-    padding: 14px 30px;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
-    transition: transform 0.1s;
+    background-color: #8b5cf6; color: #fff; border: none; padding: 14px 30px; border-radius: 12px;
+    font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3); transition: transform 0.1s;
 }
 .checkout-btn:active { transform: scale(0.96); }
 .checkout-btn:disabled { background-color: #27272a; color: #52525b; box-shadow: none; }

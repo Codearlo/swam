@@ -1,65 +1,102 @@
 /* mobile-admin/sales/create/sales-create.js */
 
 let cart = [];
+let allCustomers = []; // Cache local para filtrado rápido
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Carga de datos iniciales
-    loadCustomers();
-    setupSearch();
-    setupPaymentMethods(); // Nueva lógica de botones
+    // 1. Cargar Componentes
+    if(typeof loadMobileHeader === 'function') await loadMobileHeader();
+    try {
+        const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
+        if(resp.ok) document.getElementById('bottom-nav-container').innerHTML = await resp.text();
+    } catch(e) {}
+
+    // 2. Inicializar
+    await fetchCustomers(); // Cargar lista inicial
+    setupCustomerSearch();  // Activar buscador de clientes
+    setupProductSearch();   // Activar buscador de productos
+    setupPaymentMethods();
     setupCartActions();
 });
 
-// --- CLIENTES ---
-async function loadCustomers() {
-    const select = document.getElementById('customer-select');
-    // Usamos API real o Mock si falla
+// --- CLIENTES (Buscador Personalizado) ---
+async function fetchCustomers() {
     try {
         const res = await mobileApi.getCustomers();
-        if(res.success && res.data.length > 0) {
-            select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
-            res.data.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.full_name;
-                select.appendChild(opt);
-            });
+        if(res.success) {
+            allCustomers = res.data;
         } else {
-            // Mock Fallback
-            loadMockCustomers(select);
+            // Mock si falla API
+            allCustomers = [
+                { id: 1, full_name: "Cliente General" },
+                { id: 2, full_name: "Juan Pérez" },
+                { id: 3, full_name: "Maria Delgado" },
+                { id: 4, full_name: "Empresa SAC" }
+            ];
         }
-    } catch(e) { loadMockCustomers(select); }
+    } catch(e) { console.error(e); }
 }
 
-function loadMockCustomers(select) {
-    const mocks = [{id:1, name:'Cliente General'}, {id:2, name:'Juan Pérez'}];
-    select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
-    mocks.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
-        select.appendChild(opt);
+function setupCustomerSearch() {
+    const input = document.getElementById('customer-search-input');
+    const dropdown = document.getElementById('customer-dropdown');
+    const hiddenId = document.getElementById('selected-customer-id');
+
+    input.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        // Mostrar dropdown si hay texto o si se hace click
+        if (term.length === 0) {
+            dropdown.classList.add('u-hidden');
+            return;
+        }
+        
+        const filtered = allCustomers.filter(c => c.full_name.toLowerCase().includes(term));
+        renderCustomerOptions(filtered);
+    });
+
+    // Mostrar todos al hacer focus
+    input.addEventListener('focus', () => {
+        if(input.value.trim() === '') {
+            renderCustomerOptions(allCustomers); // Mostrar recientes o todos
+        }
+    });
+
+    // Cerrar al click fuera
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('u-hidden');
+        }
     });
 }
 
-// --- MÉTODOS DE PAGO (Botones) ---
-function setupPaymentMethods() {
-    const buttons = document.querySelectorAll('.pay-btn');
-    const input = document.getElementById('selected-payment-method');
-
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // UI
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // Logic
-            input.value = btn.dataset.method;
+function renderCustomerOptions(customers) {
+    const dropdown = document.getElementById('customer-dropdown');
+    const input = document.getElementById('customer-search-input');
+    const hiddenId = document.getElementById('selected-customer-id');
+    
+    dropdown.innerHTML = '';
+    
+    if (customers.length === 0) {
+        dropdown.innerHTML = '<div style="padding:15px; color:#666;">No encontrado</div>';
+    } else {
+        customers.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = c.full_name;
+            div.addEventListener('click', () => {
+                input.value = c.full_name;
+                hiddenId.value = c.id;
+                dropdown.classList.add('u-hidden');
+            });
+            dropdown.appendChild(div);
         });
-    });
+    }
+    
+    dropdown.classList.remove('u-hidden');
 }
 
-// --- BUSCADOR ---
-function setupSearch() {
+// --- PRODUCTOS ---
+function setupProductSearch() {
     const input = document.getElementById('product-search');
     const resultsBox = document.getElementById('search-results');
     let debounceTimer;
@@ -75,9 +112,7 @@ function setupSearch() {
 
         debounceTimer = setTimeout(async () => {
             const res = await mobileApi.searchProducts(term);
-            // Mock si falla API o no devuelve nada para demo
-            const data = res.success ? res.data : [];
-            renderSearchResults(data);
+            renderProductResults(res.data || []);
         }, 300);
     });
 
@@ -88,7 +123,7 @@ function setupSearch() {
     });
 }
 
-function renderSearchResults(products) {
+function renderProductResults(products) {
     const container = document.getElementById('search-results');
     container.innerHTML = '';
     
@@ -118,7 +153,7 @@ function renderSearchResults(products) {
     container.classList.remove('u-hidden');
 }
 
-// --- CARRITO ---
+// --- CARRITO Y PAGO (Igual que antes) ---
 function addToCart(product) {
     const existing = cart.find(item => item.id === product.id);
     if (existing) {
@@ -178,31 +213,50 @@ function renderCart() {
     
     // Checkout Action
     btnCheckout.onclick = async () => {
-        const customerId = document.getElementById('customer-select').value;
-        if (!customerId) { alert('Selecciona un cliente'); return; }
+        const customerId = document.getElementById('selected-customer-id').value; // Usamos el ID hidden
+        if (!customerId) { alert('Selecciona un cliente de la lista'); return; }
         
         btnCheckout.disabled = true;
-        btnCheckout.innerHTML = 'Procesando...'; // Feedback visual
+        btnCheckout.innerHTML = 'Procesando...'; 
         
-        // Simular o Real Checkout
         const paymentMethod = document.getElementById('selected-payment-method').value;
+        
+        // Mapeo simple de método de pago (puedes ajustarlo según tus IDs reales en BD)
+        let pmId = 1; // Efectivo por defecto
+        if (paymentMethod === 'card') pmId = 2; // Ejemplo
+        if (paymentMethod === 'yape') pmId = 3; // Ejemplo
+
         const res = await mobileApi.createSale({ 
             customerId, 
             total, 
-            paymentMethodId: 1 // TODO: Mapear string 'yape' a ID real de BD
+            paymentMethodId: pmId,
+            userId: null 
         });
         
         if(res.success) {
             alert('Venta Creada');
             cart = [];
             renderCart();
-            document.getElementById('customer-select').value = "";
+            document.getElementById('customer-search-input').value = "";
+            document.getElementById('selected-customer-id').value = "";
         } else {
             alert('Error: ' + res.error);
         }
         btnCheckout.disabled = false;
         btnCheckout.innerHTML = `Cobrar <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
     };
+}
+
+function setupPaymentMethods() {
+    const buttons = document.querySelectorAll('.pay-btn');
+    const input = document.getElementById('selected-payment-method');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            input.value = btn.dataset.method;
+        });
+    });
 }
 
 function setupCartActions() {
