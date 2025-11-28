@@ -3,50 +3,59 @@
 let cart = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if(typeof loadMobileHeader === 'function') await loadMobileHeader();
-    
-    try {
-        const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
-        if(resp.ok) document.getElementById('bottom-nav-container').innerHTML = await resp.text();
-    } catch(e) {}
-
-    // Fecha
-    const dateStr = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-    document.getElementById('sale-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-
-    // Inicializar datos
-    await loadInitialData();
+    // Carga de datos iniciales
+    loadCustomers();
     setupSearch();
+    setupPaymentMethods(); // Nueva lógica de botones
     setupCartActions();
 });
 
-async function loadInitialData() {
-    // 1. Clientes
-    const customersRes = await mobileApi.getCustomers();
+// --- CLIENTES ---
+async function loadCustomers() {
     const select = document.getElementById('customer-select');
-    select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
-    
-    if (customersRes.success) {
-        customersRes.data.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.full_name;
-            select.appendChild(opt);
-        });
-    }
+    // Usamos API real o Mock si falla
+    try {
+        const res = await mobileApi.getCustomers();
+        if(res.success && res.data.length > 0) {
+            select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
+            res.data.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.full_name;
+                select.appendChild(opt);
+            });
+        } else {
+            // Mock Fallback
+            loadMockCustomers(select);
+        }
+    } catch(e) { loadMockCustomers(select); }
+}
 
-    // 2. Métodos de Pago
-    const pmRes = await mobileApi.getPaymentMethods();
-    const pmSelect = document.getElementById('payment-method');
-    if (pmRes.success && pmRes.data.length > 0) {
-        pmSelect.innerHTML = '';
-        pmRes.data.forEach(pm => {
-            const opt = document.createElement('option');
-            opt.value = pm.id;
-            opt.textContent = pm.name;
-            pmSelect.appendChild(opt);
+function loadMockCustomers(select) {
+    const mocks = [{id:1, name:'Cliente General'}, {id:2, name:'Juan Pérez'}];
+    select.innerHTML = '<option value="" disabled selected>Seleccionar Cliente...</option>';
+    mocks.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name;
+        select.appendChild(opt);
+    });
+}
+
+// --- MÉTODOS DE PAGO (Botones) ---
+function setupPaymentMethods() {
+    const buttons = document.querySelectorAll('.pay-btn');
+    const input = document.getElementById('selected-payment-method');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // UI
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Logic
+            input.value = btn.dataset.method;
         });
-    }
+    });
 }
 
 // --- BUSCADOR ---
@@ -66,7 +75,9 @@ function setupSearch() {
 
         debounceTimer = setTimeout(async () => {
             const res = await mobileApi.searchProducts(term);
-            renderSearchResults(res.data || []);
+            // Mock si falla API o no devuelve nada para demo
+            const data = res.success ? res.data : [];
+            renderSearchResults(data);
         }, 300);
     });
 
@@ -82,7 +93,7 @@ function renderSearchResults(products) {
     container.innerHTML = '';
     
     if (products.length === 0) {
-        container.innerHTML = '<div style="padding:12px; color:#666; text-align:center;">No encontrado</div>';
+        container.innerHTML = '<div style="padding:15px; color:#666; text-align:center;">No encontrado</div>';
         container.classList.remove('u-hidden');
         return;
     }
@@ -126,7 +137,7 @@ function updateQty(index, change) {
     }
     renderCart();
 }
-window.updateQty = updateQty; // Exponer
+window.updateQty = updateQty; 
 
 function renderCart() {
     const container = document.getElementById('cart-items-container');
@@ -138,11 +149,7 @@ function renderCart() {
     container.innerHTML = '';
 
     if (cart.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <p>Tu carrito está vacío</p>
-            </div>
-        `;
+        container.innerHTML = `<div class="empty-state"><p>Agrega productos para comenzar</p></div>`;
         totalEl.textContent = 'S/. 0.00';
         btnCheckout.disabled = true;
         return;
@@ -151,70 +158,56 @@ function renderCart() {
     let total = 0;
     cart.forEach((item, index) => {
         total += item.price * item.qty;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-            <div class="item-info">
-                <div class="item-title">${item.name}</div>
-                <div class="item-price">S/. ${item.price.toFixed(2)} x ${item.qty}</div>
-            </div>
-            <div class="item-actions">
-                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
-                <div class="qty-val">${item.qty}</div>
-                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+        container.innerHTML += `
+            <div class="cart-item">
+                <div class="item-info">
+                    <div class="item-title">${item.name}</div>
+                    <div class="item-price">S/. ${item.price.toFixed(2)}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                    <div class="qty-val">${item.qty}</div>
+                    <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                </div>
             </div>
         `;
-        container.appendChild(div);
     });
 
     totalEl.textContent = `S/. ${total.toFixed(2)}`;
     btnCheckout.disabled = false;
-    btnCheckout.onclick = handleCheckout;
-}
-
-// --- GUARDAR VENTA ---
-async function handleCheckout() {
-    const customerId = document.getElementById('customer-select').value;
-    const paymentMethodId = document.getElementById('payment-method').value;
-    const btn = document.getElementById('btn-checkout');
-
-    if (!customerId) {
-        alert('Por favor selecciona un cliente');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Procesando...';
-
-    const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     
-    // Obtener ID usuario (si auth-utils.js guarda user_id, úsalo, sino null o mock)
-    // Aquí asumimos que auth-utils o login guardaron algo, o enviamos null
-    const userId = null; 
-
-    const result = await mobileApi.createSale({
-        customerId: customerId,
-        paymentMethodId: paymentMethodId,
-        total: total,
-        userId: userId
-    });
-
-    if (result.success) {
-        alert('¡Venta realizada con éxito!');
-        cart = [];
-        renderCart();
-        btn.textContent = 'Confirmar Venta';
-    } else {
-        alert('Error al guardar: ' + result.error);
-        btn.disabled = false;
-        btn.textContent = 'Confirmar Venta';
-    }
+    // Checkout Action
+    btnCheckout.onclick = async () => {
+        const customerId = document.getElementById('customer-select').value;
+        if (!customerId) { alert('Selecciona un cliente'); return; }
+        
+        btnCheckout.disabled = true;
+        btnCheckout.innerHTML = 'Procesando...'; // Feedback visual
+        
+        // Simular o Real Checkout
+        const paymentMethod = document.getElementById('selected-payment-method').value;
+        const res = await mobileApi.createSale({ 
+            customerId, 
+            total, 
+            paymentMethodId: 1 // TODO: Mapear string 'yape' a ID real de BD
+        });
+        
+        if(res.success) {
+            alert('Venta Creada');
+            cart = [];
+            renderCart();
+            document.getElementById('customer-select').value = "";
+        } else {
+            alert('Error: ' + res.error);
+        }
+        btnCheckout.disabled = false;
+        btnCheckout.innerHTML = `Cobrar <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+    };
 }
 
-// Botón limpiar
 function setupCartActions() {
     document.getElementById('btn-clear-cart').addEventListener('click', () => {
-        if(cart.length > 0 && confirm('¿Vaciar carrito?')) {
+        if(cart.length > 0 && confirm('¿Borrar todo?')) {
             cart = [];
             renderCart();
         }

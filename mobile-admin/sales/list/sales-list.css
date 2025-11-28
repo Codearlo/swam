@@ -34,7 +34,7 @@ body {
     display: flex;
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px; /* Rectangular Sharp */
+    border-radius: 8px; 
     padding: 4px;
 }
 
@@ -130,27 +130,7 @@ body {
     font-weight: 600;
 }
 .status-completed { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-
-/* FAB */
-.fab-btn {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    background-color: var(--mobile-accent, #8b5cf6);
-    color: #ffffff;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
-    border: 1px solid rgba(255,255,255,0.2);
-    z-index: 900;
-    transition: transform 0.2s;
-    text-decoration: none;
-}
-.fab-btn:active { transform: scale(0.9); }
+.status-pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
 
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
