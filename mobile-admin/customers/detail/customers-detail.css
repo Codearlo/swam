@@ -1,6 +1,6 @@
 /* mobile-admin/customers/detail/customers-detail.css */
 
-/* ... (Estilos anteriores se mantienen igual) ... */
+/* ... (Estilos anteriores del body, header, etc. SE MANTIENEN IGUAL) ... */
 
 body {
     background-color: var(--mobile-bg, #000000);
@@ -12,8 +12,6 @@ body {
     height: 100vh;
     overflow: hidden; 
 }
-
-/* ... (Resto de estilos previos: profile, cards, etc) ... */
 
 .page-header-bar {
     flex-shrink: 0;
@@ -103,13 +101,14 @@ body {
 .chevron { margin-left: auto; }
 .loading-state { text-align: center; padding: 20px; color: #666; }
 
-/* === ESTILOS DEL MODAL PERSONALIZADO === */
+/* === ESTILOS DEL MODAL PERSONALIZADO (GLASSMORPHISM) === */
 .custom-modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro */
-    backdrop-filter: blur(10px); /* Efecto difuminado */
-    -webkit-backdrop-filter: blur(10px);
+    /* Fondo oscuro pero semitransparente para enfocar la atención */
+    background-color: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(5px); /* Desenfoque del fondo de la página */
+    -webkit-backdrop-filter: blur(5px);
     z-index: 2000;
     display: flex; justify-content: center; align-items: center;
     opacity: 0; pointer-events: none; visibility: hidden;
@@ -121,13 +120,17 @@ body {
 }
 
 .custom-modal-content {
-    background-color: #09090b; /* Casi negro */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    width: 90%; max-width: 320px;
-    padding: 24px;
+    /* EFECTO VIDRIO AQUÍ */
+    background-color: rgba(15, 15, 17, 0.65); /* Fondo oscuro muy transparente */
+    backdrop-filter: blur(25px); /* Difuminado fuerte para efecto vidrio */
+    -webkit-backdrop-filter: blur(25px); /* Soporte para iOS */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); /* Sombra profunda */
+    
+    border-radius: 24px;
+    width: 85%; max-width: 320px;
+    padding: 30px 24px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -137,17 +140,19 @@ body {
 }
 
 .modal-icon-warning {
-    width: 56px; height: 56px;
-    background: rgba(239, 68, 68, 0.15);
+    width: 60px; height: 60px;
+    background: rgba(239, 68, 68, 0.1); /* Rojo muy sutil */
     color: #ef4444;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px auto;
+    margin: 0 auto 20px auto;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); /* Resplandor rojo suave */
 }
 
-.modal-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.modal-text { color: #a1a1aa; font-size: 0.95rem; margin-bottom: 4px; }
-.modal-subtext { color: #52525b; font-size: 0.8rem; margin-bottom: 24px; }
+.modal-title { font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px; }
+.modal-text { color: #d4d4d8; font-size: 1rem; margin-bottom: 4px; line-height: 1.5; }
+.modal-subtext { color: #71717a; font-size: 0.85rem; margin-bottom: 28px; }
 
 .modal-actions {
     display: flex; gap: 12px;
@@ -155,25 +160,26 @@ body {
 
 .modal-btn {
     flex: 1;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px;
+    border-radius: 12px;
     font-weight: 600;
     font-size: 0.95rem;
     border: none;
     cursor: pointer;
     font-family: inherit;
+    transition: transform 0.1s, background-color 0.2s;
 }
 
 .btn-cancel {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.08);
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
-.btn-cancel:active { background-color: rgba(255, 255, 255, 0.1); }
+.btn-cancel:active { background-color: rgba(255, 255, 255, 0.15); transform: scale(0.98); }
 
 .btn-danger {
-    background-color: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
 }
-.btn-danger:active { transform: scale(0.98); }
+.btn-danger:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3); }
