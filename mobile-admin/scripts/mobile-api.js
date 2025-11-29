@@ -2,14 +2,14 @@
 
 const mobileApi = {
     
-    // --- VENTAS ---
+    // ... (El resto de funciones getSales, createSale, etc. se mantienen igual) ...
+
     async getSalesHistory(page = 1, pageSize = 20, searchTerm = '') {
         if (!supabaseClient) return { success: false, error: 'Sin conexión a BD' };
         try {
             const start = (page - 1) * pageSize;
             const end = start + pageSize - 1;
             
-            // Intentamos traer datos snapshot si existen, sino fallback a relaciones
             let query = supabaseClient
                 .from('sales')
                 .select(`
@@ -29,7 +29,6 @@ const mobileApi = {
             const sales = data.map(sale => ({
                 id: sale.id,
                 code: sale.sale_code || '---',
-                // Si guardaste el nombre snapshot úsalo, sino usa la relación
                 customer: sale.customers?.full_name || 'Cliente General', 
                 amount: parseFloat(sale.total_sale || 0),
                 date: sale.sale_date || sale.created_at,
@@ -40,54 +39,32 @@ const mobileApi = {
         } catch (error) { return { success: false, error: error.message }; }
     },
 
-    // --- SNAPSHOT DE VENTA (IMPORTANTE) ---
     async createSale(salePayload) {
+        // ... (código existente createSale) ...
         if (!supabaseClient) return { success: false, error: 'Sin conexión' };
-
         try {
-            // Preparar el objeto de venta.
-            // Para cumplir tu requerimiento: intentamos guardar los nombres textuales.
-            // Asegúrate que tu tabla 'sales' tenga columnas JSON o Text para esto,
-            // si no las tiene, Supabase ignorará los campos extra o dará error si es estricto.
-            
             const saleData = {
                 sale_code: `V-${Date.now().toString().slice(-6)}`,
                 sale_date: new Date().toISOString(),
                 total_sale: salePayload.total,
-                
-                // Referencias ID (Aún necesarias para integridad si la BD lo exige)
                 customer_id: salePayload.customerId, 
                 payment_method_id: salePayload.paymentMethodId,
-                
-                // SNAPSHOTS: Datos "congelados" (Esto es lo que pides)
-                // Si tu tabla soporta columna JSON 'items_snapshot' o 'customer_name_snapshot'
-                // customer_snapshot_name: salePayload.customerName, 
-                // items_snapshot: salePayload.items 
             };
-
-            const { data, error } = await supabaseClient
-                .from('sales')
-                .insert([saleData])
-                .select()
-                .single();
-
+            const { data, error } = await supabaseClient.from('sales').insert([saleData]).select().single();
             if (error) throw error;
-
             return { success: true, data: data };
-        } catch (error) {
-            console.error('Error createSale:', error);
-            return { success: false, error: error.message };
-        }
+        } catch (error) { return { success: false, error: error.message }; }
     },
 
     async searchProducts(term) {
+        // ... (código existente searchProducts) ...
         if (!supabaseClient) return { success: false, error: 'Sin conexión' };
         try {
             const { data, error } = await supabaseClient
                 .from('products')
                 .select('id, name, sku, suggested_price, is_active')
                 .ilike('name', `%${term}%`)
-                .eq('is_active', true) // Solo productos activos
+                .eq('is_active', true)
                 .limit(10);
             if(error) throw error;
             return { success: true, data: data.map(p => ({ 
@@ -98,18 +75,25 @@ const mobileApi = {
 
     // --- CLIENTES ---
 
-    async getCustomers(page = 1, pageSize = 20, search = '') {
+    async getCustomers(page = 1, pageSize = 20, search = '', onlyActive = true) {
         if (!supabaseClient) return { success: false, error: 'Sin conexión' };
         try {
             const start = (page - 1) * pageSize;
+            
             let query = supabaseClient
                 .from('customers')
                 .select('*', { count: 'exact' })
-                .eq('is_active', true) // IMPORTANTE: Solo traer activos (no eliminados)
                 .order('full_name', { ascending: true })
                 .range(start, start + pageSize - 1);
 
-            if (search) query = query.or(`full_name.ilike.%${search}%,document_number.ilike.%${search}%`);
+            // Mantenemos la lógica de filtro corregida anteriormente
+            if (onlyActive) {
+                query = query.eq('is_active', true);
+            }
+
+            if (search) {
+                query = query.or(`full_name.ilike.%${search}%,document_number.ilike.%${search}%`);
+            }
             
             const { data, error, count } = await query;
             if (error) throw error;
@@ -144,18 +128,24 @@ const mobileApi = {
         } catch (error) { return { success: false, error: error.message }; }
     },
 
-    // --- NUEVO: ELIMINAR CLIENTE (SOFT DELETE) ---
-    // En lugar de borrar la fila (DELETE), marcamos is_active = false.
-    // Esto preserva el historial de ventas pasadas.
+    // --- CAMBIO PRINCIPAL: BORRADO FÍSICO ---
     async deleteCustomer(id) {
         if (!supabaseClient) return { success: false };
         try {
+            // ANTES: .update({ is_active: false })
+            // AHORA: .delete() -> Esto elimina la fila de la base de datos permanentemente
             const { error } = await supabaseClient
                 .from('customers')
-                .update({ is_active: false }) 
+                .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+                // Manejo especial: Si falla por llave foránea (tiene ventas)
+                if (error.code === '23503') {
+                    throw new Error('No se puede eliminar: El cliente tiene ventas registradas.');
+                }
+                throw error;
+            }
             return { success: true };
         } catch (error) {
             console.error(error);

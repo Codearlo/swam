@@ -1,5 +1,8 @@
 /* mobile-admin/customers/detail/customers-detail.js */
 
+// Variable para almacenar el ID que vamos a eliminar
+let customerIdToDelete = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
@@ -9,6 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => history.back(), 1000);
         return; 
     }
+
+    // Guardar ID globalmente para usarlo en el modal
+    customerIdToDelete = id;
 
     // Cargar datos
     const res = await mobileApi.getCustomerById(id);
@@ -30,8 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('btn-edit').href = `../edit/customers-edit.html?id=${id}`;
         document.getElementById('btn-full-history').href = `/mobile-admin/sales/list/sales-list.html`; 
 
-        // Botón Eliminar
-        setupDeleteAction(id, c.full_name);
+        // Configurar acciones del Modal
+        setupModalActions(c.full_name);
 
         loadLastSale(id);
     } else {
@@ -40,21 +46,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function setupDeleteAction(id, name) {
-    const btnDelete = document.getElementById('btn-delete');
-    
-    btnDelete.addEventListener('click', async () => {
-        // Usamos confirm nativo o podrías hacer un modal custom
-        const confirmed = confirm(`¿Estás seguro de eliminar a ${name}?`);
-        
-        if (confirmed) {
-            const res = await mobileApi.deleteCustomer(id);
+function setupModalActions(name) {
+    const triggerBtn = document.getElementById('btn-delete-trigger');
+    const modal = document.getElementById('delete-modal');
+    const cancelBtn = document.getElementById('btn-modal-cancel');
+    const confirmBtn = document.getElementById('btn-modal-confirm');
+    const modalNameSpan = document.getElementById('modal-customer-name');
+
+    // 1. ABRIR MODAL
+    triggerBtn.addEventListener('click', () => {
+        modalNameSpan.textContent = name;
+        modal.classList.add('is-visible');
+    });
+
+    // 2. CERRAR MODAL (Cancelar)
+    cancelBtn.addEventListener('click', () => {
+        modal.classList.remove('is-visible');
+    });
+
+    // Cerrar al dar click fuera de la tarjeta (en el fondo oscuro)
+    modal.addEventListener('click', (e) => {
+        if(e.target === modal) modal.classList.remove('is-visible');
+    });
+
+    // 3. CONFIRMAR ELIMINACIÓN
+    confirmBtn.addEventListener('click', async () => {
+        if (!customerIdToDelete) return;
+
+        // UI Loading State
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Eliminando...';
+
+        try {
+            const res = await mobileApi.deleteCustomer(customerIdToDelete);
+            
             if (res.success) {
-                showToast('Cliente eliminado', 'success');
-                setTimeout(() => history.back(), 1000);
+                showToast('Cliente eliminado permanentemente', 'success');
+                modal.classList.remove('is-visible');
+                
+                // Redirigir a la lista
+                setTimeout(() => {
+                    window.location.replace('../list/customers-list.html'); 
+                }, 1500);
             } else {
-                showToast('No se pudo eliminar el cliente', 'error');
+                showToast(res.error || 'Error al eliminar', 'error');
+                // Restaurar botón si falló
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Sí, Eliminar';
+                modal.classList.remove('is-visible');
             }
+        } catch (error) {
+            console.error(error);
+            showToast('Error de conexión', 'error');
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Sí, Eliminar';
         }
     });
 }

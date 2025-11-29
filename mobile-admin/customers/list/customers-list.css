@@ -167,8 +167,18 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-.status-active { color: #10b981; background: rgba(16, 185, 129, 0.15); }
-.status-inactive { color: #9ca3af; background: rgba(156, 163, 175, 0.15); }
+
+.status-active { 
+    color: #10b981; 
+    background: rgba(16, 185, 129, 0.15); 
+}
+
+/* MODIFICADO: Rojo para Inactivo */
+.status-inactive { 
+    color: #ef4444; 
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.2); 
+}
 
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }

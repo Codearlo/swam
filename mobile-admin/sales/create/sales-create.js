@@ -14,11 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchCustomers() {
     try {
-        const res = await mobileApi.getCustomers();
+        const res = await mobileApi.getCustomers(1, 100); // Traemos más registros por defecto
         if(res.success) {
-            allCustomers = res.data;
+            // FILTRO ADICIONAL: Solo mostrar ACTIVOS en el dropdown de ventas
+            allCustomers = res.data.filter(c => c.is_active !== false);
         } else {
-            allCustomers = [{ id: 1, full_name: "Cliente General" }, { id: 2, full_name: "Juan Pérez" }];
+            allCustomers = [];
         }
     } catch(e) { console.error(e); }
 }
@@ -39,6 +40,7 @@ function setupCustomerSearch() {
     });
 
     input.addEventListener('focus', () => {
+        // Al hacer focus, mostramos todos los disponibles (que ya están filtrados por activo arriba)
         if(input.value.trim() === '') renderCustomerOptions(allCustomers);
     });
 
