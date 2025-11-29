@@ -11,7 +11,6 @@ body {
     overflow: hidden; 
 }
 
-/* Header */
 .page-header-bar {
     flex-shrink: 0;
     display: flex;
@@ -34,17 +33,22 @@ body {
     cursor: pointer;
 }
 
+/* Botón Eliminar */
+.icon-btn-danger {
+    background: transparent;
+    border: none;
+    color: #ef4444; /* Rojo */
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.icon-btn-danger:active { transform: scale(0.9); }
+
 .header-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
 
-.edit-link {
-    color: var(--mobile-accent, #8b5cf6);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 8px;
-}
-
-/* Contenido */
 .mobile-main-content {
     flex: 1;
     overflow-y: auto;
@@ -54,189 +58,85 @@ body {
     gap: 16px;
 }
 
-/* --- PERFIL CON TOQUE MORADO --- */
+/* Perfil Limpio */
 .profile-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: transparent; 
     border: none;
-    padding: 20px 0;
-    margin-bottom: 10px;
+    padding: 10px 0 20px 0;
 }
 
-/* CAMBIO 1: Avatar con fondo morado sutil */
 .profile-avatar-large {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    
-    /* Fondo morado translúcido (elegante) */
-    background-color: rgba(139, 92, 246, 0.15); 
-    
-    /* Borde morado suave */
+    width: 80px; height: 80px; border-radius: 50%;
+    background-color: rgba(139, 92, 246, 0.15); /* Fondo sutil morado */
     border: 1px solid rgba(139, 92, 246, 0.3); 
-    
-    /* Letra morada clara */
     color: #a78bfa; 
-    
-    font-size: 2.5rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 2.5rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
     margin-bottom: 16px;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1); /* Resplandor muy suave opcional */
 }
 
 .profile-name { font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; text-align: center; color: #fff; }
-
-/* CAMBIO 2: DNI con fondo morado muy suave */
 .profile-doc { 
-    font-size: 0.9rem; 
-    
-    /* Fondo morado muy oscuro/transparente */
+    font-size: 0.9rem; color: #e9d5ff; font-weight: 500;
     background-color: rgba(139, 92, 246, 0.1); 
-    
-    /* Texto casi blanco con tinte morado */
-    color: #e9d5ff; 
-    
-    /* Borde sutil */
     border: 1px solid rgba(139, 92, 246, 0.15);
-    
-    padding: 4px 12px; 
-    border-radius: 20px; 
-    font-weight: 500; 
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 16px;
 }
 
-/* Etiquetas de Sección */
-.section-label {
-    font-size: 0.8rem;
-    color: #a1a1aa;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 8px;
-    margin-bottom: -4px;
+/* Botón Editar Píldora */
+.edit-btn-pill {
+    text-decoration: none;
+    color: #fff;
+    background-color: #1c1c1e;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
-/* Tarjetas de Información */
+.section-label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; margin-bottom: -4px; font-weight: 600; }
+
 .info-card {
-    background-color: #0c0c0e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-height: 60px;
+    background-color: #0c0c0e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px;
+    display: flex; align-items: center; gap: 14px; min-height: 60px;
 }
 
-.icon-wrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
+.icon-wrapper { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .icon-purple { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
 .icon-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 .icon-pink { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
 .icon-orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
 
-.info-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-}
+.info-content { display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.info-label { font-size: 0.7rem; color: #52525b; text-transform: uppercase; font-weight: 600; }
+.info-value { font-size: 1rem; color: #fff; font-weight: 500; }
 
-.info-label {
-    font-size: 0.7rem;
-    color: #52525b;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.info-value {
-    font-size: 1rem;
-    color: #fff;
-    font-weight: 500;
-}
-
-/* Tarjeta Última Venta */
+/* Venta Preview */
 .sale-preview-card {
-    background-color: #0c0c0e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    background-color: #0c0c0e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
 }
-
-.sale-preview-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding-bottom: 12px;
-}
-
+.sale-preview-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
 .sale-code { font-weight: 700; color: #fff; }
 .sale-date { font-size: 0.8rem; color: #a1a1aa; }
-
-.sale-preview-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
+.sale-preview-body { display: flex; justify-content: space-between; align-items: center; }
 .sale-label { font-size: 0.9rem; color: #a1a1aa; }
 .sale-amount { font-size: 1.4rem; font-weight: 800; color: #fff; }
-
-.status-badge {
-    align-self: flex-start;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-weight: 600;
-}
+.status-badge { align-self: flex-start; font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
 .status-completed { color: #10b981; background: rgba(16, 185, 129, 0.15); }
+.empty-sales-state { text-align: center; padding: 20px; color: #52525b; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; }
 
-.empty-sales-state {
-    text-align: center;
-    padding: 20px;
-    color: #52525b;
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 12px;
-    font-size: 0.9rem;
-}
-
-/* Enlace Acción */
 .action-card-link {
-    background-color: #0c0c0e;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
-    transition: background 0.2s;
-    margin-top: 10px;
+    background-color: #0c0c0e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px;
+    display: flex; align-items: center; gap: 14px; text-decoration: none; transition: background 0.2s; margin-top: 10px;
 }
-
-.action-card-link:active {
-    background-color: rgba(255,255,255,0.05);
-}
-
+.action-card-link:active { background-color: rgba(255,255,255,0.05); }
 .action-content { flex: 1; display: flex; flex-direction: column; }
 .action-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
 .action-subtitle { font-size: 0.8rem; color: #a1a1aa; }
 .chevron { margin-left: auto; }
-
 .loading-state { text-align: center; padding: 20px; color: #666; }

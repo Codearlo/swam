@@ -1,6 +1,7 @@
 /* mobile-admin/customers/list/customers-list.js */
 
-let allCustomers = []; // Cache local
+let allCustomers = []; 
+let currentFilter = 'active'; // Default
 
 document.addEventListener('DOMContentLoaded', async () => {
     if(typeof loadMobileHeader === 'function') await loadMobileHeader();
@@ -16,11 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mainBtn.setAttribute('aria-label', 'Nuevo Cliente');
             }
         }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
 
-    // 3. Inits
     setupFilters();
-    loadCustomers();
+    loadCustomers(); // Carga y aplica filtro default
     
     const input = document.getElementById('search-input');
     let debounceTimer;
@@ -33,38 +33,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadCustomers() {
     const container = document.getElementById('customers-list-container');
     
-    // Llamada API (Trae todos para filtrado local rápido)
-    const res = await mobileApi.getCustomers(1, 100, '');
+    // Traer TODOS para poder filtrar localmente entre Activos/Inactivos sin recargar API
+    const res = await mobileApi.getCustomers(1, 100, ''); 
     
     if(res.success) {
         allCustomers = res.data;
-        renderList(allCustomers);
+        applyFilter(); // Aplicar el filtro 'active' inicial
     } else {
-        container.innerHTML = `
-            <div class="u-flex-center" style="flex-direction:column; padding:40px 0; color:#ef4444; text-align:center;">
-                <p>Error al cargar clientes</p>
-                <small style="opacity:0.7; font-size:0.8rem">${res.error}</small>
-            </div>`;
+        container.innerHTML = `<div class="u-flex-center" style="padding:40px; color:#ef4444;">Error al cargar</div>`;
     }
+}
+
+function applyFilter() {
+    let filtered = [...allCustomers];
+    
+    if (currentFilter === 'active') {
+        filtered = allCustomers.filter(c => c.is_active !== false);
+    }
+    // Si es 'all', mostramos todos (activos e inactivos)
+    
+    renderList(filtered);
 }
 
 function renderList(data) {
     const container = document.getElementById('customers-list-container');
     
     if (!data || data.length === 0) {
-        container.innerHTML = `
-            <div class="u-flex-center" style="flex-direction:column; padding:60px 0; color:#52525b; text-align:center;">
-                <p>No se encontraron clientes</p>
-            </div>`;
+        container.innerHTML = `<div class="u-flex-center" style="padding:60px 0; color:#52525b;">No hay clientes</div>`;
         return;
     }
 
-    // NUEVA ESTRUCTURA HTML (Similar a Ventas)
     container.innerHTML = data.map(c => {
-        // Estado mockeado si no existe en DB
         const isActive = c.is_active !== false; 
         const statusClass = isActive ? 'status-active' : 'status-inactive';
-        const statusText = isActive ? 'Activo' : 'Inactivo';
+        const statusText = isActive ? 'ACTIVO' : 'INACTIVO';
 
         return `
         <a href="../detail/customers-detail.html?id=${c.id}" class="customer-card">
@@ -79,6 +81,7 @@ function renderList(data) {
                     </div>
                 </div>
             </div>
+            
             <div class="customer-card-right">
                 <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
@@ -87,23 +90,16 @@ function renderList(data) {
     }).join('');
 }
 
-// --- FILTROS ---
 function setupFilters() {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => {
         btn.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
-            const filter = btn.dataset.filter;
             
-            let filtered = [...allCustomers];
-            if (filter === 'active') {
-                filtered = allCustomers.filter(c => c.is_active !== false);
-            }
-            // Add more filters here if needed
+            currentFilter = btn.dataset.filter; // Actualizar estado global
+            applyFilter(); // Re-filtrar lista
             
-            renderList(filtered);
-            // Limpiar buscador al cambiar filtro
             document.getElementById('search-input').value = '';
         });
     });
@@ -111,9 +107,17 @@ function setupFilters() {
 
 function filterCustomers(term) {
     term = term.toLowerCase();
-    const filtered = allCustomers.filter(c => 
+    
+    // Filtrar primero por texto
+    let filtered = allCustomers.filter(c => 
         c.full_name.toLowerCase().includes(term) || 
         (c.document_number && c.document_number.includes(term))
     );
+    
+    // Luego aplicar el filtro de estado activo/todos
+    if (currentFilter === 'active') {
+        filtered = filtered.filter(c => c.is_active !== false);
+    }
+    
     renderList(filtered);
 }

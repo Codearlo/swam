@@ -12,6 +12,7 @@
     
     <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
     <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
+    <link rel="stylesheet" href="/mobile-admin/components/toast/toast.css">
     
     <link rel="stylesheet" href="customers-detail.css">
     
@@ -24,7 +25,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </button>
         <h1 class="header-title">Detalle Cliente</h1>
-        <a id="btn-edit" href="#" class="edit-link">Editar</a>
+        
+        <button id="btn-delete" class="icon-btn-danger" aria-label="Eliminar Cliente">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4l1-1h4l1 1h4a2 2 0 0 1 2 2z"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        </button>
     </header>
 
     <main class="mobile-main-content">
@@ -33,6 +37,7 @@
             <div class="profile-avatar-large" id="detail-avatar">C</div>
             <h2 class="profile-name" id="detail-name">Cargando...</h2>
             <span class="profile-doc" id="detail-doc">...</span>
+            <a id="btn-edit" href="#" class="edit-btn-pill">Editar Perfil</a>
         </div>
 
         <h3 class="section-label">Información de Contacto</h3>
@@ -92,6 +97,7 @@
     <script src="/public/shared/scripts/supabase-client.js"></script>
     <script src="/public/shared/scripts/auth-utils.js"></script>
     <script src="/mobile-admin/scripts/mobile-api.js"></script>
+    <script src="/mobile-admin/components/toast/toast.js"></script>
     <script src="customers-detail.js"></script>
 </body>
 </html>
