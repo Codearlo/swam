@@ -2,50 +2,149 @@
 
 /**
  * MOBILE API FACADE
- * Este archivo coordina los servicios especializados.
- * Requiere que sales-service.js, customers-service.js y products-service.js se carguen antes.
+ * Centraliza el acceso a los servicios de negocio.
+ * Dependencias: 
+ * - services/sales-service.js
+ * - services/customers-service.js
+ * - services/products-service.js
  */
 
 const mobileApi = {
-    // --- VENTAS (Usa SalesService) ---
-    getSalesHistory: (p, s, t) => SalesService.getHistory(p, s, t),
-    createSale: (p) => SalesService.create(p),
-    searchProducts: (t) => SalesService.searchProductsForSale(t),
+    
+    // ==========================================
+    // 1. MÓDULO DE VENTAS (Delegado a SalesService)
+    // ==========================================
+    
+    async getSalesHistory(page, pageSize, searchTerm) {
+        if (typeof SalesService === 'undefined') return { success: false, error: 'SalesService no cargado' };
+        return await SalesService.getHistory(page, pageSize, searchTerm);
+    },
 
-    // --- CLIENTES (Usa CustomersService) ---
-    getCustomers: (p, s, term, a) => CustomersService.getAll(p, s, term, a),
-    getCustomerById: (id) => CustomersService.getById(id),
-    createCustomer: (d) => CustomersService.create(d),
-    updateCustomer: (id, d) => CustomersService.update(id, d),
-    deleteCustomer: (id) => CustomersService.delete(id),
-    getCustomerSales: (id, l) => CustomersService.getSales(id, l),
-    getCustomerCredits: (id) => CustomersService.getCredits(id),
+    async createSale(salePayload) {
+        if (typeof SalesService === 'undefined') return { success: false, error: 'SalesService no cargado' };
+        return await SalesService.create(salePayload);
+    },
 
-    // --- PRODUCTOS (Usa ProductsService) ---
-    getProducts: (p, s, term, f) => ProductsService.getAll(p, s, term, f),
-    getProductById: (id) => ProductsService.getById(id),
-    createProduct: (d) => ProductsService.create(d),
-    updateProduct: (id, d) => ProductsService.update(id, d),
-    uploadProductImage: (f) => ProductsService.uploadImage(f),
-    getCategoriesTree: () => ProductsService.getCategoriesTree(),
-    getBrands: (s) => ProductsService.getBrands(s),
-    createBrand: (n) => ProductsService.createBrand(n),
-    subscribeToProducts: (cb) => ProductsService.subscribe(cb),
+    async searchProducts(term) {
+        // Usado en la pantalla de Nueva Venta para buscar items
+        if (typeof SalesService === 'undefined') return { success: false, error: 'SalesService no cargado' };
+        return await SalesService.searchProductsForSale(term);
+    },
 
-    // --- UTILIDADES GLOBALES ---
+    // ==========================================
+    // 2. MÓDULO DE CLIENTES (Delegado a CustomersService)
+    // ==========================================
+
+    async getCustomers(page, pageSize, search, onlyActive) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.getAll(page, pageSize, search, onlyActive);
+    },
+
+    async getCustomerById(id) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.getById(id);
+    },
+
+    async createCustomer(data) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.create(data);
+    },
+
+    async updateCustomer(id, data) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.update(id, data);
+    },
+
+    async deleteCustomer(id) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.delete(id);
+    },
+
+    async getCustomerSales(customerId, limit) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.getSales(customerId, limit);
+    },
+
+    async getCustomerCredits(id) {
+        if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
+        return await CustomersService.getCredits(id);
+    },
+
+    // ==========================================
+    // 3. MÓDULO DE PRODUCTOS (Delegado a ProductsService)
+    // ==========================================
+
+    async getProducts(page, pageSize, search, filter) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.getAll(page, pageSize, search, filter);
+    },
+
+    async getProductById(id) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.getById(id);
+    },
+
+    async createProduct(data) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.create(data);
+    },
+
+    async updateProduct(id, data) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.update(id, data);
+    },
+
+    async uploadProductImage(file) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.uploadImage(file);
+    },
+
+    async getCategoriesTree() {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.getCategoriesTree();
+    },
+
+    async getBrands(search) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.getBrands(search);
+    },
+
+    async createBrand(name) {
+        if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
+        return await ProductsService.createBrand(name);
+    },
+
+    subscribeToProducts(callback) {
+        if (typeof ProductsService === 'undefined') return null;
+        return ProductsService.subscribe(callback);
+    },
+
+    // ==========================================
+    // 4. OTROS / UTILIDADES / DASHBOARD
+    // ==========================================
+
     async getPaymentMethods() {
         if (!supabaseClient) return { success: false, data: [] };
-        const { data } = await supabaseClient.from('payment_methods').select('id, name').eq('is_active', true);
-        return { success: true, data: data || [] };
+        try {
+            const { data, error } = await supabaseClient.from('payment_methods').select('id, name').eq('is_active', true);
+            if (error) throw error;
+            return { success: true, data: data || [] };
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
     },
 
     async getDashboardData() {
-        // Datos básicos para el dashboard home
+        // Simulación o llamada real a RPC si existiera
         return { success: true, dailySales: 0, activeOrders: 0, activeCustomers: 0, productsInStock: 0 };
     },
     
     async getRecentSales(limit=3) {
-        return this.getSalesHistory(1, limit);
+        // Reutilizamos el servicio de ventas
+        if (typeof SalesService !== 'undefined') {
+            return await SalesService.getHistory(1, limit);
+        }
+        return { success: false, error: 'Servicio no disponible' };
     },
     
     async getInventoryAlerts(limit=3) {
@@ -53,5 +152,4 @@ const mobileApi = {
     }
 };
 
-// Exponer globalmente
 window.mobileApi = mobileApi;
