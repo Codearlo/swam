@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const activeLink = document.getElementById('nav-products');
             if (activeLink) activeLink.classList.add('is-active');
             
+            // Botón central apunta a Crear Producto
             const mainBtn = document.querySelector('.bottom-nav-item--main');
             if (mainBtn) {
                 mainBtn.href = '../create/products-create.html'; 
@@ -29,19 +30,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTabs();
     setupSearch();
 
-    // 3. Cargar Datos Iniciales
+    // 3. Cargar Datos
     await loadProducts();
 
-    // 4. INICIAR SUSCRIPCIÓN REALTIME
-    if (mobileApi.subscribeToProducts) {
+    // 4. Realtime
+    if (typeof mobileApi !== 'undefined' && mobileApi.subscribeToProducts) {
         productsSubscription = mobileApi.subscribeToProducts(() => {
-            // Cuando hay un cambio, recargamos la lista en "segundo plano" (sin spinner invasivo)
             loadProducts(true); 
         });
     }
 });
 
-// Limpiar suscripción al salir (opcional en navegación tradicional, útil en SPAs)
+// Limpieza
 window.addEventListener('beforeunload', () => {
     if (productsSubscription && typeof supabaseClient !== 'undefined') {
         supabaseClient.removeChannel(productsSubscription);
@@ -56,13 +56,15 @@ function setupTabs() {
             btn.classList.add('active');
             currentFilter = btn.dataset.filter;
             currentPage = 1;
-            loadProducts(); // Carga normal con spinner al cambiar tab
+            loadProducts();
         });
     });
 }
 
 function setupSearch() {
     const input = document.getElementById('search-input');
+    if(!input) return;
+    
     let debounce;
     input.addEventListener('input', (e) => {
         clearTimeout(debounce);
@@ -74,28 +76,31 @@ function setupSearch() {
     });
 }
 
-/**
- * Carga la lista de productos.
- * @param {boolean} isBackgroundUpdate - Si es true, no borra el contenido actual mientras carga.
- */
 async function loadProducts(isBackgroundUpdate = false) {
     const container = document.getElementById('products-list-container');
     
-    // Solo mostrar el spinner de carga si NO es una actualización en tiempo real
+    if (!container) return;
+
     if (!isBackgroundUpdate) {
         container.innerHTML = '<div class="u-flex-center" style="padding:40px"><div class="spin" style="width:24px;height:24px;border:2px solid #fff;border-top-color:transparent;border-radius:50%"></div></div>';
     }
 
     try {
-        const res = await mobileApi.getProducts(currentPage, 20, currentSearch, currentFilter);
-
-        // Si es update silencioso, solo limpiamos justo antes de renderizar
-        if (isBackgroundUpdate) {
-            container.innerHTML = '';
+        // Verificación crítica para evitar "Error inesperado" por caché
+        if (typeof mobileApi === 'undefined' || typeof mobileApi.getProducts !== 'function') {
+            throw new Error("La API no está cargada correctamente. Intenta recargar la página (F5 o borrar caché).");
         }
 
+        const res = await mobileApi.getProducts(currentPage, 20, currentSearch, currentFilter);
+
+        if (isBackgroundUpdate) container.innerHTML = '';
+
         if (!res.success) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444">Error al cargar datos</div>`;
+            // Muestra el error REAL que viene de la base de datos
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444">
+                <p style="font-weight:bold; margin-bottom:5px;">Error de Datos</p>
+                <small>${res.error || 'Error desconocido'}</small>
+            </div>`;
             return;
         }
 
@@ -104,26 +109,21 @@ async function loadProducts(isBackgroundUpdate = false) {
             return;
         }
 
-        // Si no es update silencioso, limpiamos el spinner ahora
-        if (!isBackgroundUpdate) {
-            container.innerHTML = '';
-        }
+        if (!isBackgroundUpdate) container.innerHTML = '';
 
         res.data.forEach(p => {
-            const priceStr = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(p.suggested_price);
+            const priceStr = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(p.suggested_price || 0);
             
             let stockClass = 'stock-high';
             let stockText = `${p.stock} unid.`;
             if (p.stock <= 0) { stockClass = 'stock-none'; stockText = 'Agotado'; }
             else if (p.stock < 5) { stockClass = 'stock-low'; stockText = `${p.stock} unid. (Bajo)`; }
 
-            const card = document.createElement('div');
+            const card = document.createElement('div'); // Cambiado a div para evitar click accidental si no hay link
             card.className = 'product-card';
             
-            // Animación sutil de entrada para nuevos elementos en realtime
-            if(isBackgroundUpdate) {
-                card.style.animation = 'fadeIn 0.3s ease';
-            }
+            // Animación suave
+            if(isBackgroundUpdate) card.style.animation = 'fadeIn 0.3s ease';
 
             const imgHtml = p.image_url 
                 ? `<img src="${p.image_url}" alt="${p.name}" class="product-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -132,11 +132,13 @@ async function loadProducts(isBackgroundUpdate = false) {
 
             card.innerHTML = `
                 <div class="product-image-box">
-                    ${p.image_url ? `<img src="${p.image_url}" class="product-thumb">` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`}
+                    ${imgHtml}
                 </div>
                 <div class="product-details">
                     <h4 class="product-name">${p.name}</h4>
-                    <span class="product-sku">SKU: ${p.sku}</span>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <span class="product-sku" style="opacity:0.7">${p.brand || 'Generico'}</span>
+                    </div>
                     <div class="stock-badge ${stockClass}">
                         <span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;margin-right:4px;"></span>
                         ${stockText}
@@ -152,8 +154,12 @@ async function loadProducts(isBackgroundUpdate = false) {
 
     } catch (e) {
         console.error(e);
+        // Muestra el error de JS en pantalla para saber qué pasó
         if(!isBackgroundUpdate) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444">Error inesperado</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444; word-break: break-word;">
+                <p style="font-weight:bold">Error del Sistema</p>
+                <small>${e.message}</small>
+            </div>`;
         }
     }
 }
