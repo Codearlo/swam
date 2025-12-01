@@ -2,17 +2,17 @@
 
 /**
  * MOBILE API FACADE
- * Este archivo agrupa todos los micro-servicios en un solo objeto 'mobileApi'
- * para mantener compatibilidad con el resto de la aplicación.
+ * Este archivo coordina los servicios especializados.
+ * Requiere que sales-service.js, customers-service.js y products-service.js se carguen antes.
  */
 
 const mobileApi = {
-    // --- VENTAS (Delegado a SalesService) ---
+    // --- VENTAS (Usa SalesService) ---
     getSalesHistory: (p, s, t) => SalesService.getHistory(p, s, t),
     createSale: (p) => SalesService.create(p),
     searchProducts: (t) => SalesService.searchProductsForSale(t),
 
-    // --- CLIENTES (Delegado a CustomersService) ---
+    // --- CLIENTES (Usa CustomersService) ---
     getCustomers: (p, s, term, a) => CustomersService.getAll(p, s, term, a),
     getCustomerById: (id) => CustomersService.getById(id),
     createCustomer: (d) => CustomersService.create(d),
@@ -21,7 +21,7 @@ const mobileApi = {
     getCustomerSales: (id, l) => CustomersService.getSales(id, l),
     getCustomerCredits: (id) => CustomersService.getCredits(id),
 
-    // --- PRODUCTOS (Delegado a ProductsService) ---
+    // --- PRODUCTOS (Usa ProductsService) ---
     getProducts: (p, s, term, f) => ProductsService.getAll(p, s, term, f),
     getProductById: (id) => ProductsService.getById(id),
     createProduct: (d) => ProductsService.create(d),
@@ -40,6 +40,7 @@ const mobileApi = {
     },
 
     async getDashboardData() {
+        // Datos básicos para el dashboard home
         return { success: true, dailySales: 0, activeOrders: 0, activeCustomers: 0, productsInStock: 0 };
     },
     

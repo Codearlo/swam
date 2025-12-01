@@ -65,7 +65,7 @@ const SalesService = {
             if(error) throw error;
             
             return { success: true, data: data.map(p => ({ 
-                id: p.id, name: p.name, sku: p.sku, price: parseFloat(p.suggested_price), stock: 10 // Mock stock rápido
+                id: p.id, name: p.name, sku: p.sku, price: parseFloat(p.suggested_price), stock: 10 
             })) };
         } catch(e) { return { success: false, error: e.message }; }
     }

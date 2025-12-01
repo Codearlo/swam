@@ -362,4 +362,4 @@ const mobileApi = {
     async getInventoryAlerts(limit=3) { return { success: true, data: [] }; }
 };
 
-window.mobileApi = mobileApi;
+window.mobileApi = mobileApi; 
