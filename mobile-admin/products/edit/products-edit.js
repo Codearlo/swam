@@ -1,34 +1,108 @@
-/* mobile-admin/products/create/products-create.js */
+/* mobile-admin/products/edit/products-edit.js */
 
 let categoryTree = [];
 let allBrands = [];
 let selectedImageFile = null;
 let cropper = null;
+let currentProductId = null;
+let originalImageUrl = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Cargar datos
+    const params = new URLSearchParams(window.location.search);
+    currentProductId = params.get('id');
+
+    if (!currentProductId) {
+        showToast('Producto no especificado', 'error');
+        setTimeout(() => history.back(), 1000);
+        return;
+    }
+
+    // 1. Cargar datos maestros
     await Promise.all([loadCategories(), loadBrands()]);
     
-    // 2. Configurar Dropdowns Flotantes (Solución al clipping)
+    // 2. Setup UI
     setupFloatingDropdown('cat-main-wrapper', 'cat-main-dropdown');
     setupFloatingDropdown('cat-sub-wrapper', 'cat-sub-dropdown');
     setupFloatingDropdown('brand-wrapper', 'brand-dropdown');
     
-    // 3. Lógica
     setupCategoryLogic();
     setupBrandLogic();
     setupImageCropper();
     setupSwitch();
     setupSaveAction();
+    setupDeleteAction();
+
+    // 3. Cargar datos del producto
+    await loadProductData(currentProductId);
 });
+
+async function loadProductData(id) {
+    const res = await mobileApi.getProductById(id);
+    if (!res.success || !res.data) {
+        showToast('Error cargando producto', 'error');
+        return;
+    }
+
+    const p = res.data;
+
+    // Llenar campos simples
+    document.getElementById('name').value = p.name;
+    document.getElementById('suggested_price').value = p.suggested_price;
+    
+    // Imagen
+    originalImageUrl = p.image_url;
+    if (originalImageUrl) {
+        const preview = document.getElementById('preview-img');
+        preview.src = originalImageUrl;
+        preview.classList.remove('u-hidden');
+        document.getElementById('upload-placeholder').classList.add('u-hidden');
+        document.getElementById('btn-remove-img').classList.remove('u-hidden');
+    }
+
+    // Switch Estado
+    const sw = document.getElementById('is_active');
+    sw.checked = p.is_active;
+    sw.dispatchEvent(new Event('change'));
+
+    // Marca
+    if (p.brands) {
+        document.getElementById('brand_input').value = p.brands.name;
+        document.getElementById('brand_id').value = p.brand_id;
+    }
+
+    // Categoría: Detectar si es subcategoría o principal
+    if (p.category_id) {
+        let found = false;
+        
+        // 1. ¿Es una categoría padre?
+        const parentCat = categoryTree.find(c => c.id == p.category_id);
+        if (parentCat) {
+            selectCategory(parentCat);
+            found = true;
+        } else {
+            // 2. ¿Es una subcategoría?
+            for (const parent of categoryTree) {
+                if (parent.subcategories) {
+                    const sub = parent.subcategories.find(s => s.id == p.category_id);
+                    if (sub) {
+                        selectCategory(parent); // Selecciona padre
+                        // Selecciona hijo manualmente
+                        document.getElementById('cat_sub_display').value = sub.name;
+                        document.getElementById('cat_sub_id').value = sub.id;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
 
 // --- DROPDOWNS FLOTANTES ---
 function setupFloatingDropdown(wrapperId, dropdownId) {
     const wrapper = document.getElementById(wrapperId);
     const dropdown = document.getElementById(dropdownId);
-    
     if (!wrapper || !dropdown) return;
-
     document.body.appendChild(dropdown);
     dropdown.classList.add('dropdown-portal');
 
@@ -43,7 +117,6 @@ function setupFloatingDropdown(wrapperId, dropdownId) {
         if (e.target.closest('.dropdown-option')) return;
         const isHidden = dropdown.classList.contains('u-hidden');
         document.querySelectorAll('.dropdown-portal').forEach(d => d.classList.add('u-hidden'));
-        
         if (isHidden) {
             positionDropdown();
             dropdown.classList.remove('u-hidden');
@@ -61,13 +134,8 @@ function setupFloatingDropdown(wrapperId, dropdownId) {
     }
 }
 
-// Cerrar al hacer click fuera
 document.addEventListener('click', (e) => {
-    const isClickInWrapper = e.target.closest('.custom-select-container');
-    const isClickInDropdown = e.target.closest('.dropdown-portal');
-    const isClickInCropper = e.target.closest('.cropper-modal'); 
-
-    if (!isClickInWrapper && !isClickInDropdown && !isClickInCropper) {
+    if (!e.target.closest('.custom-select-container') && !e.target.closest('.dropdown-portal') && !e.target.closest('.cropper-modal')) {
         document.querySelectorAll('.dropdown-portal').forEach(d => d.classList.add('u-hidden'));
     }
 });
@@ -163,7 +231,6 @@ function renderBrands(list, dropdown, searchTerm = '') {
         };
         dropdown.appendChild(div);
     });
-
     if(searchTerm && !list.some(b => b.name.toLowerCase() === searchTerm.toLowerCase())) {
         const createDiv = document.createElement('div');
         createDiv.className = 'dropdown-option create-option';
@@ -178,7 +245,6 @@ async function createNewBrand(name) {
     input.disabled = true; input.value = "Creando...";
     const res = await mobileApi.createBrand(name);
     input.disabled = false;
-    
     if(res.success) {
         allBrands.push(res.data);
         input.value = res.data.name;
@@ -191,7 +257,7 @@ async function createNewBrand(name) {
     }
 }
 
-// --- CROPPER (Imagen) ---
+// --- CROPPER ---
 function setupImageCropper() {
     const box = document.getElementById('image-preview-box');
     const fileInput = document.getElementById('image_file');
@@ -264,10 +330,11 @@ function setupImageCropper() {
     removeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         selectedImageFile = null;
+        originalImageUrl = null;
+        previewImg.src = '';
         previewImg.classList.add('u-hidden');
         removeBtn.classList.add('u-hidden');
         placeholder.classList.remove('u-hidden');
-        previewImg.src = '';
     });
 }
 
@@ -291,36 +358,53 @@ function setupSaveAction() {
         const price = parseFloat(document.getElementById('suggested_price').value);
         const isActive = document.getElementById('is_active').checked;
 
-        if (!selectedImageFile) { showToast('Falta imagen', 'error'); return; }
         if (!name) { showToast('Falta nombre', 'error'); return; }
         if (!mainCatId) { showToast('Falta categoría', 'error'); return; }
         if (!brandId) { showToast('Falta marca', 'error'); return; }
 
-        btn.disabled = true; btn.textContent = 'Subiendo imagen...';
+        btn.disabled = true; btn.textContent = 'Guardando...';
 
-        const fileToUpload = new File([selectedImageFile], `prod-${Date.now()}.jpg`, { type: 'image/jpeg' });
-        const uploadRes = await mobileApi.uploadProductImage(fileToUpload);
-        
-        if(!uploadRes.success) {
-            showToast('Error subiendo imagen', 'error');
-            btn.disabled = false; return;
+        let finalImageUrl = originalImageUrl;
+
+        // Si cambió la imagen, subirla
+        if (selectedImageFile) {
+            btn.textContent = 'Subiendo imagen...';
+            const fileToUpload = new File([selectedImageFile], `prod-${Date.now()}.jpg`, { type: 'image/jpeg' });
+            const uploadRes = await mobileApi.uploadProductImage(fileToUpload);
+            if(!uploadRes.success) {
+                showToast('Error al subir imagen', 'error');
+                btn.disabled = false; return;
+            }
+            finalImageUrl = uploadRes.url;
         }
 
-        btn.textContent = 'Guardando...';
-        const finalCatId = subCatId ? subCatId : mainCatId;
+        const finalCategoryId = subCatId ? subCatId : mainCatId;
         const data = {
-            name, category_id: finalCatId, brand_id: brandId,
+            name, category_id: finalCategoryId, brand_id: brandId,
             suggested_price: isNaN(price) ? 0 : price,
-            image_url: uploadRes.url, is_active: isActive
+            image_url: finalImageUrl,
+            is_active: isActive
         };
 
-        const res = await mobileApi.createProduct(data);
+        const res = await mobileApi.updateProduct(currentProductId, data);
         if(res.success) {
-            showToast('Guardado', 'success');
+            showToast('Producto actualizado', 'success');
             setTimeout(() => history.back(), 1500);
         } else {
-            showToast('Error al guardar', 'error');
-            btn.disabled = false; btn.textContent = 'Guardar Producto';
+            showToast(res.error || 'Error al actualizar', 'error');
+            btn.disabled = false; btn.textContent = 'Guardar Cambios';
+        }
+    });
+}
+
+// --- ELIMINAR (Provisorio, requiere endpoint) ---
+function setupDeleteAction() {
+    const btn = document.getElementById('btn-delete');
+    btn.addEventListener('click', () => {
+        // Aquí deberías llamar a mobileApi.deleteProduct(currentProductId)
+        // Por ahora solo muestra un mensaje o confirmación
+        if(confirm('¿Eliminar producto?')) {
+             showToast('Eliminación en desarrollo', 'info');
         }
     });
 }

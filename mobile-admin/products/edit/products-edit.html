@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nuevo Producto - SWAM</title>
+    <title>Editar Producto - SWAM</title>
     
     <link rel="stylesheet" href="/public/shared/styles/reset.css">
     <link rel="stylesheet" href="/public/shared/styles/variables.css">
@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="/mobile-admin/styles/mobile-theme.css">
     <link rel="stylesheet" href="/mobile-admin/components/bottom-nav/bottom-nav.css">
     <link rel="stylesheet" href="/mobile-admin/components/toast/toast.css">
-    <link rel="stylesheet" href="products-create.css">
+    
+    <link rel="stylesheet" href="products-edit.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     
@@ -24,8 +25,10 @@
         <button class="back-btn" onclick="history.back()" aria-label="Volver">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
         </button>
-        <h1 class="header-title">Nuevo Producto</h1>
-        <div style="width: 40px;"></div>
+        <h1 class="header-title">Editar Producto</h1>
+        <button id="btn-delete" class="icon-btn-danger" aria-label="Eliminar Producto">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4l1-1h4l1 1h4a2 2 0 0 1 2 2z"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        </button>
     </header>
 
     <main class="mobile-main-content">
@@ -33,11 +36,13 @@
         <div class="image-upload-container">
             <input type="file" id="image_file" accept="image/*" class="u-hidden">
             <div class="image-preview-box" id="image-preview-box">
+                <img id="preview-img" class="preview-img u-hidden" alt="Producto">
+                
                 <div class="upload-placeholder" id="upload-placeholder">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    <span>Subir Imagen</span>
+                    <span>Cambiar Imagen</span>
                 </div>
-                <img id="preview-img" class="preview-img u-hidden" alt="Vista previa">
+                
                 <button type="button" id="btn-remove-img" class="remove-img-btn u-hidden">×</button>
             </div>
         </div>
@@ -48,7 +53,7 @@
             <div class="input-icon-wrapper icon-purple">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
-            <input type="text" id="name" class="clean-input" placeholder="Nombre completo (Ej. Attack Shark X11)" autocomplete="off">
+            <input type="text" id="name" class="clean-input" placeholder="Nombre completo" autocomplete="off">
         </div>
 
         <div class="form-row-card">
@@ -56,7 +61,6 @@
                 <input type="text" id="cat_main_display" class="clean-input pointer" placeholder="Categoría" readonly>
                 <input type="hidden" id="cat_main_id">
                 <svg class="chevron-down" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                
                 <div id="cat-main-dropdown" class="custom-dropdown u-hidden"></div>
             </div>
             
@@ -64,18 +68,16 @@
                 <input type="text" id="cat_sub_display" class="clean-input pointer" placeholder="Subcat." readonly>
                 <input type="hidden" id="cat_sub_id">
                 <svg class="chevron-down" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                
                 <div id="cat-sub-dropdown" class="custom-dropdown u-hidden"></div>
             </div>
         </div>
 
-        <div class="input-card custom-select-container z-high" id="brand-wrapper">
+        <div class="input-card custom-select-container" id="brand-wrapper">
             <div class="input-icon-wrapper icon-orange">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"></path><path d="M4 10V3"></path><path d="M12 21v-9"></path><path d="M12 8V3"></path><path d="M20 21v-5"></path><path d="M20 12V3"></path><path d="M1 14h6"></path><path d="M9 8h6"></path><path d="M17 16h6"></path></svg>
             </div>
-            <input type="text" id="brand_input" class="clean-input" placeholder="Buscar o crear marca..." autocomplete="off">
+            <input type="text" id="brand_input" class="clean-input" placeholder="Buscar marca..." autocomplete="off">
             <input type="hidden" id="brand_id">
-            
             <div id="brand-dropdown" class="custom-dropdown u-hidden"></div>
         </div>
 
@@ -84,7 +86,7 @@
             <div class="input-icon-wrapper icon-green">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
             </div>
-            <input type="number" id="suggested_price" class="clean-input" placeholder="Precio de Venta (Opcional)" step="0.01">
+            <input type="number" id="suggested_price" class="clean-input" placeholder="Precio de Venta" step="0.01">
         </div>
 
         <h3 class="section-label">Estado</h3>
@@ -93,10 +95,10 @@
                 <div class="input-icon-wrapper icon-grey">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </div>
-                <span class="switch-text" id="status-text" style="color: #10b981;">Producto Activo</span>
+                <span class="switch-text" id="status-text">Producto Activo</span>
             </div>
             <label class="switch">
-                <input type="checkbox" id="is_active" checked>
+                <input type="checkbox" id="is_active">
                 <span class="slider round"></span>
             </label>
         </div>
@@ -106,7 +108,7 @@
 
     <footer class="form-footer">
         <button id="btn-save" class="action-btn action-btn--primary">
-            Guardar Producto
+            Guardar Cambios
         </button>
     </footer>
 
@@ -135,6 +137,6 @@
     <script src="/mobile-admin/scripts/mobile-api.js"></script>
     
     <script src="/mobile-admin/components/toast/toast.js"></script>
-    <script src="products-create.js"></script> 
+    <script src="products-edit.js"></script> 
 </body>
 </html>

@@ -1,61 +1,365 @@
-/* mobile-admin/components/mobile-header/mobile-header.js */
+/* mobile-admin/scripts/mobile-api.js */
 
-async function loadMobileHeader() {
-    const container = document.getElementById('mobile-header-container');
-    if (!container) return;
+const mobileApi = {
+    
+    // ==========================================
+    // 1. MÓDULO DE VENTAS
+    // ==========================================
 
-    try {
-        const response = await fetch('/mobile-admin/components/mobile-header/mobile-header.html');
-        if (response.ok) {
-            container.innerHTML = await response.text();
-            initializeHeaderData();
-            initializeNotifications();
-        } else {
-            console.error('Error cargando header:', response.status);
-        }
-    } catch (error) {
-        console.error('Error en loadMobileHeader:', error);
-    }
-}
+    async getSalesHistory(page = 1, pageSize = 20, searchTerm = '') {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión a BD' };
+        try {
+            const start = (page - 1) * pageSize;
+            const end = start + pageSize - 1;
+            
+            let query = supabaseClient
+                .from('sales')
+                .select(`
+                    id, sale_code, total_sale, sale_date, created_at, 
+                    customers ( full_name )
+                `, { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(start, end);
 
-function initializeHeaderData() {
-    const fullName = localStorage.getItem('swam_user_full_name') || 'Admin';
-    const firstName = fullName.split(' ')[0];
-    const initial = firstName.charAt(0).toUpperCase();
-
-    const nameEl = document.getElementById('mobile-header-username');
-    const avatarEl = document.getElementById('mobile-header-avatar');
-
-    if (nameEl) nameEl.textContent = firstName;
-    if (avatarEl) avatarEl.textContent = initial;
-}
-
-function initializeNotifications() {
-    const btnNotif = document.getElementById('btn-notifications');
-    const btnClose = document.getElementById('btn-close-notif');
-    const modal = document.getElementById('notifications-modal');
-
-    if (btnNotif && modal) {
-        // CAMBIO: Toggle de clase 'is-open' para activar animación
-        btnNotif.addEventListener('click', (e) => {
-            e.stopPropagation();
-            modal.classList.toggle('is-open');
-        });
-
-        if (btnClose) {
-            btnClose.addEventListener('click', (e) => {
-                e.stopPropagation();
-                modal.classList.remove('is-open');
-            });
-        }
-
-        // Cerrar al hacer click fuera
-        document.addEventListener('click', (e) => {
-            if (!modal.contains(e.target) && !btnNotif.contains(e.target)) {
-                modal.classList.remove('is-open');
+            if (searchTerm) {
+                query = query.ilike('sale_code', `%${searchTerm}%`);
             }
-        });
-    }
-}
 
-window.loadMobileHeader = loadMobileHeader;
+            const { data, error, count } = await query;
+            if (error) throw error;
+
+            const sales = data.map(sale => ({
+                id: sale.id,
+                code: sale.sale_code || '---',
+                customer: sale.customers?.full_name || 'Cliente General', 
+                amount: parseFloat(sale.total_sale || 0),
+                date: sale.sale_date || sale.created_at,
+                status: 'completed'
+            }));
+
+            return { success: true, data: sales, total: count };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async createSale(salePayload) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const saleData = {
+                sale_code: `V-${Date.now().toString().slice(-6)}`,
+                sale_date: new Date().toISOString(),
+                total_sale: salePayload.total,
+                customer_id: salePayload.customerId, 
+                payment_method_id: salePayload.paymentMethodId,
+            };
+            const { data, error } = await supabaseClient.from('sales').insert([saleData]).select().single();
+            if (error) throw error;
+            return { success: true, data: data };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async searchProducts(term) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('id, name, sku, suggested_price, is_active')
+                .ilike('name', `%${term}%`)
+                .eq('is_active', true)
+                .limit(10);
+            if(error) throw error;
+            
+            return { success: true, data: data.map(p => ({ 
+                id: p.id, name: p.name, sku: p.sku, price: parseFloat(p.suggested_price), stock: 10 
+            })) };
+        } catch(e) { return { success: false, error: e.message }; }
+    },
+
+    // ==========================================
+    // 2. MÓDULO DE CLIENTES
+    // ==========================================
+
+    async getCustomers(page = 1, pageSize = 20, search = '', onlyActive = true) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const start = (page - 1) * pageSize;
+            
+            let query = supabaseClient
+                .from('customers')
+                .select('*', { count: 'exact' })
+                .order('full_name', { ascending: true })
+                .range(start, start + pageSize - 1);
+
+            if (onlyActive) {
+                query = query.eq('is_active', true);
+            }
+            if (search) {
+                query = query.or(`full_name.ilike.%${search}%,document_number.ilike.%${search}%`);
+            }
+            
+            const { data, error, count } = await query;
+            if (error) throw error;
+            return { success: true, data: data, total: count };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async getCustomerById(id) {
+        if (!supabaseClient) return { success: false };
+        try {
+            const { data, error } = await supabaseClient.from('customers').select('*').eq('id', id).single();
+            if (error) throw error;
+            return { success: true, data: data };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async createCustomer(data) {
+        if (!supabaseClient) return { success: false };
+        try { 
+            const { data: d, error } = await supabaseClient.from('customers').insert([data]).select().single(); 
+            if(error) throw error; 
+            return { success: true, data: d }; 
+        } catch(e) { return { success: false, error: e.message }; }
+    },
+
+    async updateCustomer(id, data) {
+        if (!supabaseClient) return { success: false };
+        try {
+            const { data: d, error } = await supabaseClient.from('customers').update(data).eq('id', id).select().single();
+            if (error) throw error;
+            return { success: true, data: d };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async deleteCustomer(id) {
+        if (!supabaseClient) return { success: false };
+        try {
+            const { error } = await supabaseClient.from('customers').delete().eq('id', id);
+            if (error) {
+                if (error.code === '23503') throw new Error('No se puede eliminar: El cliente tiene ventas registradas.');
+                throw error;
+            }
+            return { success: true };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async getCustomerSales(customerId, limit = 5) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const { data, error } = await supabaseClient.from('sales').select('id, sale_code, total_sale, created_at').eq('customer_id', customerId).order('created_at', { ascending: false }).limit(limit);
+            if (error) throw error;
+            return { success: true, data: data.map(s => ({ id: s.id, code: s.sale_code, amount: parseFloat(s.total_sale), date: s.created_at })) };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async getCustomerCredits(id) {
+         if (!supabaseClient) return { success: false };
+         try {
+             const { data, error } = await supabaseClient.from('customers').select('credit_limit, current_debt').eq('id', id).single();
+             if(error) throw error;
+             return { success: true, data: { debt: data.current_debt || 0, limit: data.credit_limit || 0 } };
+         } catch(e) { return { success: false, error: e.message }; }
+    },
+
+    // ==========================================
+    // 3. MÓDULO DE PRODUCTOS (INVENTARIO)
+    // ==========================================
+
+    async getProducts(page = 1, pageSize = 20, search = '', filter = 'active') {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const start = (page - 1) * pageSize;
+            
+            let query = supabaseClient
+                .from('products')
+                .select(`
+                    id, name, suggested_price, image_url, is_active, sku,
+                    brands ( name ),
+                    batches ( quantity_available )
+                `, { count: 'exact' })
+                .order('created_at', { ascending: false }) // Mostrar los más nuevos primero
+                .range(start, start + pageSize - 1);
+
+            if (filter === 'active') {
+                query = query.eq('is_active', true);
+            }
+
+            if (search) {
+                query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
+            }
+
+            const { data, error, count } = await query;
+            if (error) throw error;
+
+            let products = data.map(p => {
+                const totalStock = p.batches 
+                    ? p.batches.reduce((sum, b) => sum + (b.quantity_available || 0), 0)
+                    : 0;
+                
+                return {
+                    id: p.id,
+                    sku: p.sku || '',
+                    name: p.name,
+                    brand: p.brands?.name || 'Genérico',
+                    suggested_price: p.suggested_price,
+                    image_url: p.image_url,
+                    is_active: p.is_active,
+                    stock: totalStock
+                };
+            });
+
+            if (filter === 'low_stock') {
+                products = products.filter(p => p.stock < 10);
+            }
+
+            return { success: true, data: products, total: count };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async createProduct(data) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const { data: d, error } = await supabaseClient
+                .from('products')
+                .insert([data])
+                .select()
+                .single();
+            if (error) throw error;
+            return { success: true, data: d };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async uploadProductImage(file) {
+        if (!supabaseClient) return { success: false, error: 'Sin conexión' };
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabaseClient.storage
+                .from('product-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
+            return { success: true, url: data.publicUrl };
+        } catch (error) {
+            console.error('Error upload:', error);
+            return { success: false, error: 'Error al subir imagen' };
+        }
+    },
+
+    async getCategoriesTree() {
+        if (!supabaseClient) return { success: false, data: [] };
+        try {
+            const { data, error } = await supabaseClient
+                .from('product_categories')
+                .select('id, name, parent_id')
+                .eq('is_active', true)
+                .order('name');
+            
+            if (error) throw error;
+
+            const parents = data.filter(c => c.parent_id === null);
+            const children = data.filter(c => c.parent_id !== null);
+
+            const tree = parents.map(parent => ({
+                ...parent,
+                subcategories: children.filter(child => child.parent_id === parent.id)
+            }));
+
+            return { success: true, data: tree };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async getBrands(search = '') {
+        if (!supabaseClient) return { success: false, data: [] };
+        try {
+            let query = supabaseClient
+                .from('brands')
+                .select('id, name')
+                .eq('is_active', true)
+                .order('name');
+            if(search) query = query.ilike('name', `%${search}%`);
+            const { data, error } = await query;
+            if (error) throw error;
+            return { success: true, data: data };
+        } catch (error) { return { success: false, error: error.message }; }
+    },
+
+    async createBrand(name) {
+        if (!supabaseClient) return { success: false };
+        try {
+            const { data, error } = await supabaseClient
+                .from('brands')
+                .insert([{ name: name }])
+                .select()
+                .single();
+            if (error) throw error;
+            return { success: true, data: data };
+        } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ==========================================
+    // 4. SUSCRIPCIÓN EN TIEMPO REAL (CON AVISOS)
+    // ==========================================
+    subscribeToProducts(callback) {
+        if (!supabaseClient) return null;
+        
+        console.log('🔌 Intentando conectar Realtime...');
+        
+        const channel = supabaseClient.channel('mobile-products-realtime')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'products' },
+                (payload) => {
+                    console.log('🔔 Cambio en producto:', payload.eventType);
+                    // AVISO VISUAL EN EL CELULAR
+                    if(typeof showToast === 'function') showToast('Actualizando inventario...', 'success');
+                    callback(); 
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'batches' }, 
+                (payload) => {
+                    console.log('🔔 Cambio en stock:', payload.eventType);
+                    callback();
+                }
+            )
+            .subscribe((status) => {
+                console.log('Estado de suscripción:', status);
+                
+                if (status === 'SUBSCRIBED') {
+                    // Si ves esto en el celular, la conexión es exitosa
+                    if(typeof showToast === 'function') showToast('Conectado en tiempo real 🟢', 'success');
+                }
+                
+                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    // Si ves esto, hay problemas de red
+                    if(typeof showToast === 'function') showToast('Error de conexión en vivo 🔴', 'error');
+                }
+            });
+            
+        return channel;
+    },
+
+    // ==========================================
+    // 5. UTILIDADES
+    // ==========================================
+
+    async getPaymentMethods() {
+        if (!supabaseClient) return { success: false, data: [] };
+        const { data } = await supabaseClient.from('payment_methods').select('id, name').eq('is_active', true);
+        return { success: true, data: data || [] };
+    },
+
+    async getDashboardData() {
+        return { success: true, dailySales: 0, activeOrders: 0, activeCustomers: 0, productsInStock: 0 };
+    },
+    
+    async getRecentSales(limit=3) { return this.getSalesHistory(1, limit); },
+    
+    async getInventoryAlerts(limit=3) { return { success: true, data: [] }; }
+};
+
+window.mobileApi = mobileApi;
