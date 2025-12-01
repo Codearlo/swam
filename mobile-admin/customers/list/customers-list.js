@@ -2,28 +2,53 @@
 
 let currentPage = 1;
 let currentSearch = '';
-let currentFilter = 'active'; // 'active' (Activos) o 'all' (Todos)
+let currentFilter = 'active'; 
+let isDeleting = false;
 
-// --- SOLUCIÓN AL PROBLEMA DE REFRESCO ---
-// Usamos 'pageshow' en lugar de solo DOMContentLoaded.
-// Esto detecta cuando el usuario regresa a esta página usando el botón "Atrás" del navegador
-// y fuerza la recarga de la lista para mostrar los cambios recientes (como eliminaciones).
+// Refrescar lista al volver atrás (Solución Zombie)
 window.addEventListener('pageshow', (event) => {
-    // Si la página ya estaba cargada en memoria (cache del navegador), recargamos los clientes
-    // O si es la primera carga, también funciona.
     loadCustomers();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- 1. CARGA DE INTERFAZ (RESTITUÍDO) ---
+    
+    // Cargar Header Superior
+    if(typeof loadMobileHeader === 'function') {
+        await loadMobileHeader();
+    }
+    
+    // Cargar Barra de Navegación Inferior
+    try {
+        const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
+        if(resp.ok) {
+            const navContainer = document.getElementById('bottom-nav-container');
+            if (navContainer) {
+                navContainer.innerHTML = await resp.text();
+                // Marcar pestaña activa
+                document.getElementById('nav-customers')?.classList.add('is-active');
+                
+                // Configurar botón central (+)
+                const mainBtn = document.querySelector('.bottom-nav-item--main');
+                if(mainBtn) {
+                    // Si es un link 'a', poner href, si es button, manejar click
+                    if(mainBtn.tagName === 'A') {
+                        mainBtn.href = '/mobile-admin/customers/create/customers-create.html';
+                    } else {
+                        mainBtn.onclick = () => window.location.href = '/mobile-admin/customers/create/customers-create.html';
+                    }
+                }
+            }
+        }
+    } catch(e) { console.error('Error cargando menú', e); }
+
+    // --- 2. LÓGICA DE LA LISTA ---
     setupTabs();
     setupSearch();
-    // loadCustomers() se llama automáticamente por el evento pageshow de arriba,
-    // pero lo dejamos aquí por seguridad para navegadores antiguos.
     loadCustomers();
 });
 
 function setupTabs() {
-    // Seleccionamos por atributo data-filter para evitar errores de ID null
     const btnActive = document.querySelector('.tab-btn[data-filter="active"]');
     const btnAll = document.querySelector('.tab-btn[data-filter="all"]');
 
@@ -45,7 +70,6 @@ function setupTabs() {
 function setActiveTab(tab) {
     currentFilter = tab;
     
-    // Actualizar estilos visuales (Clase .active)
     const allTabs = document.querySelectorAll('.tab-btn');
     allTabs.forEach(btn => {
         if (btn.dataset.filter === tab) {
@@ -55,7 +79,6 @@ function setActiveTab(tab) {
         }
     });
     
-    // Reiniciar y recargar lista
     currentPage = 1;
     loadCustomers();
 }
@@ -80,13 +103,11 @@ async function loadCustomers() {
     const listContainer = document.getElementById('customers-list-container');
     if (!listContainer) return;
 
-    // Spinner de carga
     listContainer.innerHTML = '<div class="u-flex-center" style="padding:40px"><div class="spin" style="width:24px;height:24px;border:2px solid #fff;border-top-color:transparent;border-radius:50%"></div></div>';
 
-    // Lógica de filtro para la API
+    // Si filtro es 'active', onlyActive=true. Si es 'all', onlyActive=false.
     const onlyActive = (currentFilter === 'active');
     
-    // Llamada a la API
     const res = await mobileApi.getCustomers(currentPage, 20, currentSearch, onlyActive);
 
     listContainer.innerHTML = '';
@@ -104,16 +125,11 @@ async function loadCustomers() {
     res.data.forEach(c => {
         const div = document.createElement('a');
         div.className = 'customer-card';
-        // Al hacer click, lleva al detalle (donde ahora está el botón de borrar)
         div.href = `../detail/customers-detail.html?id=${c.id}`;
         
-        // Determinar estado y estilos
         const isActive = c.is_active !== false; 
         const statusClass = isActive ? 'status-active' : 'status-inactive';
         const statusText = isActive ? 'ACTIVO' : 'INACTIVO';
-
-        // --- CAMBIO: SE ELIMINÓ EL BOTÓN DE BORRAR DE AQUÍ ---
-        // Ahora toda la tarjeta es clickeable para ir al detalle.
 
         div.innerHTML = `
             <div class="customer-card-left">

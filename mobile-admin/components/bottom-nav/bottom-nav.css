@@ -6,12 +6,12 @@
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: rgba(9, 9, 11, 0.95); 
+    background-color: rgba(9, 9, 11, 0.95); /* Fondo oscuro casi sólido */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(139, 92, 246, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 
 .bottom-nav {
@@ -19,7 +19,7 @@
     justify-content: space-between;
     align-items: center;
     height: 70px;
-    padding: 0 24px;
+    padding: 0 20px;
     max-width: 600px;
     margin: 0 auto;
     position: relative;
@@ -30,72 +30,77 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    color: #52525b; 
+    gap: 4px;
+    color: #52525b; /* Color gris apagado por defecto */
     text-decoration: none;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 500;
-    width: 60px;
-    background: none;
+    width: 64px; 
+    height: 56px; 
+    background: transparent;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease; /* Transición rápida */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .bottom-nav-item svg {
-    width: 24px;
+    width: 24px; /* Un poco más grande para compensar la falta de caja */
     height: 24px;
     stroke-width: 2px;
+    transition: stroke 0.2s ease, transform 0.2s ease;
 }
 
+/* --- ESTADO ACTIVO (MINIMALISTA) --- */
 .bottom-nav-item.is-active {
-    color: var(--mobile-accent, #8b5cf6);
+    background-color: transparent; /* Sin fondo */
+    box-shadow: none;              /* Sin sombra */
+    color: var(--mobile-accent, #8b5cf6); /* El texto se pinta de morado */
+    font-weight: 600;
 }
 
 .bottom-nav-item.is-active svg {
-    stroke: var(--mobile-accent, #8b5cf6);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
-    transform: translateY(-2px);
+    stroke: var(--mobile-accent, #8b5cf6); /* El icono se pinta de morado */
+    transform: translateY(-2px); /* Pequeña elevación visual */
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4)); /* Brillo sutil solo al icono */
 }
 
-/* --- Botón Central Flotante (Rectangular Redondeado) --- */
+/* --- Botón Central Flotante (Se mantiene igual) --- */
 .bottom-nav-item--main {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: -20px; /* Ajustado ligeramente */
+    top: -24px;
     width: auto;
+    height: auto;
     overflow: visible;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 .main-btn-circle {
-    width: 56px; /* Ligeramente más compacto */
-    height: 56px;
-    
-    /* CAMBIO: De 50% a 14px para hacerlo cuadrado redondeado (Squircle) */
-    border-radius: 14px; 
-    
+    width: 58px;
+    height: 58px;
+    border-radius: 18px; 
     background: var(--mobile-gradient, linear-gradient(135deg, #8b5cf6 0%, #4c1d95 100%));
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-    
-    /* Borde negro más grueso para separar visualmente del fondo */
-    border: 4px solid #000000; 
-    
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    border: 4px solid rgba(9, 9, 11, 1);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* Rotar ligeramente el cuadrado da un estilo diamante opcional, pero lo dejamos recto */
 }
 
 .bottom-nav-item--main:active .main-btn-circle {
-    transform: scale(0.9);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    transform: scale(0.92);
+    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
 }
 
 .bottom-nav-item--main svg {
     stroke: #ffffff;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
+    filter: none;
+    transform: none;
 }
