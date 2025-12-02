@@ -5,9 +5,8 @@ let currentSearch = '';
 let currentFilter = 'active'; 
 let productsSubscription = null;
 
-// Evento para refrescar al volver (back button)
+// Evento para refrescar al volver
 window.addEventListener('pageshow', (event) => {
-    // Si la página se restauró desde la caché (bfcache), recargamos
     if (event.persisted) {
         loadProducts(true);
     }
@@ -17,29 +16,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Cargar Header
     if(typeof loadMobileHeader === 'function') await loadMobileHeader();
     
-    // 2. Cargar Bottom Nav y ACTIVAR EL ICONO DE PRODUCTOS
+    // 2. Cargar Bottom Nav
     try {
         const resp = await fetch('/mobile-admin/components/bottom-nav/bottom-nav.html');
         if(resp.ok) {
             document.getElementById('bottom-nav-container').innerHTML = await resp.text();
             
-            // Activar icono "Productos"
-            const activeLink = document.getElementById('nav-products');
-            if (activeLink) activeLink.classList.add('is-active');
+            // Activar icono
+            document.getElementById('nav-products')?.classList.add('is-active');
             
-            // Reconfigurar botón central (+) para ir a Crear Producto
+            // Configurar botón central (+)
             const mainBtn = document.querySelector('.bottom-nav-item--main');
             if (mainBtn) {
-                mainBtn.href = '../create/products-create.html'; 
-                mainBtn.setAttribute('aria-label', 'Agregar Nuevo Producto');
+                // Si es un link <a>
+                if(mainBtn.tagName === 'A') {
+                    mainBtn.href = '../create/products-create.html';
+                    mainBtn.setAttribute('aria-label', 'Agregar Nuevo Producto');
+                } else {
+                    // Si es un <button>
+                    mainBtn.onclick = () => window.location.href = '../create/products-create.html';
+                }
             }
             
-            // Configurar menú lateral
+            // Menú lateral
             const menuBtn = document.getElementById('mobile-menu-trigger');
             if(menuBtn) {
                 menuBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const sidebar = document.querySelector('.admin-sidebar'); // Si usas sidebar móvil
+                    const sidebar = document.querySelector('.admin-sidebar');
                     if(sidebar) sidebar.classList.add('is-open');
                 });
             }
@@ -53,15 +57,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Cargar Datos
     await loadProducts();
 
-    // 5. Suscripción Realtime (Actualización automática)
+    // 5. Suscripción Realtime
     if (typeof mobileApi !== 'undefined' && mobileApi.subscribeToProducts) {
         productsSubscription = mobileApi.subscribeToProducts(() => {
-            loadProducts(true); // Recarga silenciosa
+            loadProducts(true);
         });
     }
 });
 
-// Limpiar suscripción al salir
 window.addEventListener('beforeunload', () => {
     if (productsSubscription && typeof supabaseClient !== 'undefined') {
         supabaseClient.removeChannel(productsSubscription);
@@ -99,7 +102,6 @@ async function loadProducts(isBackgroundUpdate = false) {
     const container = document.getElementById('products-list-container');
     if (!container) return;
 
-    // Spinner solo si no es actualización de fondo
     if (!isBackgroundUpdate) {
         container.innerHTML = '<div class="u-flex-center" style="padding:40px"><div class="spin" style="width:24px;height:24px;border:2px solid #fff;border-top-color:transparent;border-radius:50%"></div></div>';
     }
@@ -111,7 +113,6 @@ async function loadProducts(isBackgroundUpdate = false) {
 
         const res = await mobileApi.getProducts(currentPage, 20, currentSearch, currentFilter);
 
-        // Limpiar para renderizar
         if (isBackgroundUpdate) container.innerHTML = '';
 
         if (!res.success) {
@@ -129,45 +130,45 @@ async function loadProducts(isBackgroundUpdate = false) {
         res.data.forEach(p => {
             const priceStr = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(p.suggested_price || 0);
             
-            // Lógica de Stock
+            // Lógica de Stock Badge
             let stockClass = 'stock-high';
-            let stockText = `${p.stock} unid.`;
+            let stockText = `${p.stock} Unid.`;
             
             if (p.stock <= 0) { stockClass = 'stock-none'; stockText = 'Agotado'; }
             else if (p.stock < 5) { stockClass = 'stock-low'; stockText = `${p.stock} (Bajo)`; }
             else if (p.stock < 10) { stockClass = 'stock-medium'; }
 
-            // Crear Tarjeta (Link a Editar)
+            // Imagen (Si no hay, usa icono genérico)
+            const imgHtml = p.image_url 
+                ? `<img src="${p.image_url}" alt="${p.name}" class="product-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                   <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                   </div>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>`;
+
             const card = document.createElement('a');
             card.className = 'product-card';
             card.href = `../edit/products-edit.html?id=${p.id}`;
             
-            if(isBackgroundUpdate) card.style.animation = 'fadeIn 0.3s ease';
-
-            // Manejo de imagen
-            const imgHtml = p.image_url 
-                ? `<img src="${p.image_url}" alt="${p.name}" class="product-thumb" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                   <div class="product-image-box" style="display:none; border:none; width:100%; height:100%;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>`
-                : `<div class="product-image-box" style="border:none; width:100%; height:100%;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>`;
-
+            // Estructura idéntica a Sales
             card.innerHTML = `
-                <div class="product-image-box">${imgHtml}</div>
-                
-                <div class="product-details">
-                    <h4 class="product-name">${p.name}</h4>
-                    <span class="product-brand">${p.brand || 'Generico'}</span>
-                    
-                    <div class="stock-badge ${stockClass}">
-                        <span class="stock-dot"></span>
-                        ${stockText}
+                <div class="product-card-left">
+                    <div class="product-icon-box">
+                        ${imgHtml}
+                    </div>
+                    <div class="product-details">
+                        <h4 class="product-name">${p.name}</h4>
+                        <div class="product-meta">
+                            <span>${p.brand || 'Genérico'}</span>
+                            <span style="opacity:0.3">•</span>
+                            <span>${p.sku || 'S/SKU'}</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="product-right">
-                    <span class="product-price">${priceStr}</span>
-                    <span class="status-indicator ${p.is_active ? 'active' : ''}">
-                        ${p.is_active ? 'Activo' : 'Inactivo'}
-                    </span>
+                <div class="product-card-right">
+                    <div class="product-price">${priceStr}</div>
+                    <span class="stock-badge ${stockClass}">${stockText}</span>
                 </div>
             `;
             container.appendChild(card);

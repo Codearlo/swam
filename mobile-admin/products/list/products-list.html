@@ -25,14 +25,14 @@
 
     <main class="mobile-main-content">
         
-        <div class="page-title-row">
-            <h1 class="page-title">Inventario</h1>
+        <div class="page-header">
+            <h2 class="page-title">Inventario</h2>
+            
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-filter="active">Activos</button>
+                <button class="tab-btn" data-filter="low_stock">Bajo Stock</button>
+                <button class="tab-btn" data-filter="all">Todos</button>
             </div>
-
-        <div class="filter-tabs">
-            <button class="tab-btn active" data-filter="active">Activos</button>
-            <button class="tab-btn" data-filter="low_stock">Stock Bajo</button>
-            <button class="tab-btn" data-filter="all">Todos</button>
         </div>
 
         <div class="search-container">
@@ -58,9 +58,6 @@
     <script src="/public/shared/scripts/auth-utils.js"></script>
 
     <script src="/mobile-admin/scripts/services/products-service.js"></script>
-    <script src="/mobile-admin/scripts/services/customers-service.js"></script>
-    <script src="/mobile-admin/scripts/services/sales-service.js"></script>
-
     <script src="/mobile-admin/scripts/mobile-api.js"></script>
     
     <script src="/mobile-admin/components/mobile-header/mobile-header.js"></script>

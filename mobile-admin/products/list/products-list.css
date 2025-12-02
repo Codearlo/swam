@@ -14,30 +14,28 @@ body {
     gap: 16px;
 }
 
-/* Header */
-.page-title-row {
+/* --- HEADER --- */
+.page-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .page-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: #ffffff;
     margin: 0;
     letter-spacing: -0.5px;
 }
 
-/* Filtros */
+/* --- FILTROS (TABS) --- */
 .filter-tabs {
     display: flex;
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px; 
+    border-radius: 8px; 
     padding: 4px;
-    gap: 4px;
 }
 
 .tab-btn {
@@ -45,23 +43,22 @@ body {
     background: transparent;
     border: none;
     color: var(--mobile-text-muted, #a1a1aa);
-    padding: 10px 4px;
+    padding: 8px;
     font-size: 0.85rem;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
-    white-space: nowrap;
 }
 
 .tab-btn.active {
-    background-color: #27272a;
+    background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Buscador */
+/* --- BUSCADOR --- */
 .search-container { margin-bottom: 4px; }
 
 .search-input-wrapper {
@@ -70,13 +67,8 @@ body {
     align-items: center;
     background-color: #0c0c0e;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 0 12px;
-    transition: border-color 0.2s;
-}
-
-.search-input-wrapper:focus-within {
-    border-color: var(--mobile-accent, #8b5cf6);
 }
 
 .search-input {
@@ -84,138 +76,124 @@ body {
     background: transparent;
     border: none;
     color: #ffffff;
-    padding: 16px 10px;
+    padding: 14px 10px;
     font-size: 0.95rem;
     outline: none;
     font-family: inherit;
 }
 
-/* Lista */
+/* --- LISTA DE PRODUCTOS --- */
 .products-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
+/* Tarjeta unificada (Igual a Sales) */
 .product-card {
     background-color: var(--mobile-card-bg, #09090b);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 16px;
-    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 14px;
     text-decoration: none;
     color: inherit;
-    position: relative;
-    overflow: hidden;
     transition: background-color 0.2s;
 }
 
 .product-card:active {
-    background-color: rgba(255,255,255,0.08);
+    background-color: rgba(255, 255, 255, 0.08);
     border-color: var(--mobile-accent, #8b5cf6);
 }
 
-/* Imagen */
-.product-image-box {
-    width: 64px;
-    height: 64px;
-    background-color: #18181b;
-    border-radius: 10px;
+/* Lado Izquierdo (Imagen + Textos) */
+.product-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0; /* Para que el texto se corte si es largo */
+}
+
+/* Caja de Imagen/Icono */
+.product-icon-box {
+    width: 42px;
+    height: 42px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #a78bfa;
     flex-shrink: 0;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.05);
-    color: #52525b;
+    overflow: hidden; /* Para recortar la imagen real */
 }
 
 .product-thumb {
-    width: 100%; height: 100%; object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* Detalles */
+/* Textos */
 .product-details {
-    flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+    overflow: hidden;
 }
 
 .product-name {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.product-brand {
+.product-meta {
     font-size: 0.75rem;
     color: #a1a1aa;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-}
-
-/* Badge de Stock */
-.stock-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #71717a;
+    gap: 6px;
 }
 
-.stock-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-}
-
-.stock-high { color: #10b981; } 
-.stock-high .stock-dot { background-color: #10b981; box-shadow: 0 0 5px rgba(16,185,129,0.5); }
-
-.stock-medium { color: #f59e0b; }
-.stock-medium .stock-dot { background-color: #f59e0b; }
-
-.stock-low { color: #ef4444; }
-.stock-low .stock-dot { background-color: #ef4444; }
-
-.stock-none { color: #52525b; }
-.stock-none .stock-dot { background-color: #52525b; }
-
-/* Precio y Estado */
-.product-right {
+/* Lado Derecho (Precio + Badge) */
+.product-card-right {
+    text-align: right;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
-    justify-content: space-between;
-    height: 100%;
+    gap: 2px;
+    margin-left: 10px;
 }
 
 .product-price {
-    font-size: 1rem;
     font-weight: 800;
+    font-size: 1rem;
     color: #ffffff;
 }
 
-.status-indicator {
-    font-size: 0.65rem;
+/* Badges de Stock */
+.stock-badge {
+    font-size: 0.7rem;
     padding: 2px 6px;
     border-radius: 4px;
-    background: rgba(255,255,255,0.05);
-    color: #71717a;
+    font-weight: 600;
+    white-space: nowrap;
 }
-.status-indicator.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+.stock-high { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.stock-medium { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.stock-low { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.stock-none { color: #52525b; background: rgba(255, 255, 255, 0.05); }
 
 /* Utilidades */
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 .u-flex-center { display: flex; justify-content: center; align-items: center; width: 100%; }
-.u-hidden { display: none !important; }

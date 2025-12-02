@@ -17,10 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 1. Cargar datos maestros
     await Promise.all([loadCategories(), loadBrands()]);
     
-    // 2. Setup UI
     setupFloatingDropdown('cat-main-wrapper', 'cat-main-dropdown');
     setupFloatingDropdown('cat-sub-wrapper', 'cat-sub-dropdown');
     setupFloatingDropdown('brand-wrapper', 'brand-dropdown');
@@ -32,11 +30,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupSaveAction();
     setupDeleteAction();
 
-    // 3. Cargar datos del producto
     await loadProductData(currentProductId);
 });
 
 async function loadProductData(id) {
+    if (typeof mobileApi === 'undefined') return;
+
     const res = await mobileApi.getProductById(id);
     if (!res.success || !res.data) {
         showToast('Error cargando producto', 'error');
@@ -45,12 +44,11 @@ async function loadProductData(id) {
 
     const p = res.data;
 
-    // Llenar campos simples
     document.getElementById('name').value = p.name;
     document.getElementById('suggested_price').value = p.suggested_price;
     
-    // Imagen
     originalImageUrl = p.image_url;
+    
     if (originalImageUrl) {
         const preview = document.getElementById('preview-img');
         preview.src = originalImageUrl;
@@ -59,34 +57,27 @@ async function loadProductData(id) {
         document.getElementById('btn-remove-img').classList.remove('u-hidden');
     }
 
-    // Switch Estado
     const sw = document.getElementById('is_active');
     sw.checked = p.is_active;
     sw.dispatchEvent(new Event('change'));
 
-    // Marca
     if (p.brands) {
         document.getElementById('brand_input').value = p.brands.name;
         document.getElementById('brand_id').value = p.brand_id;
     }
 
-    // Categoría: Detectar si es subcategoría o principal
     if (p.category_id) {
         let found = false;
-        
-        // 1. ¿Es una categoría padre?
         const parentCat = categoryTree.find(c => c.id == p.category_id);
         if (parentCat) {
             selectCategory(parentCat);
             found = true;
         } else {
-            // 2. ¿Es una subcategoría?
             for (const parent of categoryTree) {
                 if (parent.subcategories) {
                     const sub = parent.subcategories.find(s => s.id == p.category_id);
                     if (sub) {
-                        selectCategory(parent); // Selecciona padre
-                        // Selecciona hijo manualmente
+                        selectCategory(parent);
                         document.getElementById('cat_sub_display').value = sub.name;
                         document.getElementById('cat_sub_id').value = sub.id;
                         found = true;
@@ -98,7 +89,7 @@ async function loadProductData(id) {
     }
 }
 
-// --- DROPDOWNS FLOTANTES ---
+// ... (Funciones UI auxiliares igual que antes) ...
 function setupFloatingDropdown(wrapperId, dropdownId) {
     const wrapper = document.getElementById(wrapperId);
     const dropdown = document.getElementById(dropdownId);
@@ -140,8 +131,8 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// --- CATEGORÍAS ---
 async function loadCategories() {
+    if (typeof mobileApi === 'undefined') return;
     const res = await mobileApi.getCategoriesTree();
     if(res.success) categoryTree = res.data;
 }
@@ -169,7 +160,6 @@ function renderCategories(dropdown) {
 function selectCategory(cat) {
     document.getElementById('cat_main_display').value = cat.name;
     document.getElementById('cat_main_id').value = cat.id;
-    
     const subDisplay = document.getElementById('cat_sub_display');
     const subId = document.getElementById('cat_sub_id');
     const subWrapper = document.getElementById('cat-sub-wrapper');
@@ -200,8 +190,8 @@ function selectCategory(cat) {
     }
 }
 
-// --- MARCAS ---
 async function loadBrands() {
+    if (typeof mobileApi === 'undefined') return;
     const res = await mobileApi.getBrands();
     if(res.success) allBrands = res.data;
 }
@@ -257,7 +247,6 @@ async function createNewBrand(name) {
     }
 }
 
-// --- CROPPER ---
 function setupImageCropper() {
     const box = document.getElementById('image-preview-box');
     const fileInput = document.getElementById('image_file');
@@ -284,12 +273,8 @@ function setupImageCropper() {
                     modal.classList.add('is-visible');
                     if(cropper) cropper.destroy();
                     cropper = new Cropper(cropperImg, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        dragMode: 'move',
-                        autoCropArea: 1,
-                        background: false,
-                        responsive: true,
+                        aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 1,
+                        background: false, responsive: true, modal: true
                     });
                 }, 150);
             };
@@ -309,7 +294,6 @@ function setupImageCropper() {
             previewImg.classList.remove('u-hidden');
             removeBtn.classList.remove('u-hidden');
             placeholder.classList.add('u-hidden');
-            
             modal.classList.remove('is-visible');
             setTimeout(() => {
                 modal.classList.add('u-hidden');
@@ -330,7 +314,6 @@ function setupImageCropper() {
     removeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         selectedImageFile = null;
-        originalImageUrl = null;
         previewImg.src = '';
         previewImg.classList.add('u-hidden');
         removeBtn.classList.add('u-hidden');
@@ -347,7 +330,7 @@ function setupSwitch() {
     });
 }
 
-// --- GUARDAR ---
+// --- GUARDAR Y BORRAR ---
 function setupSaveAction() {
     const btn = document.getElementById('btn-save');
     btn.addEventListener('click', async () => {
@@ -365,18 +348,28 @@ function setupSaveAction() {
         btn.disabled = true; btn.textContent = 'Guardando...';
 
         let finalImageUrl = originalImageUrl;
+        let shouldDeleteOld = false;
 
-        // Si cambió la imagen, subirla
+        // Caso 1: Nueva imagen
         if (selectedImageFile) {
             btn.textContent = 'Subiendo imagen...';
             const fileToUpload = new File([selectedImageFile], `prod-${Date.now()}.jpg`, { type: 'image/jpeg' });
             const uploadRes = await mobileApi.uploadProductImage(fileToUpload);
+            
             if(!uploadRes.success) {
                 showToast('Error al subir imagen', 'error');
                 btn.disabled = false; return;
             }
             finalImageUrl = uploadRes.url;
+            shouldDeleteOld = true;
+        } 
+        // Caso 2: Se quitó la imagen
+        else if (!selectedImageFile && document.getElementById('preview-img').classList.contains('u-hidden')) {
+            finalImageUrl = null;
+            shouldDeleteOld = true;
         }
+
+        if (!originalImageUrl) shouldDeleteOld = false;
 
         const finalCategoryId = subCatId ? subCatId : mainCatId;
         const data = {
@@ -387,7 +380,14 @@ function setupSaveAction() {
         };
 
         const res = await mobileApi.updateProduct(currentProductId, data);
+        
         if(res.success) {
+            if (shouldDeleteOld && originalImageUrl) {
+                console.log('🗑️ Ejecutando borrado de imagen antigua...');
+                // Aquí llamamos al servicio que ahora nos avisa si falla
+                await mobileApi.deleteProductImage(originalImageUrl);
+            }
+
             showToast('Producto actualizado', 'success');
             setTimeout(() => history.back(), 1500);
         } else {
@@ -397,12 +397,9 @@ function setupSaveAction() {
     });
 }
 
-// --- ELIMINAR (Provisorio, requiere endpoint) ---
 function setupDeleteAction() {
     const btn = document.getElementById('btn-delete');
     btn.addEventListener('click', () => {
-        // Aquí deberías llamar a mobileApi.deleteProduct(currentProductId)
-        // Por ahora solo muestra un mensaje o confirmación
         if(confirm('¿Eliminar producto?')) {
              showToast('Eliminación en desarrollo', 'info');
         }

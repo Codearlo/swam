@@ -84,6 +84,47 @@ const ProductsService = {
         } catch (error) { console.error(error); return { success: false, error: 'Error al subir imagen' }; }
     },
 
+    // --- FUNCIÓN DE BORRADO ROBUSTA ---
+    async deleteImage(url) {
+        if (!supabaseClient || !url) return { success: false };
+        try {
+            // Limpieza de URL
+            const cleanUrl = url.split('?')[0];
+            
+            // Extraer nombre del archivo del bucket 'product-images'
+            const parts = cleanUrl.split('/product-images/');
+            if (parts.length < 2) {
+                console.warn("⚠️ URL no pertenece a este bucket:", url);
+                return { success: false, error: 'URL externa o inválida' };
+            }
+            
+            // Decodificar (ej: %20 -> espacio)
+            const path = decodeURIComponent(parts.pop());
+            
+            console.log(`🗑️ Eliminando archivo: [${path}]`);
+
+            const { data, error } = await supabaseClient.storage
+                .from('product-images')
+                .remove([path]);
+
+            if (error) {
+                console.error("❌ Error Supabase:", error);
+                throw error;
+            }
+
+            // Verificar si realmente se borró algo
+            if (data && data.length === 0) {
+                console.warn("⚠️ ALERTA: Supabase devolvió un array vacío []. El archivo no se borró. Verifica las Políticas RLS en el dashboard.");
+                return { success: false, error: 'Permiso denegado o archivo no encontrado' };
+            }
+
+            console.log("✅ Archivo eliminado con éxito:", data);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
     async getCategoriesTree() {
         if (!supabaseClient) return { success: false, data: [] };
         try {
@@ -117,18 +158,14 @@ const ProductsService = {
 
     subscribe(callback) {
         if (!supabaseClient) return null;
-        console.log('🔌 Suscribiendo a cambios en productos...');
         const channel = supabaseClient.channel('mobile-products-realtime')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-                if(typeof showToast === 'function') showToast('Actualizando inventario...', 'success'); callback(); 
+                if(typeof showToast === 'function') showToast('Inventario actualizado', 'success'); callback(); 
             })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'batches' }, () => {
-                if(typeof showToast === 'function') showToast('Actualizando stock...', 'success'); callback();
+                if(typeof showToast === 'function') showToast('Stock actualizado', 'success'); callback();
             })
-            .subscribe((status) => {
-                if (status === 'SUBSCRIBED' && typeof showToast === 'function') showToast('Conectado en tiempo real 🟢', 'success');
-                if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') && typeof showToast === 'function') showToast('Error de conexión en vivo 🔴', 'error');
-            });
+            .subscribe();
         return channel;
     }
 };
