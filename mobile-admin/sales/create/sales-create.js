@@ -1,310 +1,215 @@
 /* mobile-admin/sales/create/sales-create.js */
 
-let cart = [];
-let allCustomers = [];
-let paymentMethods = [];
-
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Cargar Datos
-    await Promise.all([loadCustomers(), loadPaymentMethods()]);
-    
-    // 2. Setup Dropdowns Flotantes
-    setupFloatingDropdown('customer-wrapper', 'customer-dropdown');
-    setupFloatingDropdown('product-wrapper', 'product-results');
-    
-    // 3. Lógica
-    setupCustomerSearch();
-    setupProductSearch();
-    setupPaymentLogic();
-    setupCartLogic();
-    setupCheckout();
-    
-    renderCart(); // Render inicial (vacío)
-});
-
-// --- UTILS: DROPDOWN FLOTANTE ---
-function setupFloatingDropdown(wrapperId, dropdownId) {
-    const wrapper = document.getElementById(wrapperId);
-    const dropdown = document.getElementById(dropdownId);
-    if (!wrapper || !dropdown) return;
-
-    document.body.appendChild(dropdown);
-    dropdown.classList.add('dropdown-portal');
-
-    const positionDropdown = () => {
-        const rect = wrapper.getBoundingClientRect();
-        dropdown.style.top = `${rect.bottom + 5}px`;
-        dropdown.style.left = `${rect.left}px`;
-        dropdown.style.width = `${rect.width}px`;
+    // Estado del carrito
+    const cart = {
+        items: [],
+        total: 0,
+        customerId: null,
+        paymentMethodId: null
     };
 
-    const input = wrapper.querySelector('input');
-    if(input) {
-        input.addEventListener('focus', () => {
-            if(input.value.trim().length > 0 || dropdown.children.length > 0) {
-                positionDropdown();
-                dropdown.classList.remove('u-hidden');
-            }
-        });
-        
-        // Actualizar posición al escribir
-        input.addEventListener('input', () => {
-            positionDropdown();
-        });
-    }
-}
+    // Elementos DOM
+    const productSearchInput = document.getElementById('productSearch');
+    const searchResultsContainer = document.getElementById('searchResults');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    
+    // Inicialización
+    init();
 
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.custom-select-container') && !e.target.closest('.dropdown-portal')) {
-        document.querySelectorAll('.dropdown-portal').forEach(d => d.classList.add('u-hidden'));
-    }
-});
-
-// --- 1. CLIENTES ---
-async function loadCustomers() {
-    const res = await mobileApi.getCustomers(1, 100, '', true); // Activos
-    if(res.success) allCustomers = res.data;
-}
-
-function setupCustomerSearch() {
-    const input = document.getElementById('customer_input');
-    const dropdown = document.getElementById('customer-dropdown');
-    const hiddenId = document.getElementById('customer_id');
-
-    input.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allCustomers.filter(c => c.full_name.toLowerCase().includes(term));
-        
-        dropdown.innerHTML = '';
-        if (filtered.length === 0) {
-            dropdown.classList.add('u-hidden');
-            return;
+    async function init() {
+        // Cargar métodos de pago por defecto (opcional)
+        const pmResponse = await mobileApi.getPaymentMethods();
+        if (pmResponse.success && pmResponse.data.length > 0) {
+            cart.paymentMethodId = pmResponse.data[0].id; // Seleccionar el primero por defecto
         }
 
-        filtered.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'dropdown-option';
-            div.textContent = c.full_name;
-            div.onclick = () => {
-                input.value = c.full_name;
-                hiddenId.value = c.id;
-                dropdown.classList.add('u-hidden');
-            };
-            dropdown.appendChild(div);
-        });
-        dropdown.classList.remove('u-hidden');
-    });
-}
+        setupEventListeners();
+        renderCart();
+    }
 
-// --- 2. PRODUCTOS ---
-function setupProductSearch() {
-    const input = document.getElementById('product_input');
-    const dropdown = document.getElementById('product-results');
-    let debounce;
+    function setupEventListeners() {
+        // Buscador de productos
+        let debounceTimer;
+        if (productSearchInput) {
+            productSearchInput.addEventListener('input', (e) => {
+                const term = e.target.value.trim();
+                clearTimeout(debounceTimer);
+                
+                if (term.length < 2) {
+                    searchResultsContainer.style.display = 'none';
+                    return;
+                }
 
-    input.addEventListener('input', (e) => {
-        clearTimeout(debounce);
-        const term = e.target.value.trim();
-        
-        if (term.length < 2) {
-            dropdown.classList.add('u-hidden');
-            return;
+                debounceTimer = setTimeout(async () => {
+                    await searchProducts(term);
+                }, 400);
+            });
         }
 
-        debounce = setTimeout(async () => {
-            const res = await mobileApi.searchProducts(term);
-            dropdown.innerHTML = '';
-            
-            if (res.success && res.data.length > 0) {
-                res.data.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = 'search-result-item';
-                    div.innerHTML = `
-                        <div class="result-info">
-                            <span class="result-name">${p.name}</span>
-                            <span class="result-sku">SKU: ${p.sku}</span>
-                        </div>
-                        <span class="result-price">S/. ${p.price.toFixed(2)}</span>
-                    `;
-                    div.onclick = () => {
-                        addToCart(p);
-                        input.value = ''; // Limpiar buscador
-                        dropdown.classList.add('u-hidden');
-                    };
-                    dropdown.appendChild(div);
-                });
-                dropdown.classList.remove('u-hidden');
-            } else {
-                dropdown.classList.add('u-hidden');
-            }
-        }, 300);
-    });
-}
-
-// --- 3. CARRITO ---
-function addToCart(product) {
-    const existing = cart.find(item => item.id === product.id);
-    if (existing) {
-        existing.qty++;
-    } else {
-        cart.push({ ...product, qty: 1 });
+        // Botón Cobrar
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', handleCheckout);
+        }
     }
-    renderCart();
-    showToast(`${product.name} agregado`, 'success');
-}
 
-function updateQty(index, change) {
-    if (cart[index].qty + change <= 0) {
-        cart.splice(index, 1);
-    } else {
-        cart[index].qty += change;
+    async function searchProducts(term) {
+        const response = await mobileApi.searchProducts(term);
+        
+        if (response.success && response.data.length > 0) {
+            renderSearchResults(response.data);
+        } else {
+            searchResultsContainer.innerHTML = '<div class="p-3 text-center text-muted">No se encontraron productos</div>';
+            searchResultsContainer.style.display = 'block';
+        }
     }
-    renderCart();
-}
 
-function renderCart() {
-    const container = document.getElementById('cart-items-container');
-    const countEl = document.getElementById('cart-count');
-    const totalEl = document.getElementById('footer-total');
-    const btnCheckout = document.getElementById('btn-checkout');
-    const btnClear = document.getElementById('btn-clear-cart');
-
-    let totalQty = 0;
-    let totalPrice = 0;
-
-    container.innerHTML = '';
-
-    cart.forEach((item, index) => {
-        totalQty += item.qty;
-        totalPrice += item.price * item.qty;
-
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-            <div class="item-info">
-                <div class="item-title">${item.name}</div>
-                <div class="item-price">S/. ${item.price.toFixed(2)} x ${item.qty}</div>
-            </div>
-            <div class="item-actions">
-                <button class="qty-btn remove-one">-</button>
-                <div class="qty-val">${item.qty}</div>
-                <button class="qty-btn add-one">+</button>
-            </div>
-        `;
-        
-        // Listeners para botones +/-
-        div.querySelector('.remove-one').onclick = () => updateQty(index, -1);
-        div.querySelector('.add-one').onclick = () => updateQty(index, 1);
-        
-        container.appendChild(div);
-    });
-
-    // Estado Vacío
-    if (cart.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    function renderSearchResults(products) {
+        const html = products.map(p => `
+            <div class="search-item" onclick='addToCart(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
+                <div class="item-info">
+                    <span class="item-name">${p.name}</span>
+                    <span class="item-sku">${p.sku || ''}</span>
                 </div>
-                <p>Busca productos para agregarlos</p>
-            </div>`;
+                <div class="item-price">$${p.price.toFixed(2)}</div>
+            </div>
+        `).join('');
+
+        searchResultsContainer.innerHTML = html;
+        searchResultsContainer.style.display = 'block';
     }
 
-    // Actualizar Totales
-    countEl.textContent = totalQty;
-    totalEl.textContent = `S/. ${totalPrice.toFixed(2)}`;
-    
-    // Habilitar/Deshabilitar botones
-    btnCheckout.disabled = cart.length === 0;
-    if(btnClear) btnClear.disabled = cart.length === 0;
-}
-
-function setupCartLogic() {
-    const btnClear = document.getElementById('btn-clear-cart');
-    if(btnClear) {
-        btnClear.addEventListener('click', () => {
-            if(cart.length > 0 && confirm('¿Vaciar carrito?')) {
-                cart = [];
-                renderCart();
-            }
-        });
-    }
-}
-
-// --- 4. PAGO ---
-async function loadPaymentMethods() {
-    const res = await mobileApi.getPaymentMethods();
-    if(res.success && res.data.length > 0) {
-        paymentMethods = res.data;
-        // Opcional: Renderizar botones si vienen de BD, por ahora usamos los del HTML
-        // Pero mapeamos IDs reales si es necesario.
-    }
-}
-
-function setupPaymentLogic() {
-    const buttons = document.querySelectorAll('.pay-btn');
-    const input = document.getElementById('selected-payment-method');
-    
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            input.value = btn.dataset.id;
-        });
-    });
-}
-
-// --- 5. CHECKOUT (Guardar Venta) ---
-function setupCheckout() {
-    const btn = document.getElementById('btn-checkout');
-    
-    btn.addEventListener('click', async () => {
-        const customerId = document.getElementById('customer_id').value;
-        const paymentMethodId = document.getElementById('selected-payment-method').value;
+    // Función global para añadir al carrito
+    window.addToCart = (product) => {
+        const existing = cart.items.find(i => i.id === product.id);
         
-        // Validación básica
-        if (!customerId) {
-            showToast('Selecciona un cliente', 'error');
-            document.getElementById('customer_input').focus();
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.items.push({ ...product, qty: 1 });
+        }
+        
+        // Limpiar búsqueda
+        if (productSearchInput) productSearchInput.value = '';
+        searchResultsContainer.style.display = 'none';
+        
+        updateCartTotal();
+        renderCart();
+    };
+
+    window.removeFromCart = (index) => {
+        cart.items.splice(index, 1);
+        updateCartTotal();
+        renderCart();
+    };
+
+    window.updateQty = (index, delta) => {
+        const item = cart.items[index];
+        const newQty = item.qty + delta;
+        
+        if (newQty <= 0) {
+            removeFromCart(index);
+        } else {
+            item.qty = newQty;
+            updateCartTotal();
+            renderCart();
+        }
+    };
+
+    function updateCartTotal() {
+        cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        if (totalAmountEl) totalAmountEl.textContent = `$${cart.total.toFixed(2)}`;
+        
+        // Actualizar estado del botón
+        if (checkoutBtn) {
+            checkoutBtn.disabled = cart.items.length === 0;
+            checkoutBtn.style.opacity = cart.items.length === 0 ? '0.5' : '1';
+        }
+    }
+
+    function renderCart() {
+        if (!cartItemsContainer) return;
+
+        if (cart.items.length === 0) {
+            cartItemsContainer.innerHTML = `
+                <div class="empty-cart-state">
+                    <p>El carrito está vacío</p>
+                    <small>Busca productos para agregar</small>
+                </div>`;
             return;
         }
 
-        if (cart.length === 0) return;
+        const html = cart.items.map((item, index) => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">$${item.price.toFixed(2)} x ${item.qty}</div>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                    <span class="qty-val">${item.qty}</span>
+                    <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                </div>
+                <div class="cart-item-total">
+                    $${(item.price * item.qty).toFixed(2)}
+                </div>
+            </div>
+        `).join('');
 
-        btn.disabled = true;
-        btn.innerHTML = 'Procesando...';
+        cartItemsContainer.innerHTML = html;
+    }
 
-        // Calcular total final
-        const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    async function handleCheckout() {
+        if (cart.items.length === 0) return;
+        if (isLoading) return;
 
-        const payload = {
-            customerId: customerId,
-            paymentMethodId: paymentMethodId,
-            total: total,
-            items: cart // En el futuro se guardarán los items también
-        };
+        const confirm = window.confirm(`¿Confirmar venta por $${cart.total.toFixed(2)}?`);
+        if (!confirm) return;
+
+        // Mostrar loading en botón
+        const originalText = checkoutBtn.innerText;
+        checkoutBtn.innerText = 'Procesando...';
+        checkoutBtn.disabled = true;
+        isLoading = true;
 
         try {
-            const res = await mobileApi.createSale(payload);
-            
-            if (res.success) {
-                showToast('¡Venta Exitosa!', 'success');
-                cart = [];
+            // Construir payload
+            const saleData = {
+                total: cart.total,
+                customerId: cart.customerId, // Null = Cliente General
+                paymentMethodId: cart.paymentMethodId,
+                items: cart.items.map(i => ({ 
+                    product_id: i.id, 
+                    quantity: i.qty, 
+                    unit_price: i.price 
+                }))
+            };
+
+            const result = await mobileApi.createSale(saleData);
+
+            if (result.success) {
+                alert('Venta realizada con éxito!');
+                // Reiniciar carrito
+                cart.items = [];
+                updateCartTotal();
                 renderCart();
-                // Limpiar cliente
-                document.getElementById('customer_input').value = '';
-                document.getElementById('customer_id').value = '';
+                // Opcional: Redirigir a historial
+                // window.location.href = '../list/sales-list.html';
             } else {
-                showToast('Error al procesar venta', 'error');
+                alert('Error al crear venta: ' + result.error);
             }
-        } catch (error) {
-            console.error(error);
-            showToast('Error de conexión', 'error');
+        } catch (e) {
+            console.error(e);
+            alert('Error inesperado');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = `Confirmar Venta <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
-            // Si quedó vacío, renderCart lo deshabilitará correctamente
-            if(cart.length === 0) btn.disabled = true;
+            checkoutBtn.innerText = originalText;
+            checkoutBtn.disabled = false;
+            isLoading = false;
         }
-    });
-}
+    }
+    
+    // Variable flag para evitar doble submit
+    let isLoading = false;
+});
