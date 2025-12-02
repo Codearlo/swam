@@ -4,7 +4,10 @@
     
     global.mobileApi = {
         
-        // --- VENTAS ---
+        // ==========================================
+        // 1. MÓDULO DE VENTAS (Delegado a SalesService)
+        // ==========================================
+        
         async getSalesHistory(page, pageSize, searchTerm) {
             if (typeof SalesService === 'undefined') return { success: false, error: 'SalesService no cargado' };
             return await SalesService.getHistory(page, pageSize, searchTerm);
@@ -20,7 +23,10 @@
             return await SalesService.searchProductsForSale(term);
         },
 
-        // --- CLIENTES ---
+        // ==========================================
+        // 2. MÓDULO DE CLIENTES (Delegado a CustomersService)
+        // ==========================================
+
         async getCustomers(page, pageSize, search, onlyActive) {
             if (typeof CustomersService === 'undefined') return { success: false, error: 'CustomersService no cargado' };
             return await CustomersService.getAll(page, pageSize, search, onlyActive);
@@ -56,7 +62,10 @@
             return await CustomersService.getCredits(id);
         },
 
-        // --- PRODUCTOS ---
+        // ==========================================
+        // 3. MÓDULO DE PRODUCTOS (Delegado a ProductsService)
+        // ==========================================
+
         async getProducts(page, pageSize, search, filter) {
             if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
             return await ProductsService.getAll(page, pageSize, search, filter);
@@ -77,12 +86,13 @@
             return await ProductsService.update(id, data);
         },
 
+        // --- ¡ESTAS ERAN LAS FUNCIONES QUE FALTABAN! ---
+        
         async uploadProductImage(file) {
             if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
             return await ProductsService.uploadImage(file);
         },
 
-        // NUEVO: EXPONER FUNCIÓN DE BORRADO
         async deleteProductImage(url) {
             if (typeof ProductsService === 'undefined') return { success: false, error: 'ProductsService no cargado' };
             return await ProductsService.deleteImage(url);
@@ -108,7 +118,10 @@
             return ProductsService.subscribe(callback);
         },
 
-        // --- OTROS ---
+        // ==========================================
+        // 4. OTROS / UTILIDADES
+        // ==========================================
+
         async getPaymentMethods() {
             if (typeof supabaseClient === 'undefined') return { success: false, data: [] };
             try {
